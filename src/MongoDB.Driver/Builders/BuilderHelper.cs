@@ -36,8 +36,7 @@ namespace MongoDB.Driver.Builders
             var info = new BsonSerializationInfo(
                 null,
                 serializer,
-                type,
-                serializer.GetDefaultSerializationOptions());
+                type);
 
             _binder = new SerializationInfoBinder(info, false);
         }
@@ -91,17 +90,6 @@ namespace MongoDB.Driver.Builders
                 var itemSerializationInfo = arraySerializer.GetItemSerializationInfo();
                 if (itemSerializationInfo != null)
                 {
-                    IBsonSerializationOptions itemSerializationOptions = null;
-                    var arrayOptions = serializationInfo.SerializationOptions as ArraySerializationOptions;
-                    if (arrayOptions != null)
-                    {
-                        itemSerializationOptions = arrayOptions.ItemSerializationOptions;
-                        return new BsonSerializationInfo(
-                            itemSerializationInfo.ElementName,
-                            itemSerializationInfo.Serializer,
-                            itemSerializationInfo.NominalType,
-                            itemSerializationOptions);
-                    }
                     return itemSerializationInfo;
                 }
             }

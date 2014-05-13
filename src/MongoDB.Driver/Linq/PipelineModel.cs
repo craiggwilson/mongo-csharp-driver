@@ -90,7 +90,7 @@ namespace MongoDB.Driver.Linq
             }
 
             var serializerType = typeof(AggregateCommandResultSerializer<>).MakeGenericType(Projection.Projector.Parameters[0].Type);
-            var serializer = (IBsonSerializer)Activator.CreateInstance(serializerType, new [] { resultSerializer, null });
+            var serializer = (IBsonSerializer)Activator.CreateInstance(serializerType, new [] { resultSerializer });
 
             var resultType = typeof(AggregateCommandResult<>).MakeGenericType(Projection.Projector.Parameters[0].Type);
 
@@ -98,8 +98,7 @@ namespace MongoDB.Driver.Linq
                 collection.Database.GetCollection("$cmd"),
                 command,
                 collection.Settings.ReadPreference,
-                serializer,
-                null);
+                serializer);
 
             cursor.SetLimit(1);
 

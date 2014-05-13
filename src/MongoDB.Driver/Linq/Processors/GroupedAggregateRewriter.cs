@@ -113,8 +113,7 @@ namespace MongoDB.Driver.Linq.Processors
                         var info = new BsonSerializationInfo(
                             "_agg" + aggregations.Count,
                             serializer,
-                            aggregation.Type,
-                            serializer.GetDefaultSerializationOptions());
+                            aggregation.Type);
 
                         var field = new FieldExpression(aggregation.Aggregation, info, true);
                         aggregations.Add(field);

@@ -1544,10 +1544,11 @@ namespace MongoDB.Driver.Builders
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="QueryBuilder&lt;TDocument&gt;"/> class.
+        /// Initializes a new instance of the <see cref="QueryBuilder&lt;TDocument&gt;" /> class.
         /// </summary>
-        /// <param name="serializationInfoHelper">The serialization info helper.</param>
-        internal QueryBuilder(BsonSerializationInfoHelper serializationInfoHelper)
+        /// <param name="documentSerializationInfo">The document serialization information.</param>
+        /// <param name="isDocumentProjected">if set to <c>true</c> [is document projected].</param>
+        internal QueryBuilder(BsonSerializationInfo documentSerializationInfo, bool isDocumentProjected)
         {
             _predicateTranslator = new PredicateTranslator();
             _helper = new BuilderHelper(documentSerializationInfo, isDocumentProjected);

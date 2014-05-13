@@ -465,7 +465,7 @@ namespace MongoDB.Driver.Linq.Processors
             var documentType = node.Type.GetGenericArguments()[0];
             var collectionExpression = new CollectionExpression(documentType, node);
             var serializer = BsonSerializer.LookupSerializer(documentType);
-            var info = new BsonSerializationInfo(null, serializer, documentType, serializer.GetDefaultSerializationOptions());
+            var info = new BsonSerializationInfo(null, serializer, documentType);
             return new PipelineExpression(
                 new CollectionExpression(documentType, node),
                 new DocumentExpression(

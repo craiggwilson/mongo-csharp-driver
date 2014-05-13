@@ -130,8 +130,7 @@ namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
                     new BsonSerializationInfo(
                         "_id",
                         serializer,
-                        key.Type,
-                        serializer.GetDefaultSerializationOptions()),
+                        key.Type),
                     true);
             }
             else if (key.NodeType == ExpressionType.Constant || key.NodeType == ExpressionType.Parameter)
@@ -142,8 +141,7 @@ namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
                     new BsonSerializationInfo(
                         "_id",
                         serializer,
-                        key.Type,
-                        serializer.GetDefaultSerializationOptions()),
+                        key.Type),
                     true);
             }
 

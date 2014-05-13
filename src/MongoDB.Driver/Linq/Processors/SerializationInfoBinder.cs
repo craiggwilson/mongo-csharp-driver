@@ -116,8 +116,7 @@ namespace MongoDB.Driver.Linq.Processors
                         itemSerializationInfo = new BsonSerializationInfo(
                             index.ToString(),
                             itemSerializationInfo.Serializer,
-                            itemSerializationInfo.NominalType,
-                            itemSerializationInfo.SerializationOptions);
+                            itemSerializationInfo.NominalType);
 
                         var serializationInfo = serializationExpression.SerializationInfo.Merge(itemSerializationInfo);
                         newNode = new FieldExpression(binary, serializationInfo, serializationExpression.IsProjected);
@@ -321,8 +320,7 @@ namespace MongoDB.Driver.Linq.Processors
                         itemSerializationInfo = new BsonSerializationInfo(
                             index.ToString(),
                             itemSerializationInfo.Serializer,
-                            itemSerializationInfo.NominalType,
-                            itemSerializationInfo.SerializationOptions);
+                            itemSerializationInfo.NominalType);
 
                         var serializationInfo = serializationExpression.SerializationInfo.Merge(itemSerializationInfo);
                         return new FieldExpression(methodCallExpression, serializationInfo, serializationExpression.IsProjected);
@@ -363,19 +361,7 @@ namespace MongoDB.Driver.Linq.Processors
                 if (arraySerializer != null)
                 {
                     var index = (int)((ConstantExpression)methodCallExpression.Arguments[0]).Value;
-                    var itemSerializationInfo = arraySerializer.GetItemSerializationInfo();
-                    var itemSerializationOptions = itemSerializationInfo.SerializationOptions;
-                    var arrayOptions = serializationExpression.SerializationInfo.SerializationOptions as ArraySerializationOptions;
-                    if(arrayOptions != null)
-                    {
-                        itemSerializationOptions = arrayOptions.ItemSerializationOptions;
-                    }
-                    itemSerializationInfo = new BsonSerializationInfo(
-                        index.ToString(),
-                        itemSerializationInfo.Serializer,
-                        itemSerializationInfo.NominalType,
-                        itemSerializationOptions);
-
+                    var itemSerializationInfo = arraySerializer.GetItemSerializationInfo().WithNewName(index.ToString());
                     var serializationInfo = serializationExpression.SerializationInfo.Merge(itemSerializationInfo);
                     return new FieldExpression(methodCallExpression, serializationInfo, serializationExpression.IsProjected);
                 }
@@ -443,8 +429,7 @@ namespace MongoDB.Driver.Linq.Processors
             return new BsonSerializationInfo(
                 null,
                 serializer,
-                type,
-                serializer.GetDefaultSerializationOptions());
+                type);
         }
     }
 }

@@ -227,13 +227,13 @@ namespace MongoDB.Driver.Linq
             {
                 //throw new NotImplementedException();
                 var serializer = new ProjectionValueStoreDeserializer(Projection.FieldSerializationInfo);
-                cursor = MongoCursor.Create(typeof(IProjectionValueStore), collection, _query, collection.Settings.ReadPreference, serializer, null);
+                cursor = MongoCursor.Create(typeof(IProjectionValueStore), collection, _query, collection.Settings.ReadPreference, serializer);
                 cursor.SetFields(_fields);
             }
             else
             {
                 var serializer = BsonSerializer.LookupSerializer(DocumentType);
-                cursor = MongoCursor.Create(DocumentType, collection, _query, collection.Settings.ReadPreference, serializer, null);
+                cursor = MongoCursor.Create(DocumentType, collection, _query, collection.Settings.ReadPreference, serializer);
             }
 
             if (_numberToSkip != null)
@@ -312,15 +312,14 @@ namespace MongoDB.Driver.Linq
             };
 
             var serializerType = typeof(DistinctCommandResultSerializer<>).MakeGenericType(_distinctValueSerializationInfo.NominalType);
-            var serializer = (IBsonSerializer)Activator.CreateInstance(serializerType, _distinctValueSerializationInfo.Serializer, _distinctValueSerializationInfo.SerializationOptions);
+            var serializer = (IBsonSerializer)Activator.CreateInstance(serializerType, _distinctValueSerializationInfo.Serializer);
 
             var cursor = MongoCursor.Create(
                 typeof(DistinctCommandResult<>).MakeGenericType(_distinctValueSerializationInfo.NominalType),
                 collection.Database.GetCollection("$cmd"), 
                 command, 
                 collection.Settings.ReadPreference, 
-                serializer, 
-                null);
+                serializer);
 
             cursor.SetLimit(1);
 

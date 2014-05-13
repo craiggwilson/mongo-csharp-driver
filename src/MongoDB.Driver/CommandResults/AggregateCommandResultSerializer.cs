@@ -27,42 +27,30 @@ namespace MongoDB.Driver
     /// Represents a serializer for a AggregateCommandResult with values of type TValue.
     /// </summary>
     /// <typeparam name="TValue">The type of the value.</typeparam>
-    public class AggregateCommandResultSerializer<TValue> : BsonBaseSerializer
+    public class AggregateCommandResultSerializer<TValue> : ClassSerializerBase<AggregateCommandResult<TValue>>
     {
         // private fields
-        private readonly IBsonSerializer _resultSerializer;
-        private readonly IBsonSerializationOptions _resultSerializationOptions;
+        private readonly IBsonSerializer<TValue> _resultSerializer;
 
         // constructors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AggregateCommandResultSerializer{TValue}"/> class.
-        /// </summary>
-        public AggregateCommandResultSerializer()
-            : this(BsonSerializer.LookupSerializer(typeof(TValue)), null)
-        {
-        }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="AggregateCommandResultSerializer{TValue}" /> class.
         /// </summary>
         /// <param name="resultSerializer">The result serializer.</param>
-        /// <param name="resultSerializationOptions">The result serialization options.</param>
-        public AggregateCommandResultSerializer(IBsonSerializer resultSerializer, IBsonSerializationOptions resultSerializationOptions)
+        public AggregateCommandResultSerializer(IBsonSerializer<TValue> resultSerializer)
         {
             _resultSerializer = resultSerializer;
-            _resultSerializationOptions = resultSerializationOptions;
         }
 
         /// <summary>
         /// Deserializes an object from a BsonReader.
         /// </summary>
-        /// <param name="bsonReader">The BsonReader.</param>
-        /// <param name="nominalType">The nominal type of the object.</param>
-        /// <param name="actualType">The actual type of the object.</param>
-        /// <param name="options">The serialization options.</param>
+        /// <param name="context">The context.</param>
         /// <returns>An object.</returns>
-        public override object Deserialize(BsonReader bsonReader, Type nominalType, Type actualType, IBsonSerializationOptions options)
+        protected override AggregateCommandResult<TValue> DeserializeValue(BsonDeserializationContext context)
         {
+            var bsonReader = context.Reader;
+
             var response = new BsonDocument();
             IEnumerable<TValue> results = null;
 
@@ -72,11 +60,11 @@ namespace MongoDB.Driver
                 var name = bsonReader.ReadName();
                 if (name == "result")
                 {
-                    results = ReadResults(bsonReader);
+                    results = ReadResults(context);
                 }
                 else
                 {
-                    var value = (BsonValue)BsonValueSerializer.Instance.Deserialize(bsonReader, typeof(BsonValue), null);
+                    var value = context.DeserializeWithChildContext(BsonValueSerializer.Instance);
                     response.Add(name, value);
                 }
             }
@@ -86,14 +74,15 @@ namespace MongoDB.Driver
         }
 
         // private methods
-        private IEnumerable<TValue> ReadResults(BsonReader bsonReader)
+        private IEnumerable<TValue> ReadResults(BsonDeserializationContext context)
         {
+            var bsonReader = context.Reader;
             var values = new List<TValue>();
 
             bsonReader.ReadStartArray();
             while (bsonReader.ReadBsonType() != BsonType.EndOfDocument)
             {
-                values.Add((TValue)_resultSerializer.Deserialize(bsonReader, typeof(TValue), _resultSerializationOptions));
+                values.Add(context.DeserializeWithChildContext(_resultSerializer));
             }
             bsonReader.ReadEndArray();
 

@@ -111,8 +111,7 @@ namespace MongoDB.Bson.Serialization
             return new BsonSerializationInfo(
                 elementName,
                 newSerializationInfo._serializer,
-                newSerializationInfo._nominalType,
-                newSerializationInfo._serializationOptions);
+                newSerializationInfo._nominalType);
         }
 
         /// <summary>
@@ -168,8 +167,7 @@ namespace MongoDB.Bson.Serialization
             return new BsonSerializationInfo(
                 elementName,
                 _serializer,
-                _nominalType,
-                _serializationOptions);
+                _nominalType);
         }
     }
 }

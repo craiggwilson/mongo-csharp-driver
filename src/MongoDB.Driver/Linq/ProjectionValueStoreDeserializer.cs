@@ -29,7 +29,7 @@ namespace MongoDB.Driver.Linq
     /// <summary>
     /// A deserializer that utilizes a list of BsonSerializationInfos to dump information into an IProjectionValueStore.
     /// </summary>
-    internal class ProjectionValueStoreDeserializer : BsonBaseSerializer
+    internal class ProjectionValueStoreDeserializer : SerializerBase<IProjectionValueStore>
     {
         // private fields
         private readonly Dictionary<string, BsonSerializationInfo> _deserializationMap;
@@ -48,15 +48,12 @@ namespace MongoDB.Driver.Linq
         /// <summary>
         /// Deserializes an object from a BsonReader.
         /// </summary>
-        /// <param name="bsonReader">The BsonReader.</param>
-        /// <param name="nominalType">The nominal type of the object.</param>
-        /// <param name="actualType">The actual type of the object.</param>
-        /// <param name="options">The serialization options.</param>
+        /// <param name="context">The context.</param>
         /// <returns>An object.</returns>
-        public override object Deserialize(BsonReader bsonReader, Type nominalType, Type actualType, IBsonSerializationOptions options)
+        public override IProjectionValueStore Deserialize(BsonDeserializationContext context)
         {
-            var type = bsonReader.GetCurrentBsonType();
-            var store = ReadDocument(bsonReader, null, null, new DocumentProjectionValueStore());
+            var type = context.Reader.GetCurrentBsonType();
+            var store = ReadDocument(context, null, null, new DocumentProjectionValueStore());
             return store;
         }
 
@@ -71,8 +68,9 @@ namespace MongoDB.Driver.Linq
             return prefix + "." + name;
         }
 
-        private IProjectionValueStore ReadArray(BsonReader bsonReader, string currentKey)
+        private IProjectionValueStore ReadArray(BsonDeserializationContext context, string currentKey)
         {
+            var bsonReader = context.Reader;
             bsonReader.ReadStartArray();
             var arrayStore = new ArrayProjectionValueStore();
             BsonType bsonType;
@@ -81,11 +79,11 @@ namespace MongoDB.Driver.Linq
                 var currentBsonType = bsonReader.GetCurrentBsonType();
                 if (currentBsonType == BsonType.Document)
                 {
-                    arrayStore.AddValue(ReadDocument(bsonReader, currentKey, null, new DocumentProjectionValueStore()));
+                    arrayStore.AddValue(ReadDocument(context, currentKey, null, new DocumentProjectionValueStore()));
                 }
                 else if (currentBsonType == BsonType.Array)
                 {
-                    arrayStore.AddValue(ReadArray(bsonReader, currentKey));
+                    arrayStore.AddValue(ReadArray(context, currentKey));
                 }
                 else
                 {
@@ -97,8 +95,9 @@ namespace MongoDB.Driver.Linq
             return arrayStore;
         }
 
-        private IProjectionValueStore ReadDocument(BsonReader bsonReader, string currentKey, string scopeKey, DocumentProjectionValueStore documentStore)
+        private IProjectionValueStore ReadDocument(BsonDeserializationContext context, string currentKey, string scopeKey, DocumentProjectionValueStore documentStore)
         {
+            var bsonReader = context.Reader;
             bsonReader.ReadStartDocument();
             BsonType bsonType;
             while ((bsonType = bsonReader.ReadBsonType()) != BsonType.EndOfDocument)
@@ -109,7 +108,7 @@ namespace MongoDB.Driver.Linq
                 BsonSerializationInfo serializationInfo;
                 if (_deserializationMap.TryGetValue(newCurrentKey, out serializationInfo))
                 {
-                    var value = serializationInfo.Serializer.Deserialize(bsonReader, serializationInfo.NominalType, serializationInfo.SerializationOptions);
+                    var value = context.DeserializeWithChildContext(serializationInfo.Serializer);
                     var singleValueStore = new SingleValueProjectionValueStore();
                     singleValueStore.SetValue(value);
                     documentStore.SetValue(newScopeKey, singleValueStore);
@@ -120,11 +119,11 @@ namespace MongoDB.Driver.Linq
                     if (bsonType == BsonType.Document)
                     {
                         // we are going to read nested documents into the same documentStore to keep them flat, optimized for lookup
-                        ReadDocument(bsonReader, newCurrentKey, newScopeKey, documentStore);
+                        ReadDocument(context, newCurrentKey, newScopeKey, documentStore);
                     }
                     else if (bsonType == BsonType.Array)
                     {
-                        documentStore.SetValue(name, ReadArray(bsonReader, newCurrentKey));
+                        documentStore.SetValue(name, ReadArray(context, newCurrentKey));
                     }
                     else
                     {

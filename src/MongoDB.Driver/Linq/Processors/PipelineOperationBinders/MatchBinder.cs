@@ -90,7 +90,7 @@ namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
                 selectorParameter);
 
             var serializer = BsonSerializer.LookupSerializer(type);
-            var info = new BsonSerializationInfo(null, serializer, type, serializer.GetDefaultSerializationOptions());
+            var info = new BsonSerializationInfo(null, serializer, type);
             var projector = new DocumentExpression(
                 selector.Body,
                 info,

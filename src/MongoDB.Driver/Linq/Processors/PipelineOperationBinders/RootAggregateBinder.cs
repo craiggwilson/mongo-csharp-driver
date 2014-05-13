@@ -119,8 +119,7 @@ namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
                 new BsonSerializationInfo(
                     "_agg0",
                     serializer,
-                    method.ReturnType,
-                    serializer.GetDefaultSerializationOptions()),
+                    method.ReturnType),
                 true);
 
             return new PipelineExpression(

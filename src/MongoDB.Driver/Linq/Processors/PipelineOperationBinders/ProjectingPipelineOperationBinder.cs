@@ -52,7 +52,7 @@ namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
         }
 
         // protected methods
-        private BsonClassMapSerializer BuildSerializerForAnonymousType(NewExpression node)
+        private IBsonSerializer BuildSerializerForAnonymousType(NewExpression node)
         {
             // We are building a serializer specifically for an anonymous type based 
             // on serialization information collected from other serializers.
@@ -82,7 +82,6 @@ namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
 
                 classMap.MapMember(parameterToProperty.Property)
                     .SetSerializer(field.SerializationInfo.Serializer)
-                    .SetSerializationOptions(field.SerializationInfo.SerializationOptions)
                     .SetElementName(parameterToProperty.Property.Name);
                 //TODO: Need to set default value as well...
             }
@@ -91,7 +90,8 @@ namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
             classMap.MapConstructor(node.Constructor, properties.Select(x => x.Name).ToArray());
             classMap.Freeze();
 
-            return new BsonClassMapSerializer(classMap);
+            var serializerType = typeof(BsonClassMapSerializer<>).MakeGenericType(node.Type);
+            return (IBsonSerializer)Activator.CreateInstance(serializerType, classMap);
         }
 
         /// <summary>
@@ -128,8 +128,7 @@ namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
                                 new BsonSerializationInfo(
                                     parameterToProperty.Property.Name,
                                     serializer,
-                                    parameterToProperty.Property.PropertyType,
-                                    serializer.GetDefaultSerializationOptions()),
+                                    parameterToProperty.Property.PropertyType),
                                 true);
                         }
                         else
@@ -162,8 +161,7 @@ namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
             return new BsonSerializationInfo(
                 null,
                 serializer,
-                type,
-                serializer.GetDefaultSerializationOptions());
+                type);
         }
     }
 }

@@ -2617,7 +2617,7 @@ namespace MongoDB.Driver.Tests.Linq.Translators.Methods
             {
                 var aggModel = (PipelineModel)model;
                 Assert.AreEqual(1, aggModel.Pipeline.Count());
-                Assert.AreEqual(aggModel.Pipeline.ElementAt(0)["$match"].ToString(), queryJson);
+                Assert.AreEqual(queryJson, aggModel.Pipeline.ElementAt(0)["$match"].ToString());
             }
 
             Assert.AreEqual(count, query.ToList().Count);

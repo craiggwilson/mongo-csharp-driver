@@ -178,34 +178,22 @@ namespace MongoDB.Driver.Linq.Translators
             var unaryExpression = variableExpression as UnaryExpression;
             if (unaryExpression != null && unaryExpression.NodeType == ExpressionType.ArrayLength)
             {
-                var arrayMemberExpression = unaryExpression.Operand as MemberExpression;
-                if (arrayMemberExpression != null)
-                {
-                    serializationInfo = GetSerializationInfo(arrayMemberExpression);
-                }
+                serializationInfo = GetSerializationInfo(unaryExpression.Operand);
             }
 
             var memberExpression = variableExpression as MemberExpression;
             if (memberExpression != null && memberExpression.Member.Name == "Count")
             {
-                var arrayMemberExpression = memberExpression.Expression as MemberExpression;
-                if (arrayMemberExpression != null)
-                {
-                    serializationInfo = GetSerializationInfo(arrayMemberExpression);
-                }
+                serializationInfo = GetSerializationInfo(memberExpression.Expression);
             }
 
             var methodCallExpression = variableExpression as MethodCallExpression;
             if (methodCallExpression != null && methodCallExpression.Method.Name == "Count" && methodCallExpression.Method.DeclaringType == typeof(Enumerable))
             {
                 var arguments = methodCallExpression.Arguments.ToArray();
-                if (arguments.Length == 1)
+                if (arguments.Length == 1 && arguments[0].Type != typeof(string))
                 {
-                    var arrayMemberExpression = methodCallExpression.Arguments[0] as MemberExpression;
-                    if (arrayMemberExpression != null && arrayMemberExpression.Type != typeof(string))
-                    {
-                        serializationInfo = GetSerializationInfo(arrayMemberExpression);
-                    }
+                    serializationInfo = GetSerializationInfo(arguments[0]);
                 }
             }
 
@@ -1084,26 +1072,18 @@ namespace MongoDB.Driver.Linq.Translators
             }
 
             var memberExpression = variableExpression as MemberExpression;
-            if (memberExpression != null && memberExpression.Member.Name == "Length")
+            if (memberExpression != null && memberExpression.Member.Name == "Length" && memberExpression.Expression.Type == typeof(string))
             {
-                var stringMemberExpression = memberExpression.Expression as MemberExpression;
-                if (stringMemberExpression != null && stringMemberExpression.Type == typeof(string))
-                {
-                    serializationInfo = GetSerializationInfo(stringMemberExpression);
-                }
+                serializationInfo = GetSerializationInfo(memberExpression.Expression);
             }
 
             var methodCallExpression = variableExpression as MethodCallExpression;
             if (methodCallExpression != null && methodCallExpression.Method.Name == "Count" && methodCallExpression.Method.DeclaringType == typeof(Enumerable))
             {
                 var args = methodCallExpression.Arguments.ToArray();
-                if (args.Length == 1)
+                if (args.Length == 1 && args[0].Type == typeof(string))
                 {
-                    var stringMemberExpression = args[0] as MemberExpression;
-                    if (stringMemberExpression != null && stringMemberExpression.Type == typeof(string))
-                    {
-                        serializationInfo = GetSerializationInfo(stringMemberExpression);
-                    }
+                    serializationInfo = GetSerializationInfo(args[0]);
                 }
             }
 

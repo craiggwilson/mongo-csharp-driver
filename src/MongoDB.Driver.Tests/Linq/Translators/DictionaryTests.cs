@@ -52,10 +52,10 @@ namespace MongoDB.Driver.Tests.Linq.Translators
             var hy = new Hashtable { { "y", 1 } };
 
             _collection.Drop();
-            _collection.Insert(new C { D = null, E = null, F = null, G = null, H = null, I = null, J = null, K = null });
-            _collection.Insert(new C { D = de, E = de, F = de, G = de, H = he, I = he, J = he, K = he });
-            _collection.Insert(new C { D = dx, E = dx, F = dx, G = dx, H = hx, I = hx, J = hx, K = hx });
-            _collection.Insert(new C { D = dy, E = dy, F = dy, G = dy, H = hy, I = hy, J = hy, K = hy });
+            _collection.Insert(new C { D = null, E = null, F = null,  H = null, I = null, J = null });
+            _collection.Insert(new C { D = de, E = de, F = de, H = he, I = he, J = he });
+            _collection.Insert(new C { D = dx, E = dx, F = dx, H = hx, I = hx, J = hx });
+            _collection.Insert(new C { D = dy, E = dy, F = dy, H = hy, I = hy, J = hy });
         }
 
         [Test]
@@ -135,16 +135,6 @@ namespace MongoDB.Driver.Tests.Linq.Translators
         {
             var query = from c in CreateQueryable<C>(_collection)
                         where c.F.ContainsKey("x")
-                        select c;
-
-            Assert.Throws<MongoLinqException>(() => { GetQueryModel(query); });
-        }
-
-        [Test]
-        public void TestWhereGContainsKeyX()
-        {
-            var query = from c in CreateQueryable<C>(_collection)
-                        where c.G.ContainsKey("x")
                         select c;
 
             Assert.Throws<MongoLinqException>(() => { GetQueryModel(query); });
@@ -232,16 +222,6 @@ namespace MongoDB.Driver.Tests.Linq.Translators
             Assert.Throws<MongoLinqException>(() => { GetQueryModel(query); });
         }
 
-        [Test]
-        public void TestWhereKContainsKeyX()
-        {
-            var query = from c in CreateQueryable<C>(_collection)
-                        where c.K.Contains("x")
-                        select c;
-
-            Assert.Throws<MongoLinqException>(() => { GetQueryModel(query); });
-        }
-
         private class C
         {
             public ObjectId Id { get; set; }
@@ -252,8 +232,6 @@ namespace MongoDB.Driver.Tests.Linq.Translators
             public IDictionary<string, int> E { get; set; } // serialized as { E : [{ k : "x", v : 1 }, ...] }
             [BsonDictionaryOptions(DictionaryRepresentation.ArrayOfArrays)]
             public IDictionary<string, int> F { get; set; } // serialized as { F : [["x", 1], ... ] }
-            [BsonDictionaryOptions(DictionaryRepresentation.Dynamic)]
-            public IDictionary<string, int> G { get; set; } // serialized form depends on actual key values
 
             [BsonDictionaryOptions(DictionaryRepresentation.Document)]
             public IDictionary H { get; set; } // serialized as { H : { x : 1, ... } }
@@ -261,8 +239,6 @@ namespace MongoDB.Driver.Tests.Linq.Translators
             public IDictionary I { get; set; } // serialized as { I : [{ k : "x", v : 1 }, ...] }
             [BsonDictionaryOptions(DictionaryRepresentation.ArrayOfArrays)]
             public IDictionary J { get; set; } // serialized as { J : [["x", 1], ... ] }
-            [BsonDictionaryOptions(DictionaryRepresentation.Dynamic)]
-            public IDictionary K { get; set; } // serialized form depends on actual key values
         }
     }
 }

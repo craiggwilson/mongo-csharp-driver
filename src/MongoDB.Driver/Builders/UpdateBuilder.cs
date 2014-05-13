@@ -2773,7 +2773,8 @@ namespace MongoDB.Driver.Builders
             }
 
             var serializationInfo = GetSerializationInfo(memberExpression);
-            TODOvar elementQueryBuilder = new QueryBuilder<TValue>();
+            var itemSerializationInfo = GetItemSerializationInfo("Pull", serializationInfo);
+            var elementQueryBuilder = new QueryBuilder<TValue>(itemSerializationInfo, false);
             var elementQuery = elementQueryBuilderFunction(elementQueryBuilder);
             _updateBuilder = _updateBuilder.Pull(serializationInfo.ElementName, elementQuery);
             return this;

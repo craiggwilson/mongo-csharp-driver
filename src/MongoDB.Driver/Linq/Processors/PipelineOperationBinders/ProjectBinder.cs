@@ -71,8 +71,7 @@ namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
                     var info = new BsonSerializationInfo(
                         ScalarProjectionFieldName, // MAGIC STRING!!! It isn't referenced anywhere else in the code.
                         serializer,
-                        projector.Type,
-                        serializer.GetDefaultSerializationOptions());
+                        projector.Type);
                     return new FieldExpression(projector, info, true);
             }
         }

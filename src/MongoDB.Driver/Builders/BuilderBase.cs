@@ -14,11 +14,14 @@
 */
 
 using System;
+using System.Collections.Generic;
+using System.Linq.Expressions;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson.Serialization.Serializers;
+using MongoDB.Driver.Linq.Processors;
 
 namespace MongoDB.Driver.Builders
 {
