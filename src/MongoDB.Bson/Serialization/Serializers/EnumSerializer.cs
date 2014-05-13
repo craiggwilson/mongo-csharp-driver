@@ -28,6 +28,7 @@ namespace MongoDB.Bson.Serialization.Serializers
     public class EnumSerializer<TEnum> : StructSerializerBase<TEnum>, IRepresentationConfigurable<EnumSerializer<TEnum>> where TEnum : struct
     {
         // private fields
+        private readonly int _offset;
         private readonly BsonType _representation;
 
         // constructors
@@ -39,15 +40,27 @@ namespace MongoDB.Bson.Serialization.Serializers
         {
         }
 
+        
         /// <summary>
         /// Initializes a new instance of the <see cref="EnumSerializer{TEnum}"/> class.
         /// </summary>
         /// <param name="representation">The representation.</param>
         public EnumSerializer(BsonType representation)
+            : this(representation, 0)
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EnumSerializer{TEnum}" /> class.
+        /// </summary>
+        /// <param name="representation">The representation.</param>
+        /// <param name="offset">The offset.</param>
+        protected EnumSerializer(BsonType representation, int offset)
         {
             switch (representation)
             {
                 case 0:
+                case BsonType.Double:
                 case BsonType.Int32:
                 case BsonType.Int64:
                 case BsonType.String:
@@ -66,6 +79,7 @@ namespace MongoDB.Bson.Serialization.Serializers
             }
 
             _representation = representation;
+            _offset = offset;
         }
 
         // public properties
@@ -93,9 +107,9 @@ namespace MongoDB.Bson.Serialization.Serializers
             var bsonType = bsonReader.GetCurrentBsonType();
             switch (bsonType)
             {
-                case BsonType.Int32: return (TEnum)Enum.ToObject(typeof(TEnum), bsonReader.ReadInt32());
-                case BsonType.Int64: return (TEnum)Enum.ToObject(typeof(TEnum), bsonReader.ReadInt64());
-                case BsonType.Double: return (TEnum)Enum.ToObject(typeof(TEnum), (long)bsonReader.ReadDouble());
+                case BsonType.Int32: return (TEnum)Enum.ToObject(typeof(TEnum), bsonReader.ReadInt32() - _offset);
+                case BsonType.Int64: return (TEnum)Enum.ToObject(typeof(TEnum), bsonReader.ReadInt64() - _offset);
+                case BsonType.Double: return (TEnum)Enum.ToObject(typeof(TEnum), (long)bsonReader.ReadDouble() - _offset);
                 case BsonType.String: return (TEnum)Enum.Parse(typeof(TEnum), bsonReader.ReadString());
                 default:
                     throw CreateCannotDeserializeFromBsonTypeException(bsonType);
@@ -123,13 +137,16 @@ namespace MongoDB.Bson.Serialization.Serializers
                     {
                         goto case BsonType.Int32;
                     }
+                case BsonType.Double:
+                    bsonWriter.WriteDouble(Convert.ToDouble(value) + _offset);
+                    break;
 
                 case BsonType.Int32:
-                    bsonWriter.WriteInt32(Convert.ToInt32(value));
+                    bsonWriter.WriteInt32(Convert.ToInt32(value) + _offset);
                     break;
 
                 case BsonType.Int64:
-                    bsonWriter.WriteInt64(Convert.ToInt64(value));
+                    bsonWriter.WriteInt64(Convert.ToInt64(value) + _offset);
                     break;
 
                 case BsonType.String:
