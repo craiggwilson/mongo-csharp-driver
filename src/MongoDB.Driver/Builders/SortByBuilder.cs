@@ -21,7 +21,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson.Serialization.Serializers;
-using MongoDB.Driver.Linq.Utils;
+using MongoDB.Driver.Linq.Processors;
 
 namespace MongoDB.Driver.Builders
 {
@@ -199,27 +199,27 @@ namespace MongoDB.Driver.Builders
     /// <typeparam name="TDocument">The type of the document.</typeparam>
     [Serializable]
     [BsonSerializer(typeof(SortByBuilder<>.Serializer))]
-    public class SortByBuilder<TDocument> : BuilderBase, IMongoSortBy
+    public class SortByBuilder<TDocument> : BuilderBase<TDocument>, IMongoSortBy
     {
         // private fields
-        private readonly BsonSerializationInfoHelper _serializationInfoHelper;
         private SortByBuilder _sortByBuilder;
 
         // constructors
         /// <summary>
-        /// Initializes a new instance of the <see cref="SortByBuilder{TDocument}"/> class.
+        /// Initializes a new instance of the <see cref="SortByBuilder&lt;TDocument&gt;"/> class.
         /// </summary>
         public SortByBuilder()
-            : this(new BsonSerializationInfoHelper())
-        { }
+        {
+            _sortByBuilder = new SortByBuilder();
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SortByBuilder{TDocument}" /> class.
         /// </summary>
-        /// <param name="serializationInfoHelper">The serialization info helper.</param>
-        internal SortByBuilder(BsonSerializationInfoHelper serializationInfoHelper)
+        /// <param name="binder">The binder.</param>
+        internal SortByBuilder(SerializationInfoBinder binder)
+            : base(binder)
         {
-            _serializationInfoHelper = serializationInfoHelper;
             _sortByBuilder = new SortByBuilder();
         }
 
@@ -260,7 +260,7 @@ namespace MongoDB.Driver.Builders
         /// <returns>The builder (so method calls can be chained).</returns>
         public SortByBuilder<TDocument> MetaTextScore(Expression<Func<TDocument, object>> memberExpression)
         {
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = GetSerializationInfo(memberExpression);
             _sortByBuilder = _sortByBuilder.MetaTextScore(serializationInfo.ElementName);
             return this;
         }
@@ -274,14 +274,6 @@ namespace MongoDB.Driver.Builders
         public override BsonDocument ToBsonDocument()
         {
             return _sortByBuilder.ToBsonDocument();
-        }
-
-        // private methods
-        private IEnumerable<string> GetElementNames(IEnumerable<Expression<Func<TDocument, object>>> memberExpressions)
-        {
-            return memberExpressions
-                .Select(x => _serializationInfoHelper.GetSerializationInfo(x))
-                .Select(x => x.ElementName);
         }
 
         // nested classes

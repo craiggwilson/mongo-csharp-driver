@@ -21,7 +21,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson.Serialization.Serializers;
-using MongoDB.Driver.Linq.Utils;
+using MongoDB.Driver.Linq.Processors;
 using MongoDB.Driver.Wrappers;
 
 namespace MongoDB.Driver.Builders
@@ -2260,10 +2260,9 @@ namespace MongoDB.Driver.Builders
     /// <typeparam name="TDocument">The type of the document.</typeparam>
     [Serializable]
     [BsonSerializer(typeof(UpdateBuilder<>.Serializer))]
-    public class UpdateBuilder<TDocument> : BuilderBase, IMongoUpdate
+    public class UpdateBuilder<TDocument> : BuilderBase<TDocument>, IMongoUpdate
     {
         // private fields
-        private readonly BsonSerializationInfoHelper _serializationInfoHelper;
         private UpdateBuilder _updateBuilder;
 
         // constructors
@@ -2272,7 +2271,6 @@ namespace MongoDB.Driver.Builders
         /// </summary>
         public UpdateBuilder()
         {
-            _serializationInfoHelper = new BsonSerializationInfoHelper();
             _updateBuilder = new UpdateBuilder();
         }
 
@@ -2293,9 +2291,9 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var itemSerializationInfo = _serializationInfoHelper.GetItemSerializationInfo("AddToSet", serializationInfo);
-            var serializedValue = _serializationInfoHelper.SerializeValue(itemSerializationInfo, value);
+            var serializationInfo = GetSerializationInfo(memberExpression);
+            var itemSerializationInfo = GetItemSerializationInfo("AddToSet", serializationInfo);
+            var serializedValue = itemSerializationInfo.SerializeValue(value);
             _updateBuilder = _updateBuilder.AddToSet(serializationInfo.ElementName, serializedValue);
             return this;
         }
@@ -2320,9 +2318,9 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("values");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var itemSerializationInfo = _serializationInfoHelper.GetItemSerializationInfo("AddToSet", serializationInfo);
-            var serializedValues = _serializationInfoHelper.SerializeValues(itemSerializationInfo, values);
+            var serializationInfo = GetSerializationInfo(memberExpression);
+            var itemSerializationInfo = GetItemSerializationInfo("AddToSet", serializationInfo);
+            var serializedValues = itemSerializationInfo.SerializeValues(values);
             _updateBuilder = _updateBuilder.AddToSetEach(serializationInfo.ElementName, serializedValues);
             return this;
         }
@@ -2342,8 +2340,8 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var serializedValue = _serializationInfoHelper.SerializeValue(serializationInfo, value);
+            var serializationInfo = GetSerializationInfo(memberExpression);
+            var serializedValue = serializationInfo.SerializeValue(value);
             return BitwiseAnd(serializationInfo, serializedValue);
         }
 
@@ -2362,8 +2360,8 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var serializedValue = _serializationInfoHelper.SerializeValue(serializationInfo, value);
+            var serializationInfo = GetSerializationInfo(memberExpression);
+            var serializedValue = serializationInfo.SerializeValue(value);
             return BitwiseAnd(serializationInfo, serializedValue);
         }
 
@@ -2382,8 +2380,8 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var serializedValue = _serializationInfoHelper.SerializeValue(serializationInfo, value);
+            var serializationInfo = GetSerializationInfo(memberExpression);
+            var serializedValue = serializationInfo.SerializeValue(value);
             return BitwiseOr(serializationInfo, serializedValue);
         }
 
@@ -2402,8 +2400,8 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var serializedValue = _serializationInfoHelper.SerializeValue(serializationInfo, value);
+            var serializationInfo = GetSerializationInfo(memberExpression);
+            var serializedValue = serializationInfo.SerializeValue(value);
             return BitwiseOr(serializationInfo, serializedValue);
         }
 
@@ -2422,8 +2420,8 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var serializedValue = _serializationInfoHelper.SerializeValue(serializationInfo, value);
+            var serializationInfo = GetSerializationInfo(memberExpression);
+            var serializedValue = serializationInfo.SerializeValue(value);
             return BitwiseXor(serializationInfo, serializedValue);
         }
 
@@ -2442,8 +2440,8 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var serializedValue = _serializationInfoHelper.SerializeValue(serializationInfo, value);
+            var serializationInfo = GetSerializationInfo(memberExpression);
+            var serializedValue = serializationInfo.SerializeValue(value);
             return BitwiseXor(serializationInfo, serializedValue);
         }
 
@@ -2472,7 +2470,7 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = GetSerializationInfo(memberExpression);
             var dateTimeSerializer = serializationInfo.Serializer as DateTimeSerializer;
             var externalRepresentation = dateTimeSerializer.Representation;
 
@@ -2502,7 +2500,7 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = GetSerializationInfo(memberExpression);
             _updateBuilder.CurrentDate(serializationInfo.ElementName, UpdateCurrentDateType.Date);
             return this;
         }
@@ -2521,7 +2519,7 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = GetSerializationInfo(memberExpression);
              _updateBuilder.CurrentDate(serializationInfo.ElementName, UpdateCurrentDateType.Timestamp);
             return this;
         }
@@ -2541,8 +2539,8 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var serializedValue = _serializationInfoHelper.SerializeValue(serializationInfo, value);
+            var serializationInfo = GetSerializationInfo(memberExpression);
+            var serializedValue = serializationInfo.SerializeValue(value);
             return Inc(serializationInfo, serializedValue);
         }
 
@@ -2561,8 +2559,8 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var serializedValue = _serializationInfoHelper.SerializeValue(serializationInfo, value);
+            var serializationInfo = GetSerializationInfo(memberExpression);
+            var serializedValue = serializationInfo.SerializeValue(value);
             return Inc(serializationInfo, serializedValue);
         }
 
@@ -2581,8 +2579,8 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var serializedValue = _serializationInfoHelper.SerializeValue(serializationInfo, value);
+            var serializationInfo = GetSerializationInfo(memberExpression);
+            var serializedValue = serializationInfo.SerializeValue(value);
             return Inc(serializationInfo, serializedValue);
         }
 
@@ -2603,8 +2601,8 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var serializedValue = _serializationInfoHelper.SerializeValue(serializationInfo, value);
+            var serializationInfo = GetSerializationInfo(memberExpression);
+            var serializedValue = serializationInfo.SerializeValue(value);
             _updateBuilder = _updateBuilder.Max(serializationInfo.ElementName, BsonValue.Create(serializedValue));
             return this;
         }
@@ -2625,8 +2623,8 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var serializedValue = _serializationInfoHelper.SerializeValue(serializationInfo, value);
+            var serializationInfo = GetSerializationInfo(memberExpression);
+            var serializedValue = serializationInfo.SerializeValue(value);
             _updateBuilder = _updateBuilder.Min(serializationInfo.ElementName, BsonValue.Create(serializedValue));
             return this;
         }
@@ -2646,8 +2644,8 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var serializedValue = _serializationInfoHelper.SerializeValue(serializationInfo, value);
+            var serializationInfo = GetSerializationInfo(memberExpression);
+            var serializedValue = serializationInfo.SerializeValue(value);
             return Mul(serializationInfo, serializedValue);
         }
 
@@ -2666,8 +2664,8 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var serializedValue = _serializationInfoHelper.SerializeValue(serializationInfo, value);
+            var serializationInfo = GetSerializationInfo(memberExpression);
+            var serializedValue = serializationInfo.SerializeValue(value);
             return Mul(serializationInfo, serializedValue);
         }
 
@@ -2686,8 +2684,8 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var serializedValue = _serializationInfoHelper.SerializeValue(serializationInfo, value);
+            var serializationInfo = GetSerializationInfo(memberExpression);
+            var serializedValue = serializationInfo.SerializeValue(value);
             return Mul(serializationInfo, serializedValue);
         }
 
@@ -2706,7 +2704,7 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = GetSerializationInfo(memberExpression);
             _updateBuilder = _updateBuilder.PopFirst(serializationInfo.ElementName);
             return this;
         }
@@ -2726,7 +2724,7 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = GetSerializationInfo(memberExpression);
             _updateBuilder = _updateBuilder.PopLast(serializationInfo.ElementName);
             return this;
         }
@@ -2747,9 +2745,9 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var itemSerializationInfo = _serializationInfoHelper.GetItemSerializationInfo("Pull", serializationInfo);
-            var serializedValue = _serializationInfoHelper.SerializeValue(itemSerializationInfo, value);
+            var serializationInfo = GetSerializationInfo(memberExpression);
+            var itemSerializationInfo = GetItemSerializationInfo("Pull", serializationInfo);
+            var serializedValue = itemSerializationInfo.SerializeValue(value);
             _updateBuilder = _updateBuilder.Pull(serializationInfo.ElementName, serializedValue);
             return this;
         }
@@ -2774,9 +2772,8 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("elementQueryBuilderFunction");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var itemSerializationInfo = _serializationInfoHelper.GetItemSerializationInfo("Pull", serializationInfo);
-            var elementQueryBuilder = new QueryBuilder<TValue>(_serializationInfoHelper);
+            var serializationInfo = GetSerializationInfo(memberExpression);
+            TODOvar elementQueryBuilder = new QueryBuilder<TValue>();
             var elementQuery = elementQueryBuilderFunction(elementQueryBuilder);
             _updateBuilder = _updateBuilder.Pull(serializationInfo.ElementName, elementQuery);
             return this;
@@ -2802,9 +2799,9 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("values");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var itemSerializationInfo = _serializationInfoHelper.GetItemSerializationInfo("PullAll", serializationInfo);
-            var serializedValues = _serializationInfoHelper.SerializeValues(itemSerializationInfo, values);
+            var serializationInfo = GetSerializationInfo(memberExpression);
+            var itemSerializationInfo = GetItemSerializationInfo("PullAll", serializationInfo);
+            var serializedValues = itemSerializationInfo.SerializeValues(values);
             _updateBuilder = _updateBuilder.PullAll(serializationInfo.ElementName, serializedValues);
             return this;
         }
@@ -2825,9 +2822,9 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var itemSerializationInfo = _serializationInfoHelper.GetItemSerializationInfo("Push", serializationInfo);
-            var serializedValue = _serializationInfoHelper.SerializeValue(itemSerializationInfo, value);
+            var serializationInfo = GetSerializationInfo(memberExpression);
+            var itemSerializationInfo = GetItemSerializationInfo("Push", serializationInfo);
+            var serializedValue = itemSerializationInfo.SerializeValue(value);
             _updateBuilder = _updateBuilder.Push(serializationInfo.ElementName, serializedValue);
             return this;
         }
@@ -2852,9 +2849,9 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("values");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var itemSerializationInfo = _serializationInfoHelper.GetItemSerializationInfo("PushAll", serializationInfo);
-            var serializedValues = _serializationInfoHelper.SerializeValues(itemSerializationInfo, values);
+            var serializationInfo = GetSerializationInfo(memberExpression);
+            var itemSerializationInfo = GetItemSerializationInfo("PushAll", serializationInfo);
+            var serializedValues = itemSerializationInfo.SerializeValues(values);
             _updateBuilder = _updateBuilder.PushAll(serializationInfo.ElementName, serializedValues);
             return this;
         }
@@ -2890,9 +2887,9 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("values");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var itemSerializationInfo = _serializationInfoHelper.GetItemSerializationInfo("PushEach", serializationInfo);
-            var serializedValues = _serializationInfoHelper.SerializeValues(itemSerializationInfo, values);
+            var serializationInfo = GetSerializationInfo(memberExpression);
+            var itemSerializationInfo = GetItemSerializationInfo("PushEach", serializationInfo);
+            var serializedValues = itemSerializationInfo.SerializeValues(values);
             _updateBuilder = _updateBuilder.PushEach(serializationInfo.ElementName, options, serializedValues);
             return this;
         }
@@ -2920,7 +2917,9 @@ namespace MongoDB.Driver.Builders
             PushEachOptions pushEachOptions = null;
             if (options != null)
             {
-                var pushEachOptionsBuilder = new PushEachOptionsBuilder<TValue>(_serializationInfoHelper);
+                var serializationInfo = GetSerializationInfo(memberExpression);
+                var itemSerializationInfo = GetItemSerializationInfo("PushEach", serializationInfo);
+                var pushEachOptionsBuilder = new PushEachOptionsBuilder<TValue>(new SerializationInfoBinder(itemSerializationInfo, false));
                 options(pushEachOptionsBuilder);
                 pushEachOptions = pushEachOptionsBuilder.Build();
             }
@@ -2944,8 +2943,8 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var serializedValue = _serializationInfoHelper.SerializeValue(serializationInfo, value);
+            var serializationInfo = GetSerializationInfo(memberExpression);
+            var serializedValue = serializationInfo.SerializeValue(value);
             _updateBuilder = _updateBuilder.Set(serializationInfo.ElementName, serializedValue);
             return this;
         }
@@ -2967,8 +2966,8 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var serializedValue = _serializationInfoHelper.SerializeValue(serializationInfo, value);
+            var serializationInfo = GetSerializationInfo(memberExpression);
+            var serializedValue = serializationInfo.SerializeValue(value);
             _updateBuilder = _updateBuilder.SetOnInsert(serializationInfo.ElementName, serializedValue);
             return this;
         }
@@ -2999,7 +2998,7 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = GetSerializationInfo(memberExpression);
             _updateBuilder = _updateBuilder.Unset(serializationInfo.ElementName);
             return this;
         }

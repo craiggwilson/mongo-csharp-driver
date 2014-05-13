@@ -17,12 +17,14 @@ using System.Linq;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
+using MongoDB.Driver.Tests.Linq;
 using NUnit.Framework;
 
 namespace MongoDB.Driver.Tests.Jira.CSharp418
 {
     [TestFixture]
-    public class CSharp418Tests
+    [Category("Linq")]
+    public class CSharp418Tests : LinqTestBase
     {
         public class C
         {
@@ -57,19 +59,9 @@ namespace MongoDB.Driver.Tests.Jira.CSharp418
                         where d.X == 1
                         select d;
 
-            var translatedQuery = MongoQueryTranslator.Translate(query);
-            Assert.IsInstanceOf<SelectQuery>(translatedQuery);
-            Assert.AreSame(_collection, translatedQuery.Collection);
-            Assert.AreSame(typeof(D), translatedQuery.DocumentType);
+            var model = GetQueryModel(query);
 
-            var selectQuery = (SelectQuery)translatedQuery;
-            Assert.AreEqual("(D d) => (d.X == 1)", ExpressionFormatter.ToString(selectQuery.Where));
-            Assert.IsNull(selectQuery.OrderBy);
-            Assert.IsNull(selectQuery.Projection);
-            Assert.IsNull(selectQuery.Skip);
-            Assert.IsNull(selectQuery.Take);
-
-            Assert.AreEqual("{ \"X\" : 1 }", selectQuery.BuildQuery().ToJson());
+            Assert.AreEqual("{ \"X\" : 1 }", model.Query.ToJson());
             Assert.AreEqual(1, query.ToList().Count);
         }
     }

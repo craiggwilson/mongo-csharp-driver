@@ -1,4 +1,4 @@
-﻿/* Copyright 2010-2014 MongoDB Inc.
+﻿/* Copyright 2010-2012 10gen Inc.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -16,14 +16,16 @@
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 
-namespace MongoDB.Driver.Linq
+namespace MongoDB.Driver.Linq.Expressions
 {
     /// <summary>
     /// An abstract base class for an Expression visitor.
     /// </summary>
-    public abstract class ExpressionVisitor
+    internal abstract class ExpressionVisitor
     {
         // constructors
         /// <summary>
@@ -38,7 +40,7 @@ namespace MongoDB.Driver.Linq
         /// Visits an Expression.
         /// </summary>
         /// <param name="node">The Expression.</param>
-        /// <returns>The Expression (posibly modified).</returns>
+        /// <returns>The Expression (possibly modified).</returns>
         protected virtual Expression Visit(Expression node)
         {
             if (node == null)
@@ -105,9 +107,9 @@ namespace MongoDB.Driver.Linq
                     return this.VisitMemberInit((MemberInitExpression)node);
                 case ExpressionType.ListInit:
                     return this.VisitListInit((ListInitExpression)node);
-                default:
-                    throw new Exception(string.Format("Unhandled expression type: '{0}'", node.NodeType));
             }
+
+            throw LinqErrors.UnsupportedExpression(node);
         }
 
         /// <summary>

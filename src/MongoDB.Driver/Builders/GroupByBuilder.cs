@@ -20,7 +20,6 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson.Serialization.Serializers;
-using MongoDB.Driver.Linq.Utils;
 
 namespace MongoDB.Driver.Builders
 {
@@ -138,10 +137,9 @@ namespace MongoDB.Driver.Builders
     /// </summary>
     /// <typeparam name="TDocument">The type of the document.</typeparam>
     [BsonSerializer(typeof(GroupByBuilder<>.Serializer))]
-    public class GroupByBuilder<TDocument> : BuilderBase, IMongoGroupBy
+    public class GroupByBuilder<TDocument> : BuilderBase<TDocument>, IMongoGroupBy
     {
         // private fields
-        private readonly BsonSerializationInfoHelper _serializationInfoHelper;
         private GroupByBuilder _groupByBuilder;
 
         // constructors
@@ -150,7 +148,6 @@ namespace MongoDB.Driver.Builders
         /// </summary>
         public GroupByBuilder()
         {
-            _serializationInfoHelper = new BsonSerializationInfoHelper();
             _groupByBuilder = new GroupByBuilder();
         }
 
@@ -162,9 +159,7 @@ namespace MongoDB.Driver.Builders
         /// <returns>The builder (so method calls can be chained).</returns>
         public GroupByBuilder<TDocument> Keys(params Expression<Func<TDocument, object>>[] memberExpressions)
         {
-            var names = memberExpressions
-                .Select(x => _serializationInfoHelper.GetSerializationInfo(x))
-                .Select(x => x.ElementName);
+            var names = GetElementNames(memberExpressions);
 
             _groupByBuilder = _groupByBuilder.Keys(names.ToArray());
             return this;

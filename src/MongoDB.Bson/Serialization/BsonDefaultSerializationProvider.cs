@@ -67,6 +67,7 @@ namespace MongoDB.Bson.Serialization
                 { typeof(CultureInfo), typeof(CultureInfoSerializer) },
                 { typeof(DateTime), typeof(DateTimeSerializer) },
                 { typeof(DateTimeOffset), typeof(DateTimeOffsetSerializer) },
+                { typeof(DayOfWeek), typeof(DayOfWeekSerializer) },
                 { typeof(Decimal), typeof(DecimalSerializer) },
                 { typeof(Double), typeof(DoubleSerializer) },
                 { typeof(ExpandoObject), typeof(ExpandoObjectSerializer) },

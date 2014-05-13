@@ -21,31 +21,19 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using MongoDB.Bson;
+using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Options;
 using MongoDB.Driver.Builders;
-using MongoDB.Driver.Linq.Utils;
+using MongoDB.Driver.Linq.Expressions;
 
-namespace MongoDB.Driver.Linq
+namespace MongoDB.Driver.Linq.Translators
 {
     /// <summary>
     /// Translates an expression tree into an IMongoQuery.
     /// </summary>
     internal class PredicateTranslator
     {
-        // private fields
-        private readonly BsonSerializationInfoHelper _serializationInfoHelper;
-
-        // constructors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PredicateTranslator"/> class.
-        /// </summary>
-        /// <param name="serializationHelper">The serialization helper.</param>
-        public PredicateTranslator(BsonSerializationInfoHelper serializationHelper)
-        {
-            _serializationInfoHelper = serializationHelper;
-        }
-
         // public methods
         /// <summary>
         /// Builds an IMongoQuery from an expression.
@@ -73,6 +61,10 @@ namespace MongoDB.Driver.Linq
                 case ExpressionType.Constant:
                     query = BuildConstantQuery((ConstantExpression)expression);
                     break;
+                case ExpressionType.Convert:
+                case ExpressionType.ConvertChecked:
+                    query = BuildConvertQuery((UnaryExpression)expression);
+                    break;
                 case ExpressionType.Equal:
                 case ExpressionType.GreaterThan:
                 case ExpressionType.GreaterThanOrEqual:
@@ -96,12 +88,17 @@ namespace MongoDB.Driver.Linq
                 case ExpressionType.TypeIs:
                     query = BuildTypeIsQuery((TypeBinaryExpression)expression);
                     break;
+                default:
+                    if (expression.NodeType == (ExpressionType)LinqToMongoExpressionType.Field)
+                    {
+                        query = BuildBooleanQuery(expression);
+                    }
+                    break;
             }
 
             if (query == null)
             {
-                var message = string.Format("Unsupported where clause: {0}.", ExpressionFormatter.ToString(expression));
-                throw new ArgumentException(message);
+                throw LinqErrors.UnsupportedExpression(expression);
             }
 
             return query;
@@ -128,7 +125,7 @@ namespace MongoDB.Driver.Linq
             if (methodCallExpression.Method.DeclaringType == typeof(Enumerable))
             {
                 var arguments = methodCallExpression.Arguments.ToArray();
-                var serializationInfo = _serializationInfoHelper.GetSerializationInfo(arguments[0]);
+                var serializationInfo = GetSerializationInfo(arguments[0]);
                 if (arguments.Length == 1)
                 {
                     return Query.And(
@@ -137,7 +134,7 @@ namespace MongoDB.Driver.Linq
                 }
                 else if (arguments.Length == 2)
                 {
-                    var itemSerializationInfo = _serializationInfoHelper.GetItemSerializationInfo("Any", serializationInfo);
+                    var itemSerializationInfo = GetItemSerializationInfo("Any", serializationInfo);
                     if (!(itemSerializationInfo.Serializer is IBsonDocumentSerializer))
                     {
                         var message = string.Format("Any is only support for items that serialize into documents. The current serializer is {0} and must implement {1} for participation in Any queries.",
@@ -145,9 +142,7 @@ namespace MongoDB.Driver.Linq
                             BsonUtils.GetFriendlyTypeName(typeof(IBsonDocumentSerializer)));
                         throw new NotSupportedException(message);
                     }
-                    var itemSerializer = itemSerializationInfo.Serializer;
                     var lambda = (LambdaExpression)arguments[1];
-                    _serializationInfoHelper.RegisterExpressionSerializer(lambda.Parameters[0], itemSerializer);
                     var query = BuildQuery(lambda.Body);
                     return Query.ElemMatch(serializationInfo.ElementName, query);
                 }
@@ -186,7 +181,7 @@ namespace MongoDB.Driver.Linq
                 var arrayMemberExpression = unaryExpression.Operand as MemberExpression;
                 if (arrayMemberExpression != null)
                 {
-                    serializationInfo = _serializationInfoHelper.GetSerializationInfo(arrayMemberExpression);
+                    serializationInfo = GetSerializationInfo(arrayMemberExpression);
                 }
             }
 
@@ -196,7 +191,7 @@ namespace MongoDB.Driver.Linq
                 var arrayMemberExpression = memberExpression.Expression as MemberExpression;
                 if (arrayMemberExpression != null)
                 {
-                    serializationInfo = _serializationInfoHelper.GetSerializationInfo(arrayMemberExpression);
+                    serializationInfo = GetSerializationInfo(arrayMemberExpression);
                 }
             }
 
@@ -209,7 +204,7 @@ namespace MongoDB.Driver.Linq
                     var arrayMemberExpression = methodCallExpression.Arguments[0] as MemberExpression;
                     if (arrayMemberExpression != null && arrayMemberExpression.Type != typeof(string))
                     {
-                        serializationInfo = _serializationInfoHelper.GetSerializationInfo(arrayMemberExpression);
+                        serializationInfo = GetSerializationInfo(arrayMemberExpression);
                     }
                 }
             }
@@ -258,7 +253,7 @@ namespace MongoDB.Driver.Linq
                     return BuildBooleanQuery((bool)constantExpression.Value);
                 }
 
-                var serializationInfo = _serializationInfoHelper.GetSerializationInfo(expression);
+                var serializationInfo = GetSerializationInfo(expression);
                 return new QueryDocument(serializationInfo.ElementName, true);
             }
             return null;
@@ -266,7 +261,6 @@ namespace MongoDB.Driver.Linq
 
         private IMongoQuery BuildComparisonQuery(BinaryExpression binaryExpression)
         {
-            // the constant could be on either side
             var variableExpression = binaryExpression.Left;
             var constantExpression = binaryExpression.Right as ConstantExpression;
             var operatorType = binaryExpression.NodeType;
@@ -334,7 +328,7 @@ namespace MongoDB.Driver.Linq
                     var enumType = unaryExpression.Operand.Type;
                     if (unaryExpression.Type == Enum.GetUnderlyingType(enumType))
                     {
-                        serializationInfo = _serializationInfoHelper.GetSerializationInfo(unaryExpression.Operand);
+                        serializationInfo = GetSerializationInfo(unaryExpression.Operand);
                         value = Enum.ToObject(enumType, value); // serialize enum instead of underlying integer
                     }
                 }
@@ -348,7 +342,7 @@ namespace MongoDB.Driver.Linq
                     var enumType = unaryExpression.Operand.Type.GetGenericArguments()[0];
                     if (unaryExpression.Type.GetGenericArguments()[0] == Enum.GetUnderlyingType(enumType))
                     {
-                        serializationInfo = _serializationInfoHelper.GetSerializationInfo(unaryExpression.Operand);
+                        serializationInfo = GetSerializationInfo(unaryExpression.Operand);
                         if (value != null)
                         {
                             value = Enum.ToObject(enumType, value); // serialize enum instead of underlying integer
@@ -358,7 +352,7 @@ namespace MongoDB.Driver.Linq
                 else
                 {
                     //Allows a cast, which would be required for compilation, such as (float){object} >= 25f to be built as Query.GTE({object}, 25)
-                    serializationInfo = _serializationInfoHelper.GetSerializationInfo(unaryExpression.Operand);
+                    serializationInfo = GetSerializationInfo(unaryExpression.Operand);
                 }
             }
             else
@@ -375,12 +369,12 @@ namespace MongoDB.Driver.Linq
                     return isTrueComparison ? query : Query.Not(query);
                 }
 
-                serializationInfo = _serializationInfoHelper.GetSerializationInfo(variableExpression);
+                serializationInfo = GetSerializationInfo(variableExpression);
             }
 
             if (serializationInfo != null)
             {
-                var serializedValue = _serializationInfoHelper.SerializeValue(serializationInfo, value);
+                var serializedValue = serializationInfo.SerializeValue(value);
                 switch (operatorType)
                 {
                     case ExpressionType.Equal: return Query.EQ(serializationInfo.ElementName, serializedValue);
@@ -413,12 +407,12 @@ namespace MongoDB.Driver.Linq
                 var arguments = methodCallExpression.Arguments.ToArray();
                 if (arguments.Length == 2)
                 {
-                    var serializationInfo = _serializationInfoHelper.GetSerializationInfo(arguments[0]);
+                    var serializationInfo = GetSerializationInfo(arguments[0]);
                     var valuesExpression = arguments[1] as ConstantExpression;
                     if (valuesExpression != null)
                     {
-                        var itemSerializationInfo = _serializationInfoHelper.GetItemSerializationInfo("ContainsAll", serializationInfo);
-                        var serializedValues = _serializationInfoHelper.SerializeValues(itemSerializationInfo, (IEnumerable)valuesExpression.Value);
+                        var itemSerializationInfo = GetItemSerializationInfo("ContainsAll", serializationInfo);
+                        var serializedValues = itemSerializationInfo.SerializeValues((IEnumerable)valuesExpression.Value);
                         return Query.All(serializationInfo.ElementName, serializedValues);
                     }
                 }
@@ -433,12 +427,12 @@ namespace MongoDB.Driver.Linq
                 var arguments = methodCallExpression.Arguments.ToArray();
                 if (arguments.Length == 2)
                 {
-                    var serializationInfo = _serializationInfoHelper.GetSerializationInfo(arguments[0]);
+                    var serializationInfo = GetSerializationInfo(arguments[0]);
                     var valuesExpression = arguments[1] as ConstantExpression;
                     if (valuesExpression != null)
                     {
-                        var itemSerializationInfo = _serializationInfoHelper.GetItemSerializationInfo("ContainsAny", serializationInfo);
-                        var serializedValues = _serializationInfoHelper.SerializeValues(itemSerializationInfo, (IEnumerable)valuesExpression.Value);
+                        var itemSerializationInfo = GetItemSerializationInfo("ContainsAny", serializationInfo);
+                        var serializedValues = itemSerializationInfo.SerializeValues((IEnumerable)valuesExpression.Value);
                         return Query.In(serializationInfo.ElementName, serializedValues);
                     }
                 }
@@ -499,7 +493,7 @@ namespace MongoDB.Driver.Linq
             }
             var key = constantExpression.Value;
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(methodCallExpression.Object);
+            var serializationInfo = GetSerializationInfo(methodCallExpression.Object);
             var serializer = serializationInfo.Serializer;
 
             var dictionarySerializer = serializer as IBsonDictionarySerializer;
@@ -516,7 +510,7 @@ namespace MongoDB.Driver.Linq
                 null, // elementName
                 keySerializer,
                 keySerializer.ValueType);
-            var serializedKey = _serializationInfoHelper.SerializeValue(keySerializationInfo, key);
+            var serializedKey = keySerializationInfo.SerializeValue(key);
 
             var dictionaryRepresentation = dictionarySerializer.DictionaryRepresentation;
             switch (dictionaryRepresentation)
@@ -559,7 +553,7 @@ namespace MongoDB.Driver.Linq
             {
                 if (typeof(IEnumerable).IsAssignableFrom(methodCallExpression.Method.DeclaringType))
                 {
-                    serializationInfo = _serializationInfoHelper.GetSerializationInfo(methodCallExpression.Object);
+                    serializationInfo = GetSerializationInfo(methodCallExpression.Object);
                     valueExpression = arguments[0] as ConstantExpression;
                 }
             }
@@ -571,19 +565,26 @@ namespace MongoDB.Driver.Linq
                     {
                         return BuildInQuery(methodCallExpression);
                     }
-                    serializationInfo = _serializationInfoHelper.GetSerializationInfo(arguments[0]);
+                    serializationInfo = GetSerializationInfo(arguments[0]);
                     valueExpression = arguments[1] as ConstantExpression;
                 }
             }
 
             if (serializationInfo != null && valueExpression != null)
             {
-                var itemSerializationInfo = _serializationInfoHelper.GetItemSerializationInfo("Contains", serializationInfo);
-                var serializedValue = _serializationInfoHelper.SerializeValue(itemSerializationInfo, valueExpression.Value);
+                var itemSerializationInfo = GetItemSerializationInfo("Contains", serializationInfo);
+                var serializedValue = itemSerializationInfo.SerializeValue(valueExpression.Value);
                 return Query.EQ(serializationInfo.ElementName, serializedValue);
             }
 
             return null;
+        }
+
+        private IMongoQuery BuildConvertQuery(UnaryExpression unaryExpression)
+        {
+            // the conversion operator in this case is purely for the expression tree
+            // and holds no consequence to a mongodb query.
+            return BuildQuery(unaryExpression.Operand);
         }
 
         private IMongoQuery BuildEqualsQuery(MethodCallExpression methodCallExpression)
@@ -649,7 +650,7 @@ namespace MongoDB.Driver.Linq
             {
                 if (arguments.Length == 2)
                 {
-                    serializationInfo = _serializationInfoHelper.GetSerializationInfo(arguments[0]);
+                    serializationInfo = GetSerializationInfo(arguments[0]);
                     valuesExpression = arguments[1] as ConstantExpression;
                 }
             }
@@ -657,7 +658,7 @@ namespace MongoDB.Driver.Linq
             {
                 if (arguments.Length == 2)
                 {
-                    serializationInfo = _serializationInfoHelper.GetSerializationInfo(arguments[1]);
+                    serializationInfo = GetSerializationInfo(arguments[1]);
                     valuesExpression = arguments[0] as ConstantExpression;
                 }
             }
@@ -671,14 +672,14 @@ namespace MongoDB.Driver.Linq
                 bool contains = methodDeclaringType == typeof(ICollection<>) || methodDeclaringType.GetInterface("ICollection`1") != null;
                 if (contains && arguments.Length == 1)
                 {
-                    serializationInfo = _serializationInfoHelper.GetSerializationInfo(arguments[0]);
+                    serializationInfo = GetSerializationInfo(arguments[0]);
                     valuesExpression = methodCallExpression.Object as ConstantExpression;
                 }
             }
 
             if (serializationInfo != null && valuesExpression != null)
             {
-                var serializedValues = _serializationInfoHelper.SerializeValues(serializationInfo, (IEnumerable)valuesExpression.Value);
+                var serializedValues = serializationInfo.SerializeValues((IEnumerable)valuesExpression.Value);
                 return Query.In(serializationInfo.ElementName, serializedValues);
             }
             return null;
@@ -711,7 +712,7 @@ namespace MongoDB.Driver.Linq
                 {
                     if (arguments.Length == 2 || arguments.Length == 3)
                     {
-                        var serializationInfo = _serializationInfoHelper.GetSerializationInfo(arguments[0]);
+                        var serializationInfo = GetSerializationInfo(arguments[0]);
                         var patternExpression = arguments[1] as ConstantExpression;
                         if (patternExpression != null)
                         {
@@ -739,7 +740,7 @@ namespace MongoDB.Driver.Linq
                     var regexExpression = obj as ConstantExpression;
                     if (regexExpression != null && arguments.Length == 1)
                     {
-                        var serializationInfo = _serializationInfoHelper.GetSerializationInfo(arguments[0]);
+                        var serializationInfo = GetSerializationInfo(arguments[0]);
                         var regex = regexExpression.Value as Regex;
                         if (regex != null)
                         {
@@ -758,7 +759,7 @@ namespace MongoDB.Driver.Linq
                 var arguments = methodCallExpression.Arguments.ToArray();
                 if (arguments.Length == 1)
                 {
-                    var serializationInfo = _serializationInfoHelper.GetSerializationInfo(arguments[0]);
+                    var serializationInfo = GetSerializationInfo(arguments[0]);
                     return Query.Or(
                         Query.Type(serializationInfo.ElementName, BsonType.Null), // this is the safe way to test for null
                         Query.EQ(serializationInfo.ElementName, ""));
@@ -804,7 +805,7 @@ namespace MongoDB.Driver.Linq
             var modBinaryExpression = variableExpression as BinaryExpression;
             if (modBinaryExpression != null && modBinaryExpression.NodeType == ExpressionType.Modulo)
             {
-                var serializationInfo = _serializationInfoHelper.GetSerializationInfo(modBinaryExpression.Left);
+                var serializationInfo = GetSerializationInfo(modBinaryExpression.Left);
                 var modulusExpression = modBinaryExpression.Right as ConstantExpression;
                 if (modulusExpression != null)
                 {
@@ -863,7 +864,7 @@ namespace MongoDB.Driver.Linq
                 (methodCallExpression.Method.Name == "IndexOf" || methodCallExpression.Method.Name == "IndexOfAny") &&
                 methodCallExpression.Method.DeclaringType == typeof(string))
             {
-                var serializationInfo = _serializationInfoHelper.GetSerializationInfo(methodCallExpression.Object);
+                var serializationInfo = GetSerializationInfo(methodCallExpression.Object);
 
                 object value;
                 var startIndex = -1;
@@ -1062,7 +1063,7 @@ namespace MongoDB.Driver.Linq
             }
             var pattern = string.Format("^.{{{0}}}{1}", index, characterClass);
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(stringExpression);
+            var serializationInfo = GetSerializationInfo(stringExpression);
             return Query.Matches(serializationInfo.ElementName, new BsonRegularExpression(pattern, "s"));
         }
 
@@ -1076,13 +1077,19 @@ namespace MongoDB.Driver.Linq
 
             BsonSerializationInfo serializationInfo = null;
 
+            var fieldExpression = variableExpression as FieldExpression;
+            if (fieldExpression != null && fieldExpression.Type == typeof(string))
+            {
+                serializationInfo = fieldExpression.SerializationInfo;
+            }
+
             var memberExpression = variableExpression as MemberExpression;
             if (memberExpression != null && memberExpression.Member.Name == "Length")
             {
                 var stringMemberExpression = memberExpression.Expression as MemberExpression;
                 if (stringMemberExpression != null && stringMemberExpression.Type == typeof(string))
                 {
-                    serializationInfo = _serializationInfoHelper.GetSerializationInfo(stringMemberExpression);
+                    serializationInfo = GetSerializationInfo(stringMemberExpression);
                 }
             }
 
@@ -1095,7 +1102,7 @@ namespace MongoDB.Driver.Linq
                     var stringMemberExpression = args[0] as MemberExpression;
                     if (stringMemberExpression != null && stringMemberExpression.Type == typeof(string))
                     {
-                        serializationInfo = _serializationInfoHelper.GetSerializationInfo(stringMemberExpression);
+                        serializationInfo = GetSerializationInfo(stringMemberExpression);
                     }
                 }
             }
@@ -1150,8 +1157,8 @@ namespace MongoDB.Driver.Linq
                 return null;
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(methodExpression.Object);
-            var serializedValue = _serializationInfoHelper.SerializeValue(serializationInfo, constantExpression.Value);
+            var serializationInfo = GetSerializationInfo(methodExpression.Object);
+            var serializedValue = serializationInfo.SerializeValue(constantExpression.Value);
 
             if (serializedValue.IsString)
             {
@@ -1300,7 +1307,7 @@ namespace MongoDB.Driver.Linq
                 pattern = pattern.Substring(0, pattern.Length - 3);
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(stringExpression);
+            var serializationInfo = GetSerializationInfo(stringExpression);
             var options = caseInsensitive ? "is" : "s";
             return Query.Matches(serializationInfo.ElementName, new BsonRegularExpression(pattern, options));
         }
@@ -1333,7 +1340,7 @@ namespace MongoDB.Driver.Linq
                 return null;
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(methodCallExpression.Object);
+            var serializationInfo = GetSerializationInfo(methodCallExpression.Object);
             var nominalType = serializationInfo.NominalType;
 
             var discriminatorConvention = BsonSerializer.LookupDiscriminatorConvention(nominalType);
@@ -1386,12 +1393,43 @@ namespace MongoDB.Driver.Linq
             }
 
             var elementName = discriminatorConvention.ElementName;
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(typeBinaryExpression.Expression);
+            var serializationInfo = GetSerializationInfo(typeBinaryExpression.Expression);
             if (serializationInfo.ElementName != null)
             {
                 elementName = string.Format("{0}.{1}", serializationInfo.ElementName, elementName);
             }
             return Query.EQ(elementName, discriminator);
+        }
+
+        private BsonSerializationInfo GetItemSerializationInfo(string methodName, BsonSerializationInfo serializationInfo)
+        {
+            var arraySerializer = serializationInfo.Serializer as IBsonArraySerializer;
+            if (arraySerializer != null)
+            {
+                var itemSerializationInfo = arraySerializer.GetItemSerializationInfo();
+                if (itemSerializationInfo != null)
+                {
+                    return itemSerializationInfo;
+                }
+            }
+
+            string message = string.Format("{0} requires that the serializer specified for {1} support items by implementing {2} and returning a non-null result. {3} is the current serializer.",
+                methodName,
+                serializationInfo.ElementName,
+                typeof(IBsonArraySerializer),
+                serializationInfo.Serializer.GetType());
+            throw new NotSupportedException(message);
+        }
+
+        private BsonSerializationInfo GetSerializationInfo(Expression node)
+        {
+            var serializationExpression = node as IBsonSerializationInfoExpression;
+            if (serializationExpression != null)
+            {
+                return serializationExpression.SerializationInfo;
+            }
+
+            throw new NotSupportedException(string.Format("Expected a document or field, but found {0}", node));
         }
 
         private string GetTrimCharsPattern(Expression trimCharsExpression)

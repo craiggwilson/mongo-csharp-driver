@@ -19,7 +19,6 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson.Serialization.Serializers;
-using MongoDB.Driver.Linq.Utils;
 
 namespace MongoDB.Driver.Builders
 {
@@ -349,7 +348,6 @@ namespace MongoDB.Driver.Builders
     /// A builder for the options used when creating an index.
     /// </summary>
     /// <typeparam name="TDocument">The type of the document.</typeparam>
-    [BsonSerializer()]
     public static class IndexOptions<TDocument>
     {
         // public static properties
@@ -496,10 +494,9 @@ namespace MongoDB.Driver.Builders
     /// <typeparam name="TDocument">The type of the document.</typeparam>
     [Serializable]
     [BsonSerializer(typeof(IndexOptionsBuilder<>.Serializer))]
-    public class IndexOptionsBuilder<TDocument> : BuilderBase, IMongoIndexOptions
+    public class IndexOptionsBuilder<TDocument> : BuilderBase<TDocument>, IMongoIndexOptions
     {
         // private fields
-        private readonly BsonSerializationInfoHelper _serializationInfoHelper;
         private IndexOptionsBuilder _indexOptionsBuilder;
 
         // constructors
@@ -508,7 +505,6 @@ namespace MongoDB.Driver.Builders
         /// </summary>
         public IndexOptionsBuilder()
         {
-            _serializationInfoHelper = new BsonSerializationInfoHelper();
             _indexOptionsBuilder = new IndexOptionsBuilder();
         }
 
@@ -611,7 +607,7 @@ namespace MongoDB.Driver.Builders
         /// </returns>
         public IndexOptionsBuilder<TDocument> SetTextLanguageOverride(Expression<Func<TDocument, string>> memberExpression)
         {
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = GetSerializationInfo(memberExpression);
             _indexOptionsBuilder.SetTextLanguageOverride(serializationInfo.ElementName);
             return this;
         }
@@ -649,7 +645,7 @@ namespace MongoDB.Driver.Builders
         /// </returns>
         public IndexOptionsBuilder<TDocument> SetWeight<TMember>(Expression<Func<TDocument, TMember>> memberExpression, int value)
         {
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = GetSerializationInfo(memberExpression);
             _indexOptionsBuilder = _indexOptionsBuilder.SetWeight(serializationInfo.ElementName, value);
             return this;
         }

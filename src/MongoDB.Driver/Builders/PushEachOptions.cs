@@ -19,7 +19,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
 using MongoDB.Driver;
-using MongoDB.Driver.Linq.Utils;
+using MongoDB.Driver.Linq.Processors;
 
 namespace MongoDB.Driver.Builders
 {
@@ -69,7 +69,7 @@ namespace MongoDB.Driver.Builders
     public class PushEachOptionsBuilder<TValue>
     {
         // private fields
-        private readonly BsonSerializationInfoHelper _serializationInfoHelper;
+        private readonly SerializationInfoBinder _binder;
         private int? _position;
         private SortByBuilder<TValue> _sortBy;
         private int? _slice;
@@ -78,10 +78,10 @@ namespace MongoDB.Driver.Builders
         /// <summary>
         /// Initializes a new instance of the <see cref="PushEachOptionsBuilder{TValue}" /> class.
         /// </summary>
-        /// <param name="serializationInfoHelper">The serialization info helper.</param>
-        internal PushEachOptionsBuilder(BsonSerializationInfoHelper serializationInfoHelper)
+        /// <param name="binder">The binder.</param>
+        internal PushEachOptionsBuilder(SerializationInfoBinder binder)
         {
-            _serializationInfoHelper = serializationInfoHelper;
+            _binder = binder;
         }
 
         // public methods
@@ -116,7 +116,7 @@ namespace MongoDB.Driver.Builders
         {
             if (_sortBy == null)
             {
-                _sortBy = new SortByBuilder<TValue>(_serializationInfoHelper);
+                _sortBy = new SortByBuilder<TValue>(_binder);
             }
 
             _sortBy.Ascending(memberExpressions);
@@ -132,7 +132,7 @@ namespace MongoDB.Driver.Builders
         {
             if (_sortBy == null)
             {
-                _sortBy = new SortByBuilder<TValue>(_serializationInfoHelper);
+                _sortBy = new SortByBuilder<TValue>(_binder);
             }
 
             _sortBy.Descending(memberExpressions);

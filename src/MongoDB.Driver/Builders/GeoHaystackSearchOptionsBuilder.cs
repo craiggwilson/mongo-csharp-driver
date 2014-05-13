@@ -19,7 +19,6 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson.Serialization.Serializers;
-using MongoDB.Driver.Linq.Utils;
 
 namespace MongoDB.Driver.Builders
 {
@@ -202,10 +201,9 @@ namespace MongoDB.Driver.Builders
     [Serializable]
     [Obsolete("Use GeoHaystackSearchArgs instead.")]
     [BsonSerializer(typeof(GeoHaystackSearchOptionsBuilder<>.Serializer))]
-    public class GeoHaystackSearchOptionsBuilder<TDocument> : BuilderBase, IMongoGeoHaystackSearchOptions
+    public class GeoHaystackSearchOptionsBuilder<TDocument> : BuilderBase<TDocument>, IMongoGeoHaystackSearchOptions
     {
         // private fields
-        private readonly BsonSerializationInfoHelper _serializationInfoHelper;
         private GeoHaystackSearchOptionsBuilder _geoHaystackBuilder;
 
         // constructors
@@ -214,7 +212,6 @@ namespace MongoDB.Driver.Builders
         /// </summary>
         public GeoHaystackSearchOptionsBuilder()
         {
-            _serializationInfoHelper = new BsonSerializationInfoHelper();
             _geoHaystackBuilder = new GeoHaystackSearchOptionsBuilder();
         }
 
@@ -250,8 +247,8 @@ namespace MongoDB.Driver.Builders
         /// <returns>The builder (so method calls can be chained).</returns>
         public GeoHaystackSearchOptionsBuilder<TDocument> SetQuery<TMember>(Expression<Func<TDocument, TMember>> memberExpression, TMember value)
         {
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var serializedValue = _serializationInfoHelper.SerializeValue(serializationInfo, value);
+            var serializationInfo = GetSerializationInfo(memberExpression);
+            var serializedValue = serializationInfo.SerializeValue(value);
             _geoHaystackBuilder = _geoHaystackBuilder.SetQuery(serializationInfo.ElementName, serializedValue);
             return this;
         }

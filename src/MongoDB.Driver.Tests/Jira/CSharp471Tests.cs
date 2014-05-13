@@ -15,13 +15,15 @@
 
 using System;
 using System.Linq;
+using MongoDB.Bson;
 using MongoDB.Driver.Linq;
+using MongoDB.Driver.Tests.Linq;
 using NUnit.Framework;
 
 namespace MongoDB.Driver.Tests.Jira
 {
     [TestFixture]
-    public class CSharp471Tests
+    public class CSharp471Tests : LinqTestBase
     {
         public class Base
         {
@@ -56,19 +58,9 @@ namespace MongoDB.Driver.Tests.Jira
                         where t is T1 && ((T1)t).B == "T1.B" 
                         select t;
 
-            var translatedQuery = MongoQueryTranslator.Translate(query);
-            Assert.IsInstanceOf<SelectQuery>(translatedQuery);
-            Assert.AreSame(collection, translatedQuery.Collection);
-            Assert.AreSame(typeof(Base), translatedQuery.DocumentType);
+            var model = GetQueryModel(query);
 
-            var selectQuery = (SelectQuery)translatedQuery;
-            Assert.AreEqual("(Base t) => ((t is T1) && ((T1)t.B == \"T1.B\"))", ExpressionFormatter.ToString(selectQuery.Where));
-            Assert.IsNull(selectQuery.OrderBy);
-            Assert.IsNull(selectQuery.Projection);
-            Assert.IsNull(selectQuery.Skip);
-            Assert.IsNull(selectQuery.Take);
-
-            Assert.AreEqual("{ \"_t\" : \"T1\", \"B\" : \"T1.B\" }", selectQuery.BuildQuery().ToString());
+            Assert.AreEqual("{ \"_t\" : \"T1\", \"B\" : \"T1.B\" }", model.Query.ToJson());
 
             var results = query.ToList();
             Assert.That(results.Count, Is.EqualTo(1));

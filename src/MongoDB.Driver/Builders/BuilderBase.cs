@@ -62,6 +62,77 @@ namespace MongoDB.Driver.Builders
         // nested classes
         internal class Serializer : UndiscriminatedActualTypeSerializer<BuilderBase>
         {
+	}
+    }
+
+    /// <summary>
+    /// Abstract base class for Typed builders.
+    /// </summary>
+    /// <typeparam name="TDocument">The type of the document.</typeparam>
+    public abstract class BuilderBase<TDocument> : BuilderBase
+    {
+        // private fields
+        private readonly BuilderHelper _helper;
+
+        // constructors
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BuilderBase{TDocument}" /> class.
+        /// </summary>
+        protected BuilderBase()
+        {
+            _helper = new BuilderHelper(typeof(TDocument));
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BuilderBase{TDocument}" /> class.
+        /// </summary>
+        /// <param name="binder">The binder.</param>
+        internal BuilderBase(SerializationInfoBinder binder)
+        {
+            _helper = new BuilderHelper(binder);
+        }
+
+        // protected methods
+        /// <summary>
+        /// Gets the name of the element.
+        /// </summary>
+        /// <param name="memberExpression">The member expression.</param>
+        /// <returns></returns>
+        protected string GetElementName(LambdaExpression memberExpression)
+        {
+            return _helper.GetElementName( memberExpression);
+        }
+
+        /// <summary>
+        /// Gets the element names.
+        /// </summary>
+        /// <param name="memberExpressions">The member expressions.</param>
+        /// <returns></returns>
+        protected IEnumerable<string> GetElementNames(IEnumerable<LambdaExpression> memberExpressions)
+        {
+            return _helper.GetElementNames(memberExpressions);
+        }
+
+        /// <summary>
+        /// Gets the serialization info.
+        /// </summary>
+        /// <param name="memberExpression">The member expression.</param>
+        /// <returns></returns>
+        protected BsonSerializationInfo GetSerializationInfo(LambdaExpression memberExpression)
+        {
+            return _helper.GetSerializationInfo(memberExpression);
+        }
+
+        /// <summary>
+        /// Gets the item serialization info.
+        /// </summary>
+        /// <param name="methodName">Name of the method.</param>
+        /// <param name="serializationInfo">The serialization info.</param>
+        /// <returns></returns>
+        /// <exception cref="System.NotSupportedException"></exception>
+        protected BsonSerializationInfo GetItemSerializationInfo(string methodName, BsonSerializationInfo serializationInfo)
+        {
+            return _helper.GetItemSerializationInfo(methodName, serializationInfo);
         }
     }
 }

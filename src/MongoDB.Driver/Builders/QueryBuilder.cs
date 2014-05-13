@@ -18,9 +18,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 using MongoDB.Driver.GeoJsonObjectModel;
 using MongoDB.Driver.Linq;
-using MongoDB.Driver.Linq.Utils;
+using MongoDB.Driver.Linq.Processors;
+using MongoDB.Driver.Linq.Translators;
 
 namespace MongoDB.Driver.Builders
 {
@@ -1528,25 +1530,27 @@ namespace MongoDB.Driver.Builders
     public class QueryBuilder<TDocument>
     {
         // private fields
-        private readonly BsonSerializationInfoHelper _serializationInfoHelper;
+        private readonly BuilderHelper _helper;
         private readonly PredicateTranslator _predicateTranslator;
 
         // constructors
         /// <summary>
-        /// Initializes a new instance of the <see cref="QueryBuilder{TDocument}"/> class.
+        /// Initializes a new instance of the <see cref="QueryBuilder&lt;TDocument&gt;"/> class.
         /// </summary>
         public QueryBuilder()
-            : this(new BsonSerializationInfoHelper())
-        { }
+        {
+            _predicateTranslator = new PredicateTranslator();
+            _helper = new BuilderHelper(typeof(TDocument));
+        }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="QueryBuilder{TDocument}"/> class.
+        /// Initializes a new instance of the <see cref="QueryBuilder&lt;TDocument&gt;"/> class.
         /// </summary>
         /// <param name="serializationInfoHelper">The serialization info helper.</param>
         internal QueryBuilder(BsonSerializationInfoHelper serializationInfoHelper)
         {
-            _serializationInfoHelper = serializationInfoHelper;
-            _predicateTranslator = new PredicateTranslator(_serializationInfoHelper);
+            _predicateTranslator = new PredicateTranslator();
+            _helper = new BuilderHelper(documentSerializationInfo, isDocumentProjected);
         }
 
         // public methods
@@ -1568,9 +1572,9 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("values");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var itemSerializationInfo = _serializationInfoHelper.GetItemSerializationInfo("All", serializationInfo);
-            var serializedValues = _serializationInfoHelper.SerializeValues(itemSerializationInfo, values);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
+            var itemSerializationInfo = _helper.GetItemSerializationInfo("All", serializationInfo);
+            var serializedValues = itemSerializationInfo.SerializeValues(values);
             return Query.All(serializationInfo.ElementName, serializedValues);
         }
 
@@ -1612,9 +1616,9 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("elementQueryBuilderFunction");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var itemSerializationInfo = _serializationInfoHelper.GetItemSerializationInfo("ElemMatch", serializationInfo);
-            var elementQueryBuilder = new QueryBuilder<TValue>(_serializationInfoHelper);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
+            var itemSerializationInfo = _helper.GetItemSerializationInfo("ElemMatch", serializationInfo).WithNewName(null);
+            var elementQueryBuilder = new QueryBuilder<TValue>(itemSerializationInfo, false);
             var elementQuery = elementQueryBuilderFunction(elementQueryBuilder);
             return Query.ElemMatch(serializationInfo.ElementName, elementQuery);
         }
@@ -1633,8 +1637,8 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var serializedValue = _serializationInfoHelper.SerializeValue(serializationInfo, value);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
+            var serializedValue = serializationInfo.SerializeValue(value);
             return Query.EQ(serializationInfo.ElementName, serializedValue);
         }
 
@@ -1652,9 +1656,9 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var itemSerializationInfo = _serializationInfoHelper.GetItemSerializationInfo("EQ", serializationInfo);
-            var serializedValue = _serializationInfoHelper.SerializeValue(itemSerializationInfo, value);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
+            var itemSerializationInfo = _helper.GetItemSerializationInfo("EQ", serializationInfo);
+            var serializedValue = itemSerializationInfo.SerializeValue(value);
             return Query.EQ(serializationInfo.ElementName, serializedValue);
         }
 
@@ -1671,7 +1675,7 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
             return Query.Exists(serializationInfo.ElementName);
         }
 
@@ -1695,7 +1699,7 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("geometry");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
             return Query.GeoIntersects<TCoordinates>(serializationInfo.ElementName, geometry);
         }
 
@@ -1713,8 +1717,8 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var serializedValue = _serializationInfoHelper.SerializeValue(serializationInfo, value);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
+            var serializedValue = serializationInfo.SerializeValue(value);
             return Query.GT(serializationInfo.ElementName, serializedValue);
         }
 
@@ -1732,9 +1736,9 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var itemSerializationInfo = _serializationInfoHelper.GetItemSerializationInfo("GT", serializationInfo);
-            var serializedValue = _serializationInfoHelper.SerializeValue(itemSerializationInfo, value);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
+            var itemSerializationInfo = _helper.GetItemSerializationInfo("GT", serializationInfo);
+            var serializedValue = itemSerializationInfo.SerializeValue(value);
             return Query.GT(serializationInfo.ElementName, serializedValue);
         }
 
@@ -1752,8 +1756,8 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var serializedValue = _serializationInfoHelper.SerializeValue(serializationInfo, value);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
+            var serializedValue = serializationInfo.SerializeValue(value);
             return Query.GTE(serializationInfo.ElementName, serializedValue);
         }
 
@@ -1771,9 +1775,9 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var itemSerializationInfo = _serializationInfoHelper.GetItemSerializationInfo("GTE", serializationInfo);
-            var serializedValue = _serializationInfoHelper.SerializeValue(itemSerializationInfo, value);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
+            var itemSerializationInfo = _helper.GetItemSerializationInfo("GTE", serializationInfo);
+            var serializedValue = itemSerializationInfo.SerializeValue(value);
             return Query.GTE(serializationInfo.ElementName, serializedValue);
         }
 
@@ -1795,8 +1799,8 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("values");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var serializedValues = _serializationInfoHelper.SerializeValues(serializationInfo, values);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
+            var serializedValues = serializationInfo.SerializeValues(values);
             return Query.In(serializationInfo.ElementName, serializedValues);
         }
 
@@ -1818,9 +1822,9 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("values");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var itemSerializationInfo = _serializationInfoHelper.GetItemSerializationInfo("In", serializationInfo);
-            var serializedValues = _serializationInfoHelper.SerializeValues(itemSerializationInfo, values);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
+            var itemSerializationInfo = _helper.GetItemSerializationInfo("In", serializationInfo);
+            var serializedValues = itemSerializationInfo.SerializeValues(values);
             return Query.In(serializationInfo.ElementName, serializedValues);
         }
 
@@ -1838,8 +1842,8 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var serializedValue = _serializationInfoHelper.SerializeValue(serializationInfo, value);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
+            var serializedValue = serializationInfo.SerializeValue(value);
             return Query.LT(serializationInfo.ElementName, serializedValue);
         }
 
@@ -1857,9 +1861,9 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var itemSerializationInfo = _serializationInfoHelper.GetItemSerializationInfo("LT", serializationInfo);
-            var serializedValue = _serializationInfoHelper.SerializeValue(itemSerializationInfo, value);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
+            var itemSerializationInfo = _helper.GetItemSerializationInfo("LT", serializationInfo);
+            var serializedValue = itemSerializationInfo.SerializeValue(value);
             return Query.LT(serializationInfo.ElementName, serializedValue);
         }
 
@@ -1877,8 +1881,8 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var serializedValue = _serializationInfoHelper.SerializeValue(serializationInfo, value);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
+            var serializedValue = serializationInfo.SerializeValue(value);
             return Query.LTE(serializationInfo.ElementName, serializedValue);
         }
 
@@ -1896,9 +1900,9 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var itemSerializationInfo = _serializationInfoHelper.GetItemSerializationInfo("LTE", serializationInfo);
-            var serializedValue = _serializationInfoHelper.SerializeValue(itemSerializationInfo, value);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
+            var itemSerializationInfo = _helper.GetItemSerializationInfo("LTE", serializationInfo);
+            var serializedValue = itemSerializationInfo.SerializeValue(value);
             return Query.LTE(serializationInfo.ElementName, serializedValue);
         }
 
@@ -1921,7 +1925,7 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("regex");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
             return Query.Matches(serializationInfo.ElementName, regex);
         }
 
@@ -1944,7 +1948,7 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("regex");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
             return Query.Matches(serializationInfo.ElementName, regex);
         }
 
@@ -1962,7 +1966,7 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
             return Query.Mod(serializationInfo.ElementName, modulus, value);
         }
 
@@ -1980,7 +1984,7 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
             return Query.Mod(serializationInfo.ElementName, modulus, value);
         }
 
@@ -2004,7 +2008,7 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("point");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
             return Query.Near(serializationInfo.ElementName, point);
         }
 
@@ -2029,7 +2033,7 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("point");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
             return Query.Near(serializationInfo.ElementName, point, maxDistance);
         }
 
@@ -2055,7 +2059,7 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("point");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
             return Query.Near(serializationInfo.ElementName, point, maxDistance, spherical);
         }
 
@@ -2103,7 +2107,7 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
             return Query.Near(serializationInfo.ElementName, x, y, maxDistance, spherical);
         }
 
@@ -2131,8 +2135,8 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var serializedValue = _serializationInfoHelper.SerializeValue(serializationInfo, value);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
+            var serializedValue = serializationInfo.SerializeValue(value);
             return Query.NE(serializationInfo.ElementName, serializedValue);
         }
 
@@ -2150,9 +2154,9 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var itemSerializationInfo = _serializationInfoHelper.GetItemSerializationInfo("NE", serializationInfo);
-            var serializedValue = _serializationInfoHelper.SerializeValue(itemSerializationInfo, value);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
+            var itemSerializationInfo = _helper.GetItemSerializationInfo("NE", serializationInfo);
+            var serializedValue = itemSerializationInfo.SerializeValue(value);
             return Query.NE(serializationInfo.ElementName, serializedValue);
         }
 
@@ -2169,7 +2173,7 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
             return Query.NotExists(serializationInfo.ElementName);
         }
 
@@ -2191,8 +2195,8 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("values");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var serializedValues = _serializationInfoHelper.SerializeValues(serializationInfo, values);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
+            var serializedValues = serializationInfo.SerializeValues(values);
             return Query.NotIn(serializationInfo.ElementName, serializedValues);
         }
 
@@ -2214,9 +2218,9 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("values");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var itemSerializationInfo = _serializationInfoHelper.GetItemSerializationInfo("NotIn", serializationInfo);
-            var serializedValues = _serializationInfoHelper.SerializeValues(itemSerializationInfo, values);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
+            var itemSerializationInfo = _helper.GetItemSerializationInfo("NotIn", serializationInfo);
+            var serializedValues = itemSerializationInfo.SerializeValues(values);
             return Query.NotIn(serializationInfo.ElementName, serializedValues);
         }
 
@@ -2258,7 +2262,7 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
             return Query.Size(serializationInfo.ElementName, size);
         }
 
@@ -2276,7 +2280,7 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
             return Query.Type(serializationInfo.ElementName, type);
         }
 
@@ -2294,7 +2298,7 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
             return Query.Type(serializationInfo.ElementName, type);
         }
 
@@ -2310,8 +2314,8 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("expression");
             }
 
-            var evaluatedExpression = PartialEvaluator.Evaluate(expression.Body);
-            return _predicateTranslator.BuildQuery(evaluatedExpression);
+            var boundExpression = _helper.EvaluateAndBind(expression.Body);
+            return _predicateTranslator.BuildQuery(boundExpression);
         }
 
         /// <summary>
@@ -2334,7 +2338,7 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("polygon");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
             return Query.Within(serializationInfo.ElementName, polygon);
         }
 
@@ -2369,7 +2373,7 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
             return Query.WithinCircle(serializationInfo.ElementName, centerX, centerY, radius, spherical);
         }
 
@@ -2387,7 +2391,7 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
             return Query.WithinPolygon(serializationInfo.ElementName, points);
         }
 
@@ -2408,7 +2412,7 @@ namespace MongoDB.Driver.Builders
                 throw new ArgumentNullException("memberExpression");
             }
 
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = _helper.GetSerializationInfo(memberExpression);
             return Query.WithinRectangle(serializationInfo.ElementName, lowerLeftX, lowerLeftY, upperRightX, upperRightY);
         }
     }

@@ -46,7 +46,7 @@ namespace MongoDB.Driver.Tests.Jira.CSharp524
             _collection.Insert(new C { Id = 1, X = 1 });
             _collection.Insert(new C { Id = 2, X = 2 });
 
-            var query = _collection.AsQueryable()
+            var query = _collection.AsQueryable(ExecutionTarget.Query)
                 .Select(d => d.X)
                 .Distinct();
 
@@ -55,9 +55,7 @@ namespace MongoDB.Driver.Tests.Jira.CSharp524
             Assert.AreEqual(1, result[0]);
             Assert.AreEqual(2, result[1]);
 
-            var ex = Assert.Throws<NotSupportedException>(() => { query.Count(); });
-            var message = "No further operators may follow Distinct in a LINQ query.";
-            Assert.AreEqual(message, ex.Message);
+            Assert.Throws<MongoLinqException>(() => query.Count());
         }
     }
 }

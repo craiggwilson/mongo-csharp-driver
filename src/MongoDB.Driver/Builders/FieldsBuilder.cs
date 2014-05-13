@@ -21,7 +21,6 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson.Serialization.Serializers;
-using MongoDB.Driver.Linq.Utils;
 
 namespace MongoDB.Driver.Builders
 {
@@ -311,10 +310,9 @@ namespace MongoDB.Driver.Builders
     /// <typeparam name="TDocument">The type of the document.</typeparam>
     [Serializable]
     [BsonSerializer(typeof(FieldsBuilder<>.Serializer))]
-    public class FieldsBuilder<TDocument> : BuilderBase, IMongoFields
+    public class FieldsBuilder<TDocument> : BuilderBase<TDocument>, IMongoFields
     {
         // private fields
-        private readonly BsonSerializationInfoHelper _serializationInfoHelper;
         private FieldsBuilder _fieldsBuilder;
 
         // constructors
@@ -323,7 +321,6 @@ namespace MongoDB.Driver.Builders
         /// </summary>
         public FieldsBuilder()
         {
-            _serializationInfoHelper = new BsonSerializationInfoHelper();
             _fieldsBuilder = new FieldsBuilder();
         }
 
@@ -337,9 +334,9 @@ namespace MongoDB.Driver.Builders
         /// <returns>The build (so method calls can be chained).</returns>
         public FieldsBuilder<TDocument> ElemMatch<TValue>(Expression<Func<TDocument, IEnumerable<TValue>>> memberExpression, Func<QueryBuilder<TValue>, IMongoQuery> elementQueryBuilderFunction)
         {
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var itemSerializationInfo = _serializationInfoHelper.GetItemSerializationInfo("ElemMatch", serializationInfo);
-            var elementQueryBuilder = new QueryBuilder<TValue>(_serializationInfoHelper);
+            var serializationInfo = GetSerializationInfo(memberExpression);
+            var itemSerializationInfo = GetItemSerializationInfo("ElemMatch", serializationInfo);
+            var elementQueryBuilder = new QueryBuilder<TValue>(itemSerializationInfo, false);
             var elementQuery = elementQueryBuilderFunction(elementQueryBuilder);
             _fieldsBuilder.ElemMatch(serializationInfo.ElementName, elementQuery);
             return this;
@@ -376,7 +373,7 @@ namespace MongoDB.Driver.Builders
         /// <returns>The builder (so method calls can be chained).</returns>
         public FieldsBuilder<TDocument> MetaTextScore(Expression<Func<TDocument, object>> memberExpression)
         {
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = GetSerializationInfo(memberExpression);
             _fieldsBuilder = _fieldsBuilder.MetaTextScore(serializationInfo.ElementName);
             return this;
         }
@@ -390,7 +387,7 @@ namespace MongoDB.Driver.Builders
         /// <returns>The builder (so method calls can be chained).</returns>
         public FieldsBuilder<TDocument> Slice<TValue>(Expression<Func<TDocument, IEnumerable<TValue>>> memberExpression, int size)
         {
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = GetSerializationInfo(memberExpression);
             _fieldsBuilder = _fieldsBuilder.Slice(serializationInfo.ElementName, size);
             return this;
         }
@@ -405,7 +402,7 @@ namespace MongoDB.Driver.Builders
         /// <returns>The builder (so method calls can be chained).</returns>
         public FieldsBuilder<TDocument> Slice<TValue>(Expression<Func<TDocument, IEnumerable<TValue>>> memberExpression, int skip, int limit)
         {
-            var serializationInfo = _serializationInfoHelper.GetSerializationInfo(memberExpression);
+            var serializationInfo = GetSerializationInfo(memberExpression);
             _fieldsBuilder = _fieldsBuilder.Slice(serializationInfo.ElementName, skip, limit);
             return this;
         }
@@ -417,15 +414,6 @@ namespace MongoDB.Driver.Builders
         public override BsonDocument ToBsonDocument()
         {
             return _fieldsBuilder.ToBsonDocument();
-        }
-
-        // private methods
-        private IEnumerable<string> GetElementNames(IEnumerable<Expression<Func<TDocument, object>>> memberExpressions)
-        {
-            var elementNames = memberExpressions
-                .Select(x => _serializationInfoHelper.GetSerializationInfo(x))
-                .Select(x => x.ElementName);
-            return elementNames;
         }
 
         // nested classes

@@ -16,7 +16,8 @@
 using System;
 using System.Linq.Expressions;
 using MongoDB.Bson;
-using MongoDB.Driver.Linq.Utils;
+using MongoDB.Driver.Builders;
+using MongoDB.Driver.Linq.Processors;
 
 namespace MongoDB.Driver
 {
@@ -130,11 +131,10 @@ namespace MongoDB.Driver
         /// <returns>The args so calls can be chained.</returns>
         public GeoHaystackSearchArgs SetAdditionalField<TDocument, TMember>(Expression<Func<TDocument, TMember>> memberExpression, TMember value)
         {
-            var serializationInfoHelper = new BsonSerializationInfoHelper();
-            var serializationInfo = serializationInfoHelper.GetSerializationInfo(memberExpression);
-            var serializedValue = serializationInfoHelper.SerializeValue(serializationInfo, value);
-            SetAdditionalField(serializationInfo.ElementName, serializedValue);
-            return this;
+            var helper = new BuilderHelper(typeof(TDocument));
+            var serializationInfo = helper.GetSerializationInfo(memberExpression);
+            var serializedValue = serializationInfo.SerializeValue(value);
+            return SetAdditionalField(serializationInfo.ElementName, serializedValue);
         }
     }
 }

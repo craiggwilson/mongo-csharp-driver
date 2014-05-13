@@ -21,7 +21,6 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson.Serialization.Serializers;
-using MongoDB.Driver.Linq.Utils;
 
 namespace MongoDB.Driver.Builders
 {
@@ -404,10 +403,9 @@ namespace MongoDB.Driver.Builders
     /// <typeparam name="TDocument">The type of the document.</typeparam>
     [Serializable]
     [BsonSerializer(typeof(IndexKeysBuilder<>.Serializer))]
-    public class IndexKeysBuilder<TDocument> : BuilderBase, IMongoIndexKeys
+    public class IndexKeysBuilder<TDocument> : BuilderBase<TDocument>, IMongoIndexKeys
     {
         // private fields
-        private readonly BsonSerializationInfoHelper _serializationInfoHelper;
         private IndexKeysBuilder _indexKeysBuilder;
 
         // constructors
@@ -416,7 +414,6 @@ namespace MongoDB.Driver.Builders
         /// </summary>
         public IndexKeysBuilder()
         {
-            _serializationInfoHelper = new BsonSerializationInfoHelper();
             _indexKeysBuilder = new IndexKeysBuilder();
         }
 
@@ -560,17 +557,6 @@ namespace MongoDB.Driver.Builders
         public override BsonDocument ToBsonDocument()
         {
             return _indexKeysBuilder.ToBsonDocument();
-        }
-
-        // private methods
-        private string GetElementName<TMember>(Expression<Func<TDocument, TMember>> memberExpression)
-        {
-            return _serializationInfoHelper.GetSerializationInfo(memberExpression).ElementName;
-        }
-
-        private IEnumerable<string> GetElementNames<TMember>(IEnumerable<Expression<Func<TDocument, TMember>>> memberExpressions)
-        {
-            return memberExpressions.Select(x => GetElementName(x));
         }
 
         // nested classes

@@ -256,6 +256,7 @@
     <Compile Include="Serialization\Serializers\CultureInfoSerializer.cs" />
     <Compile Include="Serialization\Serializers\DateTimeOffsetSerializer.cs" />
     <Compile Include="Serialization\Serializers\DateTimeSerializer.cs" />
+    <Compile Include="Serialization\Serializers\DayOfWeekSerializer.cs" />
     <Compile Include="Serialization\Serializers\DecimalSerializer.cs" />
     <Compile Include="Serialization\Serializers\DictionaryInterfaceImplementerSerializer.cs" />
     <Compile Include="Serialization\Serializers\DictionarySerializerBase.cs" />

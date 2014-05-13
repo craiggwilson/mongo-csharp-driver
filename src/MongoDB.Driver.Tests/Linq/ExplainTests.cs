@@ -1,4 +1,4 @@
-/* Copyright 2010-2014 MongoDB Inc.
+﻿/* Copyright 2010-2014 MongoDB Inc.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -72,13 +72,30 @@ namespace MongoDB.Driver.Tests.Linq
         [Test]
         public void TestDistinctQueryCannotBeExplained()
         {
-            Assert.Throws<NotSupportedException>(()=> _collection.AsQueryable<C>().Select(c=>c.X).Distinct().Explain());
+            Assert.Throws<MongoLinqException>(() => _collection.AsQueryable<C>().Select(c => c.X).Distinct().Explain());
         }
 
         [Test]
         public void TestTakeZeroQueriesCannotBeExplained()
         {
-            Assert.Throws<NotSupportedException>(() => _collection.AsQueryable<C>().Take(0).Explain());
+            Assert.Throws<MongoLinqException>(() => _collection.AsQueryable<C>().Take(0).Explain());
+        }
+
+        [Test]
+        public void TestExplainFromPipelineEqualsExplainFromAggregateExplain()
+        {
+            var linqExplain = _collection.AsQueryable<C>(ExecutionTarget.Pipeline)
+                .Where(c => c.X == 2 && c.Y == 1)
+                .Explain();
+
+            var match = new BsonDocument("$match", Query.And(Query.EQ("X", 2), Query.EQ("Y", 1)).ToBsonDocument());
+            var queryExplain = _collection.AggregateExplain(new AggregateArgs { Pipeline = new[] { match } }).Response;
+
+            // millis could be different, so we'll ignore that difference.
+            linqExplain.Remove("millis");
+            queryExplain.Remove("millis");
+
+            Assert.AreEqual(linqExplain, queryExplain);
         }
     }
 }
