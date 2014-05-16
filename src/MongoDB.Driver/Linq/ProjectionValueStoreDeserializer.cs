@@ -13,14 +13,9 @@
 * limitations under the License.
 */
 
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Text;
-
 using MongoDB.Bson;
-using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
 
@@ -35,21 +30,12 @@ namespace MongoDB.Driver.Linq
         private readonly Dictionary<string, BsonSerializationInfo> _deserializationMap;
 
         // constructors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ProjectionValueStoreDeserializer"/> class.
-        /// </summary>
-        /// <param name="deserializationInfo">The serialization info used for deserialization.</param>
         public ProjectionValueStoreDeserializer(IEnumerable<BsonSerializationInfo> deserializationInfo)
         {
             _deserializationMap = deserializationInfo.Distinct().ToDictionary(x => x.ElementName, x => x);
         }
 
         // public methods
-        /// <summary>
-        /// Deserializes an object from a BsonReader.
-        /// </summary>
-        /// <param name="context">The context.</param>
-        /// <returns>An object.</returns>
         public override IProjectionValueStore Deserialize(BsonDeserializationContext context)
         {
             var type = context.Reader.GetCurrentBsonType();

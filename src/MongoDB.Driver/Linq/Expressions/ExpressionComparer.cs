@@ -19,12 +19,11 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
 
 namespace MongoDB.Driver.Linq.Expressions
 {
     /// <summary>
-    /// Compare two expressions to determine if they are equivalent
+    /// Compare two expressions to determine if they are equivalent.
     /// </summary>
     internal class ExpressionComparer
     {
@@ -32,12 +31,6 @@ namespace MongoDB.Driver.Linq.Expressions
         private ScopedDictionary<ParameterExpression, ParameterExpression> _parameterScope;
 
         // public methods
-        /// <summary>
-        /// Compares the two expressions.
-        /// </summary>
-        /// <param name="a">The first expression.</param>
-        /// <param name="b">The second expression.</param>
-        /// <returns><c>true</c> if the expressions are equal; <c>false</c> otherwise.</returns>
         public bool Compare(Expression a, Expression b)
         {
             if (a == b)
@@ -206,7 +199,6 @@ namespace MongoDB.Driver.Linq.Expressions
                 }
             }
 
-            // NOTE: could probably leave off the Name comparison...
             return a.Type == b.Type && a.Name == b.Name;
         }
 

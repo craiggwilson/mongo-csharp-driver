@@ -22,37 +22,18 @@ using System.Text;
 
 namespace MongoDB.Driver.Linq.Expressions
 {
-    /// <summary>
-    /// A visitor that includes support for the custom AggExpression types.
-    /// </summary>
     internal class LinqToMongoExpressionVisitor : ExpressionVisitor
     {
-        /// <summary>
-        /// Gets the lambda expression.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns></returns>
         protected LambdaExpression GetLambda(Expression node)
         {
             return (LambdaExpression)StripQuotes(node);
         }
 
-        /// <summary>
-        /// Determines whether the specified node is a lambda expression.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns><c>true</c> if the node is a lambda expression; otherwise <c>false</c>.</returns>
         protected bool IsLambda(Expression node)
         {
             return StripQuotes(node).NodeType == ExpressionType.Lambda;
         }
 
-        /// <summary>
-        /// Determines whether the specified node is a lambda expression with the specified number of parameters.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <param name="parameterCount">The parameter count.</param>
-        /// <returns><c>true</c> if the node is a lambda expression; otherwise <c>false</c>.</returns>
         protected bool IsLambda(Expression node, int parameterCount)
         {
             var lambda = StripQuotes(node);
@@ -60,12 +41,6 @@ namespace MongoDB.Driver.Linq.Expressions
                 ((LambdaExpression)lambda).Parameters.Count == parameterCount;
         }
 
-        /// <summary>
-        /// Indicates whether the node is a linq method.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <param name="names">The names.</param>
-        /// <returns><c>true</c> if [is linq method] [the specified node]; otherwise, <c>false</c>.</returns>
         protected bool IsLinqMethod(MethodCallExpression node, params string[] names)
         {
             if (node.Method.DeclaringType != typeof(Enumerable) && node.Method.DeclaringType != typeof(Queryable))
@@ -81,11 +56,6 @@ namespace MongoDB.Driver.Linq.Expressions
             return names.Contains(node.Method.Name);
         }
 
-        /// <summary>
-        /// Strips the quotes from an expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <returns>An unquoted expression.</returns>
         protected Expression StripQuotes(Expression expression)
         {
             while (expression.NodeType == ExpressionType.Quote)
@@ -95,11 +65,6 @@ namespace MongoDB.Driver.Linq.Expressions
             return expression;
         }
 
-        /// <summary>
-        /// Visits an Expression.
-        /// </summary>
-        /// <param name="node">The Expression.</param>
-        /// <returns>The Expression (possibly modified).</returns>
         protected override Expression Visit(Expression node)
         {
             if (node == null)
@@ -139,11 +104,6 @@ namespace MongoDB.Driver.Linq.Expressions
             }
         }
 
-        /// <summary>
-        /// Visits the aggregate.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The AggregationExpression (possibly modified).</returns>
         protected virtual Expression VisitAggregation(AggregationExpression node)
         {
             var argument = Visit(node.Argument);
@@ -155,11 +115,6 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
-        /// <summary>
-        /// Visits the collection.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The CollectionExpression (possibly modified).</returns>
         protected virtual Expression VisitCollection(CollectionExpression node)
         {
             var queryable = Visit(node.Queryable);
@@ -171,11 +126,6 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
-        /// <summary>
-        /// Visits the distinct.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The DistinctExpression (possibly modified).</returns>
         protected virtual Expression VisitDistinct(DistinctExpression node)
         {
             var source = Visit(node.Source);
@@ -190,31 +140,16 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
-        /// <summary>
-        /// Visits the document.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The DocumentExpression (possibly modified).</returns>
         protected virtual Expression VisitDocument(DocumentExpression node)
         {
             return node;
         }
 
-        /// <summary>
-        /// Visits the field.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The FieldExpression (possibly modified).</returns>
         protected virtual Expression VisitField(FieldExpression node)
         {
             return node;
         }
 
-        /// <summary>
-        /// Visits the group.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The GroupExpression (possibly modified).</returns>
         protected virtual Expression VisitGroup(GroupExpression node)
         {
             var source = Visit(node.Source);
@@ -231,11 +166,6 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
-        /// <summary>
-        /// Visits the grouped aggregate.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The GroupedAggregateExpression (possibly modified).</returns>
         protected virtual Expression VisitGroupedAggregate(GroupedAggregateExpression node)
         {
             var aggregate = (AggregationExpression)Visit(node.Aggregation);
@@ -248,11 +178,6 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
-        /// <summary>
-        /// Visits the match.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The MatchExpression (possibly modified).</returns>
         protected virtual Expression VisitMatch(MatchExpression node)
         {
             var source = Visit(node.Source);
@@ -266,11 +191,6 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
-        /// <summary>
-        /// Visits the pipeline.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The PipelineExpression (possibly modified).</returns>
         protected virtual Expression VisitPipeline(PipelineExpression node)
         {
             var source = Visit(node.Source);
@@ -285,11 +205,6 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
-        /// <summary>
-        /// Visits the project.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The ProjectExpression (possibly modified).</returns>
         protected virtual Expression VisitProject(ProjectExpression node)
         {
             var source = Visit(node.Source);
@@ -304,11 +219,6 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
-        /// <summary>
-        /// Visits the root aggregation.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The RootAggregationExpression (possibly modified).</returns>
         protected virtual Expression VisitRootAggregation(RootAggregationExpression node)
         {
             var projector = Visit(node.Projector);
@@ -323,11 +233,6 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
-        /// <summary>
-        /// Visits the skip limit.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The SkipLimitExpression (possibly modified).</returns>
         protected virtual Expression VisitSkipLimit(SkipLimitExpression node)
         {
             var source = Visit(node.Source);
@@ -344,11 +249,6 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
-        /// <summary>
-        /// Visits the sort.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The SortExpression (possibly modified).</returns>
         protected virtual Expression VisitSort(SortExpression node)
         {
             var source = Visit(node.Source);
@@ -362,11 +262,6 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
-        /// <summary>
-        /// Visits the sort clauses.
-        /// </summary>
-        /// <param name="sortClauses">The orderings.</param>
-        /// <returns>The sort clauses (possibly modified).</returns>
         protected virtual ReadOnlyCollection<SortClause> VisitSortClauses(ReadOnlyCollection<SortClause> sortClauses)
         {
             if (sortClauses != null)

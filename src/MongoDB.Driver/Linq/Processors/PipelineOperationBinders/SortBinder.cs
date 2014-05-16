@@ -13,36 +13,20 @@
 * limitations under the License.
 */
 
-using MongoDB.Driver.Linq.Expressions;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
+using MongoDB.Driver.Linq.Expressions;
 
 namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
 {
-    /// <summary>
-    /// Binds sort operations.
-    /// </summary>
     internal class SortBinder : GroupAwarePipelineOperationBinder
     {
         // constructors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SortBinder" /> class.
-        /// </summary>
-        /// <param name="groupMap">The group map.</param>
         public SortBinder(Dictionary<Expression, GroupExpression> groupMap)
             : base(groupMap)
         { }
 
         // public methods
-        /// <summary>
-        /// Binds a Sort operation.
-        /// </summary>
-        /// <param name="pipeline">The pipeline.</param>
-        /// <param name="sortClauses">The sort clauses.</param>
-        /// <returns></returns>
         public PipelineExpression Bind(PipelineExpression pipeline, IEnumerable<SortClause> sortClauses)
         {
             RegisterProjector(pipeline.Projector);

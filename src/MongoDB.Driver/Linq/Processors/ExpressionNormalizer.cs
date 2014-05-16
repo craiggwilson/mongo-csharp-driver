@@ -13,37 +13,20 @@
 * limitations under the License.
 */
 
-using MongoDB.Driver.Linq.Expressions;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace MongoDB.Driver.Linq.Processors
 {
-    /// <summary>
-    /// A class that normalizes C# and VB expression trees.
-    /// </summary>
     internal class ExpressionNormalizer : MongoDB.Driver.Linq.Expressions.ExpressionVisitor
     {
         // public methods
-        /// <summary>
-        /// Normalizes C# and VB expression trees.
-        /// </summary>
-        /// <param name="node">The expression to normalize.</param>
-        /// <returns>The normalized expression.</returns>
         public Expression Normalize(Expression node)
         {
             return Visit(node);
         }
 
         // protected methods
-        /// <summary>
-        /// Visits a BinaryExpression.
-        /// </summary>
-        /// <param name="node">The BinaryExpression.</param>
-        /// <returns>The BinaryExpression (possibly modified).</returns>
         protected override Expression VisitBinary(BinaryExpression node)
         {
             node = EnsureConstantIsOnRight(node);

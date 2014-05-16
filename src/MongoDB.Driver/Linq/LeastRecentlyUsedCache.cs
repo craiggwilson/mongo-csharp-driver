@@ -15,15 +15,10 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
 
 namespace MongoDB.Driver.Linq
 {
-    /// <summary>
-    /// Holds the most recent values for a given type.
-    /// </summary>
     internal class LeastRecentlyUsedCache<T>
     {
         // private fields
@@ -34,11 +29,6 @@ namespace MongoDB.Driver.Linq
         private int _version;
 
         // constructors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LeastRecentlyUsedCache{T}" /> class.
-        /// </summary>
-        /// <param name="maxSize">Size of the max.</param>
-        /// <param name="comparer">The comparer.</param>
         public LeastRecentlyUsedCache(int maxSize, Func<T, T, bool> comparer)
         {
             _comparer = comparer;
@@ -48,20 +38,12 @@ namespace MongoDB.Driver.Linq
         }
 
         // public properties
-        /// <summary>
-        /// Gets the max size of the cache.
-        /// </summary>
         public int MaxSize
         {
             get { return _maxSize; }
         }
 
         // public methods
-        /// <summary>
-        /// Gets an existing item that is cached or adds the new item.
-        /// </summary>
-        /// <param name="item">The item.</param>
-        /// <returns></returns>
         public T GetOrAdd(T item)
         {
             T cachedItem;

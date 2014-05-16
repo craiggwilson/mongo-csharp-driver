@@ -18,15 +18,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver.Linq.Expressions;
 
 namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
 {
-    /// <summary>
-    /// Binds aggregates that occur at the root of a tree.
-    /// </summary>
     internal class RootAggregateBinder : ProjectingPipelineOperationBinder
     {
         public RootAggregateBinder(Dictionary<Expression, GroupExpression> groupMap)
@@ -34,14 +30,6 @@ namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
         { }
 
         // public methods
-        /// <summary>
-        /// Binds a root aggregate operation.
-        /// </summary>
-        /// <param name="method">The method.</param>
-        /// <param name="pipeline">The pipeline.</param>
-        /// <param name="argument">The argument.</param>
-        /// <param name="rootAggregationType">Type of the root aggregation.</param>
-        /// <returns></returns>
         public Expression Bind(MethodInfo method, PipelineExpression pipeline, LambdaExpression argument, RootAggregationType rootAggregationType)
         {
             string aggregatorMethodName;
@@ -128,12 +116,6 @@ namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
                 aggregator);
         }
 
-        /// <summary>
-        /// Binds an ElementAt operation.
-        /// </summary>
-        /// <param name="result">The result.</param>
-        /// <param name="index">The index.</param>
-        /// <returns></returns>
         public Expression BindElementAt(PipelineExpression result, Expression index)
         {
             // skip the index and take 1 and then run the method locally against
@@ -141,12 +123,6 @@ namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
             return BindSkipLimitWithAggregator(result, index, Expression.Constant(1), "ElementAt", Expression.Constant(0));
         }
 
-        /// <summary>
-        /// Binds an ElementAt operation.
-        /// </summary>
-        /// <param name="result">The result.</param>
-        /// <param name="index">The index.</param>
-        /// <returns></returns>
         public Expression BindElementAtOrDefault(PipelineExpression result, Expression index)
         {
             // skip the index and take 1 and then run the method locally against
@@ -154,11 +130,6 @@ namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
             return BindSkipLimitWithAggregator(result, index, Expression.Constant(1), "ElementAtOrDefault", Expression.Constant(0));
         }
 
-        /// <summary>
-        /// Binds a First operation.
-        /// </summary>
-        /// <param name="result">The result.</param>
-        /// <returns></returns>
         public Expression BindFirst(PipelineExpression result)
         {
             // take 1 and then run the method locally against
@@ -166,11 +137,6 @@ namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
             return BindSkipLimitWithAggregator(result, Expression.Constant(0), Expression.Constant(1), "First");
         }
 
-        /// <summary>
-        /// Binds a FirstOrDefault operation.
-        /// </summary>
-        /// <param name="result">The result.</param>
-        /// <returns></returns>
         public Expression BindFirstOrDefault(PipelineExpression result)
         {
             // take 1 and then run the method locally against
@@ -178,31 +144,16 @@ namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
             return BindSkipLimitWithAggregator(result, Expression.Constant(0), Expression.Constant(1), "FirstOrDefault");
         }
 
-        /// <summary>
-        /// Binds a Last operation.
-        /// </summary>
-        /// <param name="result">The result.</param>
-        /// <returns></returns>
         public Expression BindLast(PipelineExpression result)
         {
             return BindLast(result, "Last");
         }
 
-        /// <summary>
-        /// Binds a LastOrDefault operation.
-        /// </summary>
-        /// <param name="result">The result.</param>
-        /// <returns></returns>
         public Expression BindLastOrDefault(PipelineExpression result)
         {
             return BindLast(result, "LastOrDefault");
         }
 
-        /// <summary>
-        /// Binds a Single operation.
-        /// </summary>
-        /// <param name="result">The result.</param>
-        /// <returns></returns>
         public Expression BindSingle(PipelineExpression result)
         {
             // take 2 and then run the method locally against
@@ -210,11 +161,6 @@ namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
             return BindSkipLimitWithAggregator(result, Expression.Constant(0), Expression.Constant(2), "Single");
         }
 
-        /// <summary>
-        /// Binds a SingleOrDefault operation.
-        /// </summary>
-        /// <param name="result">The result.</param>
-        /// <returns></returns>
         public Expression BindSingleOrDefault(PipelineExpression result)
         {
             // take 2 and then run the method locally against

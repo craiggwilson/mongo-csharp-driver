@@ -17,34 +17,20 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
 
 namespace MongoDB.Driver.Linq
 {
-    /// <summary>
-    /// Represents a value store for a projection operation.
-    /// </summary>
     internal interface IProjectionValueStore
     {
         T GetValue<T>(string elementName, object valueIfNotPresent);
     }
 
-    /// <summary>
-    /// Holds a single value.
-    /// </summary>
     internal class SingleValueProjectionValueStore : IProjectionValueStore
     {
         // private fields
         private object _value;
 
         // public methods
-        /// <summary>
-        /// Gets the value.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="key">The key.</param>
-        /// <param name="valueIfNotPresent">The value if not present.</param>
-        /// <returns></returns>
         public T GetValue<T>(string key, object valueIfNotPresent)
         {
             if (_value == null)
@@ -54,10 +40,6 @@ namespace MongoDB.Driver.Linq
             return (T)_value;
         }
 
-        /// <summary>
-        /// Sets the value.
-        /// </summary>
-        /// <param name="value">The value.</param>
         public void SetValue(object value)
         {
             // value will never be an IProjectionValueStore
@@ -65,9 +47,6 @@ namespace MongoDB.Driver.Linq
         }
     }
 
-    /// <summary>
-    /// Holds an array of values.
-    /// </summary>
     internal class ArrayProjectionValueStore : IProjectionValueStore
     {
         // private static fields
@@ -77,22 +56,12 @@ namespace MongoDB.Driver.Linq
         private readonly List<object> _values;
 
         // constructors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ArrayProjectionValueStore"/> class.
-        /// </summary>
         public ArrayProjectionValueStore()
         {
             _values = new List<object>();
         }
 
         // public methods
-        /// <summary>
-        /// Gets the value.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="key">The key.</param>
-        /// <param name="valueIfNotPresent">The value if not present.</param>
-        /// <returns></returns>
         public T GetValue<T>(string key, object valueIfNotPresent)
         {
             var method = GetGetValuesMethod(typeof(T));
@@ -100,10 +69,6 @@ namespace MongoDB.Driver.Linq
             return (T)(method.Invoke(null, new object[] { key, _values, valueIfNotPresent }));
         }
 
-        /// <summary>
-        /// Adds the value.
-        /// </summary>
-        /// <param name="value">The value.</param>
         public void AddValue(IProjectionValueStore value)
         {
             _values.Add(value);
@@ -152,22 +117,12 @@ namespace MongoDB.Driver.Linq
         private readonly Dictionary<string, IProjectionValueStore> _values;
 
         // constructors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DocumentProjectionValueStore"/> class.
-        /// </summary>
         public DocumentProjectionValueStore()
         {
             _values = new Dictionary<string, IProjectionValueStore>();
         }
 
         // public methods
-        /// <summary>
-        /// Gets the value.
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="key">The key.</param>
-        /// <param name="valueIfNotPresent">The value if not present.</param>
-        /// <returns></returns>
         public T GetValue<T>(string key, object valueIfNotPresent)
         {
             var valueStoreAndKey = GetValueStore(key, null, valueIfNotPresent);
@@ -185,11 +140,6 @@ namespace MongoDB.Driver.Linq
             return default(T);
         }
 
-        /// <summary>
-        /// Sets the value.
-        /// </summary>
-        /// <param name="key">The key.</param>
-        /// <param name="value">The value.</param>
         public void SetValue(string key, IProjectionValueStore value)
         {
             _values.Add(key, value);

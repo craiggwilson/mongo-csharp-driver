@@ -13,38 +13,19 @@
 * limitations under the License.
 */
 
-using MongoDB.Driver.Linq.Expressions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
+using MongoDB.Driver.Linq.Expressions;
 
 namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
 {
-    /// <summary>
-    /// Binds skip and limit operations.
-    /// </summary>
     internal class SkipLimitBinder : PipelineOperationBinder
     {
         // public methods
-        /// <summary>
-        /// Binds a Skip operation.
-        /// </summary>
-        /// <param name="pipeline">The pipeline.</param>
-        /// <param name="skip">The skip.</param>
-        /// <returns></returns>
         public Expression BindSkip(PipelineExpression pipeline, Expression skip)
         {
             return BindSkipLimit(pipeline, skip, null);
         }
 
-        /// <summary>
-        /// Binds a Take operation.
-        /// </summary>
-        /// <param name="pipeline">The pipeline.</param>
-        /// <param name="take">The take.</param>
-        /// <returns></returns>
         public Expression BindTake(PipelineExpression pipeline, Expression take)
         {
             return BindSkipLimit(pipeline, null, take);

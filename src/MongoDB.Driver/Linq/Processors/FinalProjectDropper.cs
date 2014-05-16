@@ -13,39 +13,24 @@
 * limitations under the License.
 */
 
-using MongoDB.Driver.Linq.Expressions;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
+using MongoDB.Driver.Linq.Expressions;
 
 namespace MongoDB.Driver.Linq.Processors
 {
-    /// <summary>
+    /// <remarks>
     /// Drops the final project in a pipeline. This allows highly-complex projections
     /// that are incapable of being run by the server to be run by the client.
-    /// </summary>
+    /// </remarks>
     internal class FinalProjectDropper : LinqToMongoExpressionVisitor
     {
         // public methods
-        /// <summary>
-        /// Drops the final project pipeline element.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The Expression (possibly modified).</returns>
         public Expression DropFinalProject(Expression node)
         {
             return Visit(node);
         }
 
         //protected methods
-        /// <summary>
-        /// Visits the pipeline.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The PipelineExpression (possibly modified).</returns>
         protected override Expression VisitPipeline(PipelineExpression node)
         {
             Expression source;

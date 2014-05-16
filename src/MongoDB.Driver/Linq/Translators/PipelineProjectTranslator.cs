@@ -13,27 +13,18 @@
 * limitations under the License.
 */
 
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
-using MongoDB.Driver.Linq.Expressions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
+using MongoDB.Bson;
+using MongoDB.Driver.Linq.Expressions;
 using MongoDB.Driver.Linq.Processors.PipelineOperationBinders;
 
 namespace MongoDB.Driver.Linq.Translators
 {
-    /// <summary>
-    /// Translates a ProjectExpression into a $project clause.
-    /// </summary>
     internal class PipelineProjectTranslator : LinqToMongoExpressionVisitor
     {
         // private fields
-        // we sometimes just want to include a field and not rename it...
-        // we can force ourselves to not use field includsion semantics
-        // by setting this to false.
         private bool _useFieldInclusionSemantics;
 
         public PipelineProjectTranslator()
@@ -46,11 +37,6 @@ namespace MongoDB.Driver.Linq.Translators
         }
 
         // public methods
-        /// <summary>
-        /// Builds the aggregations.
-        /// </summary>
-        /// <param name="aggregations">The aggregations.</param>
-        /// <returns>A document representing the non _id fields of a $group element.</returns>
         public BsonDocument BuildAggregations(IEnumerable<Expression> aggregations)
         {
             _useFieldInclusionSemantics = false;
@@ -65,11 +51,6 @@ namespace MongoDB.Driver.Linq.Translators
             return doc;
         }
 
-        /// <summary>
-        /// Builds the group id.
-        /// </summary>
-        /// <param name="id">The id.</param>
-        /// <returns>A document for the _id field of a $group element.</returns>
         public BsonDocument BuildGroupId(Expression id)
         {
             _useFieldInclusionSemantics = false;
@@ -78,11 +59,6 @@ namespace MongoDB.Driver.Linq.Translators
             return new BsonDocument("_id", value);
         }
 
-        /// <summary>
-        /// Builds the $project document.
-        /// </summary>
-        /// <param name="projector">The projector.</param>
-        /// <returns>A document representing a $project document.</returns>
         public BsonDocument BuildProject(Expression projector)
         {
             var value = ResolveValue(projector);

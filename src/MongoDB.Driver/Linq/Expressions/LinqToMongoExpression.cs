@@ -14,26 +14,20 @@
 */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace MongoDB.Driver.Linq.Expressions
 {
     /// <summary>
-    /// Base expression class for custom Aggregation expressions.
+    /// Base expression class for custom LinqToMongo expressions.
     /// </summary>
     internal abstract class LinqToMongoExpression : Expression
     {
         // constructors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="LinqToMongoExpression" /> class.
-        /// </summary>
-        /// <param name="expressionType">Type of the expression.</param>
-        /// <param name="type">The type.</param>
         protected LinqToMongoExpression(LinqToMongoExpressionType expressionType, Type type)
 #pragma warning disable 618
+            // TODO: need to build this correctly to .NET 4 standards, although this
+            // works perfectly fine.
             : base((ExpressionType)expressionType, type)
 #pragma warning restore  618
         {

@@ -13,19 +13,13 @@
 * limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using System.Threading;
 using MongoDB.Driver.Linq.Processors;
 
 namespace MongoDB.Driver.Linq
 {
-    /// <summary>
-    /// A query that has been cached...
-    /// </summary>
     internal class CachedQuery
     {
         // private fields
@@ -41,9 +35,6 @@ namespace MongoDB.Driver.Linq
         }
 
         // public properties
-        /// <summary>
-        /// Gets the original.
-        /// </summary>
         public Expression Original
         {
             get { return _original; }

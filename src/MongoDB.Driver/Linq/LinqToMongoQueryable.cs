@@ -17,7 +17,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace MongoDB.Driver.Linq
 {
@@ -75,7 +74,6 @@ namespace MongoDB.Driver.Linq
         }
 
         // public properties
-
         /// <summary>
         /// Gets the type of the element(s) that are returned when the expression tree associated with this instance of <see cref="T:System.Linq.IQueryable" /> is executed.
         /// </summary>

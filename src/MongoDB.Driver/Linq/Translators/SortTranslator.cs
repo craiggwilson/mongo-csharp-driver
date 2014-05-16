@@ -13,14 +13,10 @@
 * limitations under the License.
 */
 
-using MongoDB.Driver.Linq.Expressions;
-using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
 using MongoDB.Driver.Builders;
+using MongoDB.Driver.Linq.Expressions;
 
 namespace MongoDB.Driver.Linq.Translators
 {

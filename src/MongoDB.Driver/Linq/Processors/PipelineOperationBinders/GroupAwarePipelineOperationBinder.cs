@@ -23,32 +23,18 @@ using MongoDB.Driver.Linq.Expressions;
 
 namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
 {
-    /// <summary>
-    /// Base class for pipeline element binders that need to be aware of groupings.
-    /// </summary>
     internal abstract class GroupAwarePipelineOperationBinder : PipelineOperationBinder
     {
         // private fields
         private readonly Dictionary<Expression, GroupExpression> _groupMap;
 
         // constructors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="GroupAwarePipelineOperationBinder" /> class.
-        /// </summary>
-        /// <param name="groupMap">The group map.</param>
         protected GroupAwarePipelineOperationBinder(Dictionary<Expression, GroupExpression> groupMap)
         {
             _groupMap = groupMap;
         }
 
         // protected methods
-        /// <summary>
-        /// Visits a MemberExpression.
-        /// </summary>
-        /// <param name="node">The MemberExpression.</param>
-        /// <returns>
-        /// The MemberExpression (possibly modified).
-        /// </returns>
         protected override Expression VisitMember(MemberExpression node)
         {
             // First and Last don't take selector expressions in their method 
@@ -63,11 +49,6 @@ namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
             return base.VisitMember(node);
         }
 
-        /// <summary>
-        /// Visits a MethodCallExpression.
-        /// </summary>
-        /// <param name="node">The MethodCallExpression.</param>
-        /// <returns>The MethodCallExpression (possibly modified).</returns>
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
             if (IsAggregateOperation(node))
@@ -78,11 +59,6 @@ namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
             return base.VisitMethodCall(node);
         }
 
-        /// <summary>
-        /// Registers the group.
-        /// </summary>
-        /// <param name="projector">The projector.</param>
-        /// <param name="group">The group.</param>
         protected void RegisterGroup(Expression projector, GroupExpression group)
         {
             _groupMap.Add(projector, group);

@@ -13,7 +13,6 @@
 * limitations under the License.
 */
 
-using MongoDB.Driver.Linq.Expressions;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -25,51 +24,24 @@ using System.Text.RegularExpressions;
 
 namespace MongoDB.Driver.Linq.Expressions
 {
-    /// <summary>
-    /// A class that formats an Expression as a string.
-    /// </summary>
     internal class LinqToMongoExpressionFormatter : LinqToMongoExpressionVisitor
     {
         // private fields
         private StringBuilder _sb;
 
         // constructors
-        /// <summary>
-        /// Initializes a new instance of the ExpressionFormatter class.
-        /// </summary>
         public LinqToMongoExpressionFormatter()
         {
             _sb = new StringBuilder();
         }
 
         // public methods
-        /// <summary>
-        /// Returns a string that represents the Expression.
-        /// </summary>
-        /// <param name="node">The Expression to format.</param>
-        /// <returns>A string that represents the Expression.</returns>
-        public static string ToString(Expression node)
-        {
-            var formatter = new LinqToMongoExpressionFormatter();
-            formatter.Visit(node);
-            return formatter.ToString();
-        }
-
-        /// <summary>
-        /// Returns a string that represents the Expression.
-        /// </summary>
-        /// <returns>A string that represents the Expression.</returns>
         public override string ToString()
         {
             return _sb.ToString();
         }
 
         // protected methods
-        /// <summary>
-        /// Visits the aggregate.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The AggregationExpression (possibly modified).</returns>
         protected override Expression VisitAggregation(AggregationExpression node)
         {
             _sb.AppendFormat("<{0}:", node.AggregationType);
@@ -79,11 +51,6 @@ namespace MongoDB.Driver.Linq.Expressions
         }
 
         // protected methods
-        /// <summary>
-        /// Visits a BinaryExpression.
-        /// </summary>
-        /// <param name="node">The BinaryExpression.</param>
-        /// <returns>The BinaryExpression.</returns>
         protected override Expression VisitBinary(BinaryExpression node)
         {
             if (node.NodeType == ExpressionType.ArrayIndex)
@@ -127,33 +94,18 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
-        /// <summary>
-        /// Visits the collection.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The CollectionExpression (possibly modified).</returns>
         protected override Expression VisitCollection(CollectionExpression node)
         {
             _sb.AppendFormat("<Collection:{0}>", node.DocumentType.Name);
             return node;
         }
 
-        /// <summary>
-        /// Visits a ConditionalExpression.
-        /// </summary>
-        /// <param name="node">The ConditionalExpression.</param>
-        /// <returns>The ConditionalExpression.</returns>
         protected override Expression VisitConditional(ConditionalExpression node)
         {
             _sb.Append("<ConditionalExpression>");
             return node;
         }
 
-        /// <summary>
-        /// Visits a ConstantExpression.
-        /// </summary>
-        /// <param name="node">The ConstantExpression.</param>
-        /// <returns>The ConstantExpression.</returns>
         protected override Expression VisitConstant(ConstantExpression node)
         {
             // need to check node.Type instead of value.GetType() because boxed Nullable<T> values are boxed as <T>
@@ -165,11 +117,6 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
-        /// <summary>
-        /// Visits the distinct.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The DistinctExpression (possibly modified).</returns>
         protected override Expression VisitDistinct(DistinctExpression node)
         {
             Visit(node.Source);
@@ -179,44 +126,24 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
-        /// <summary>
-        /// Visits the document.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The DocumentExpression.</returns>
         protected override Expression VisitDocument(DocumentExpression node)
         {
             Visit(node.Expression);
             return node;
         }
 
-        /// <summary>
-        /// Visits an ElementInit node.
-        /// </summary>
-        /// <param name="node">The ElementInit node.</param>
-        /// <returns>The ElementInit node.</returns>
         protected override ElementInit VisitElementInit(ElementInit node)
         {
             _sb.Append("<ElementInit>");
             return node;
         }
 
-        /// <summary>
-        /// Visits an ElementInit list.
-        /// </summary>
-        /// <param name="nodes">The ElementInit list.</param>
-        /// <returns>The ElementInit list.</returns>
         protected override IEnumerable<ElementInit> VisitElementInitList(ReadOnlyCollection<ElementInit> nodes)
         {
             _sb.Append("<ReadOnlyCollection<ElementInit>>");
             return nodes;
         }
 
-        /// <summary>
-        /// Visits the field.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The FieldExpression.</returns>
         protected override Expression VisitField(FieldExpression node)
         {
             if (node.SerializationInfo != null)
@@ -231,11 +158,6 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
-        /// <summary>
-        /// Visits the group.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The GroupExpression (possibly modified).</returns>
         protected override Expression VisitGroup(GroupExpression node)
         {
             Visit(node.Source);
@@ -253,11 +175,6 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
-        /// <summary>
-        /// Visits the group.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The GroupExpression (possibly modified).</returns>
         protected override Expression VisitGroupedAggregate(GroupedAggregateExpression node)
         {
             _sb.Append("<GroupedAggregate(");
@@ -266,22 +183,12 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
-        /// <summary>
-        /// Visits an InvocationExpression.
-        /// </summary>
-        /// <param name="node">The InvocationExpression.</param>
-        /// <returns>The InvocationExpression.</returns>
         protected override Expression VisitInvocation(InvocationExpression node)
         {
             _sb.Append("<InvocationExpression>");
             return node;
         }
 
-        /// <summary>
-        /// Visits a LambdaExpression.
-        /// </summary>
-        /// <param name="node">The LambdaExpression.</param>
-        /// <returns>The LambdaExpression.</returns>
         protected override Expression VisitLambda(LambdaExpression node)
         {
             _sb.Append("(");
@@ -291,22 +198,12 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
-        /// <summary>
-        /// Visits a ListInitExpression.
-        /// </summary>
-        /// <param name="node">The ListInitExpression.</param>
-        /// <returns>The ListInitExpression.</returns>
         protected override Expression VisitListInit(ListInitExpression node)
         {
             _sb.Append("<ListInitExpression>");
             return node;
         }
 
-        /// <summary>
-        /// Visits the match.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The MatchExpression (possibly modified).</returns>
         protected override Expression VisitMatch(MatchExpression node)
         {
             Visit(node.Source);
@@ -316,11 +213,6 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
-        /// <summary>
-        /// Visits a MemberExpression.
-        /// </summary>
-        /// <param name="node">The MemberExpression.</param>
-        /// <returns>The MemberExpression.</returns>
         protected override Expression VisitMember(MemberExpression node)
         {
             Visit(node.Expression);
@@ -329,77 +221,42 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
-        /// <summary>
-        /// Visits a MemberAssignment.
-        /// </summary>
-        /// <param name="node">The MemberAssignment.</param>
-        /// <returns>The MemberAssignment.</returns>
         protected override MemberAssignment VisitMemberAssignment(MemberAssignment node)
         {
             _sb.Append("<MemberAssignment>");
             return node;
         }
 
-        /// <summary>
-        /// Visits a MemberBinding.
-        /// </summary>
-        /// <param name="node">The MemberBinding.</param>
-        /// <returns>The MemberBinding (possibly modified).</returns>
         protected override MemberBinding VisitMemberBinding(MemberBinding node)
         {
             _sb.Append("<MemberBinding>");
             return node;
         }
 
-        /// <summary>
-        /// Visits a MemberBinding list.
-        /// </summary>
-        /// <param name="nodes">The MemberBinding list.</param>
-        /// <returns>The MemberBinding list.</returns>
         protected override IEnumerable<MemberBinding> VisitMemberBindingList(ReadOnlyCollection<MemberBinding> nodes)
         {
             _sb.Append("<ReadOnlyCollection<MemberBinding>>");
             return nodes;
         }
 
-        /// <summary>
-        /// Visits a MemberInitExpression.
-        /// </summary>
-        /// <param name="node">The MemberInitExpression.</param>
-        /// <returns>The MemberInitExpression.</returns>
         protected override Expression VisitMemberInit(MemberInitExpression node)
         {
             _sb.Append("<MemberInitExpression>");
             return node;
         }
 
-        /// <summary>
-        /// Visits a MemberListBinding.
-        /// </summary>
-        /// <param name="node">The MemberListBinding.</param>
-        /// <returns>The MemberListBinding.</returns>
         protected override MemberListBinding VisitMemberListBinding(MemberListBinding node)
         {
             _sb.Append("<MemberListBinding>");
             return node;
         }
 
-        /// <summary>
-        /// Visits a MemberMemberBinding.
-        /// </summary>
-        /// <param name="node">The MemberMemberBinding.</param>
-        /// <returns>The MemberMemberBinding.</returns>
         protected override MemberMemberBinding VisitMemberMemberBinding(MemberMemberBinding node)
         {
             _sb.Append("<MemberMemberBinding>");
             return node;
         }
 
-        /// <summary>
-        /// Visits a MethodCallExpression.
-        /// </summary>
-        /// <param name="node">The MethodCallExpression.</param>
-        /// <returns>The MethodCallExpression.</returns>
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
             if (node.Method.IsStatic)
@@ -428,11 +285,6 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
-        /// <summary>
-        /// Visits a NewExpression.
-        /// </summary>
-        /// <param name="node">The NewExpression.</param>
-        /// <returns>The NewExpression.</returns>
         protected override NewExpression VisitNew(NewExpression node)
         {
             _sb.Append("new ");
@@ -449,11 +301,6 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
-        /// <summary>
-        /// Visits a NewArrayExpression.
-        /// </summary>
-        /// <param name="node">The NewArrayExpression.</param>
-        /// <returns>The NewArrayExpression.</returns>
         protected override Expression VisitNewArray(NewArrayExpression node)
         {
             var elementType = node.Type.GetElementType();
@@ -469,22 +316,12 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
-        /// <summary>
-        /// Visits a ParameterExpression.
-        /// </summary>
-        /// <param name="node">The ParameterExpression.</param>
-        /// <returns>The ParameterExpression.</returns>
         protected override Expression VisitParameter(ParameterExpression node)
         {
             _sb.Append(node.Name);
             return node;
         }
 
-        /// <summary>
-        /// Visits the pipeline.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The PipelineExpression (possibly modified).</returns>
         protected override Expression VisitPipeline(PipelineExpression node)
         {
             Visit(node.Source);
@@ -494,11 +331,6 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
-        /// <summary>
-        /// Visits the project.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The ProjectExpression (possibly modified).</returns>
         protected override Expression VisitProject(ProjectExpression node)
         {
             Visit(node.Source);
@@ -508,11 +340,6 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
-        /// <summary>
-        /// Visits the root aggregation.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The RootAggregationExpression (possibly modified).</returns>
         protected override Expression VisitRootAggregation(RootAggregationExpression node)
         {
             Visit(node.Source);
@@ -529,11 +356,6 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
-        /// <summary>
-        /// Visits the skip limit.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The SkipLimitExpression (possibly modified).</returns>
         protected override Expression VisitSkipLimit(SkipLimitExpression node)
         {
             Visit(node.Source);
@@ -545,11 +367,6 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
-        /// <summary>
-        /// Visits the sort.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The SortExpression (possibly modified).</returns>
         protected override Expression VisitSort(SortExpression node)
         {
             Visit(node.Source);
@@ -563,11 +380,6 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
-        /// <summary>
-        /// Visits a TypeBinaryExpression.
-        /// </summary>
-        /// <param name="node">The TypeBinaryExpression.</param>
-        /// <returns>The TypeBinaryExpression.</returns>
         protected override Expression VisitTypeBinary(TypeBinaryExpression node)
         {
             _sb.Append("(");
@@ -578,11 +390,6 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
-        /// <summary>
-        /// Visits a UnaryExpression.
-        /// </summary>
-        /// <param name="node">The UnaryExpression.</param>
-        /// <returns>The UnaryExpression.</returns>
         protected override Expression VisitUnary(UnaryExpression node)
         {
             switch (node.NodeType)
@@ -739,6 +546,14 @@ namespace MongoDB.Driver.Linq.Expressions
             }
 
             _sb.Append(value.ToString());
+        }
+
+        // public static methods
+        public static string ToString(Expression node)
+        {
+            var formatter = new LinqToMongoExpressionFormatter();
+            formatter.Visit(node);
+            return formatter.ToString();
         }
     }
 }

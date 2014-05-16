@@ -13,18 +13,11 @@
 * limitations under the License.
 */
 
-using MongoDB.Driver.Linq.Expressions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
+using MongoDB.Driver.Linq.Expressions;
 
 namespace MongoDB.Driver.Linq.Processors
 {
-    /// <summary>
-    /// Reorders expressions to allow for further optimization.
-    /// </summary>
     /// <remarks>
     /// Specifically, this will reorder MatchExpressions and SortExpressions
     /// such that the MatchExpression will always be before(deeper than) the 
@@ -33,24 +26,12 @@ namespace MongoDB.Driver.Linq.Processors
     internal class ExpressionReorderer : LinqToMongoExpressionVisitor
     {
         // public methods
-        /// <summary>
-        /// Reorders the specified node.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns></returns>
         public Expression Reorder(Expression node)
         {
             return Visit(node);
         }
 
         // protected methods
-        /// <summary>
-        /// Visits the match.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>
-        /// The MatchExpression (possibly modified).
-        /// </returns>
         protected override Expression VisitMatch(MatchExpression node)
         {
             var source = Visit(node.Source);

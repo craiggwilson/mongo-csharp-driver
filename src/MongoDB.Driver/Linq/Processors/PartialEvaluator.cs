@@ -13,37 +13,22 @@
 * limitations under the License.
 */
 
-using MongoDB.Driver.Linq.Expressions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
+using MongoDB.Driver.Linq.Expressions;
 
 namespace MongoDB.Driver.Linq.Processors
 {
-    /// <summary>
-    /// A static class with methods to partially evaluate an Expression.
-    /// </summary>
     internal static class PartialEvaluator
     {
         // public static methods
-        /// <summary>
-        /// Performs evaluation and replacement of independent sub-trees.
-        /// </summary>
-        /// <param name="expression">The root of the expression tree.</param>
-        /// <returns>A new tree with sub-trees evaluated and replaced.</returns>
         public static Expression Evaluate(Expression expression)
         {
             return Evaluate(expression, null);
         }
 
-        /// <summary>
-        /// Performs evaluation and replacement of independent sub-trees.
-        /// </summary>
-        /// <param name="expression">The root of the expression tree.</param>
-        /// <param name="queryProvider">The query provider when the expression is a LINQ query (can be null).</param>
-        /// <returns>A new tree with sub-trees evaluated and replaced.</returns>
         public static Expression Evaluate(Expression expression, IQueryProvider queryProvider)
         {
             return new SubtreeEvaluator(new ExpressionNominator(e => CanBeEvaluatedLocally(e, queryProvider)).Nominate(expression)).Evaluate(expression);

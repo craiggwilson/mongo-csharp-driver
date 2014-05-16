@@ -13,37 +13,20 @@
 * limitations under the License.
 */
 
-using MongoDB.Driver.Linq.Expressions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
+using MongoDB.Driver.Linq.Expressions;
 
 namespace MongoDB.Driver.Linq.Processors
 {
-    /// <summary>
-    /// Combines adjacent MatchExpressions.
-    /// </summary>
     internal class MatchReducer : LinqToMongoExpressionVisitor
     {
         // public methods
-        /// <summary>
-        /// Reduces the specified node.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns></returns>
         public Expression Reduce(Expression node)
         {
             return Visit(node);
         }
 
         // protected methods
-        /// <summary>
-        /// Visits the match.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The MatchExpression (possibly modified).</returns>
         protected override Expression VisitMatch(MatchExpression node)
         {
             var source = Visit(node.Source);

@@ -13,18 +13,11 @@
 * limitations under the License.
 */
 
-using MongoDB.Driver.Linq.Expressions;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
+using MongoDB.Driver.Linq.Expressions;
 
 namespace MongoDB.Driver.Linq.Processors
 {
-    /// <summary>
-    /// Replaces all occurences of one expression with another.
-    /// </summary>
     internal class ExpressionReplacer : LinqToMongoExpressionVisitor
     {
         // private fields
@@ -32,13 +25,6 @@ namespace MongoDB.Driver.Linq.Processors
         private Expression _to;
 
         // public methods
-        /// <summary>
-        /// Replaces the specified node.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <param name="from">From.</param>
-        /// <param name="to">To.</param>
-        /// <returns>The Expression (possibly modified).</returns>
         public Expression Replace(Expression node, Expression from, Expression to)
         {
             _from = from;
@@ -46,13 +32,6 @@ namespace MongoDB.Driver.Linq.Processors
             return Visit(node);
         }
 
-        /// <summary>
-        /// Replaces all the from nodes with there corresponding to.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <param name="from">From.</param>
-        /// <param name="to">To.</param>
-        /// <returns>The Expression (possibly modified).</returns>
         public Expression ReplaceAll(Expression node, Expression[] from, Expression[] to)
         {
             for (int i = 0; i < from.Length; i++)
@@ -63,11 +42,6 @@ namespace MongoDB.Driver.Linq.Processors
             return node;
         }
 
-        /// <summary>
-        /// Visits an Expression.
-        /// </summary>
-        /// <param name="node">The Expression.</param>
-        /// <returns>The Expression (possibly modified).</returns>
         protected override Expression Visit(Expression node)
         {
             if (node == _from)

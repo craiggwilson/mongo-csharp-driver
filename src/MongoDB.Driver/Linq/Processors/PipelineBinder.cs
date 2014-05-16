@@ -13,21 +13,17 @@
 * limitations under the License.
 */
 
-using MongoDB.Bson.Serialization;
-using MongoDB.Driver.Linq.Expressions;
-using MongoDB.Driver.Linq.Processors.PipelineOperationBinders;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
+using MongoDB.Bson.Serialization;
+using MongoDB.Driver.Linq.Expressions;
+using MongoDB.Driver.Linq.Processors.PipelineOperationBinders;
 
 namespace MongoDB.Driver.Linq.Processors
 {
-    /// <summary>
-    /// Binds expression tree concepts to Aggregation Framework specific expressions.
-    /// </summary>
     internal class PipelineBinder : LinqToMongoExpressionVisitor
     {
         // private fields
@@ -35,31 +31,18 @@ namespace MongoDB.Driver.Linq.Processors
         private Stack<SortClause> _thenBys;
 
         // constructors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PipelineBinder" /> class.
-        /// </summary>
         public PipelineBinder()
         {
             _groupMap = new Dictionary<Expression, GroupExpression>();
         }
 
         // public methods
-        /// <summary>
-        /// Binds the specified node.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The bound expression tree.</returns>
         public Expression Bind(Expression node)
         {
             return Visit(node);
         }
 
         // protected methods
-        /// <summary>
-        /// Visits a ConstantExpression.
-        /// </summary>
-        /// <param name="node">The ConstantExpression.</param>
-        /// <returns>The ConstantExpression (possibly modified).</returns>
         protected override Expression VisitConstant(ConstantExpression node)
         {
             if (node.Type.IsGenericType && node.Type.GetGenericTypeDefinition() == typeof(LinqToMongoQueryable<>))
@@ -73,11 +56,6 @@ namespace MongoDB.Driver.Linq.Processors
             return node;
         }
 
-        /// <summary>
-        /// Visits a MethodCallExpression.
-        /// </summary>
-        /// <param name="node">The MethodCallExpression.</param>
-        /// <returns>The MethodCallExpression (possibly modified).</returns>
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
             if (IsLinqMethod(node))
@@ -237,11 +215,6 @@ namespace MongoDB.Driver.Linq.Processors
             return base.VisitMethodCall(node);
         }
 
-        /// <summary>
-        /// Visits a ParameterExpression.
-        /// </summary>
-        /// <param name="node">The ParameterExpression.</param>
-        /// <returns>The ParameterExpression (possibly modified).</returns>
         protected override Expression VisitParameter(ParameterExpression node)
         {
             if (node.Type.IsGenericType && node.Type.GetGenericTypeDefinition() == typeof(LinqToMongoQueryable<>))

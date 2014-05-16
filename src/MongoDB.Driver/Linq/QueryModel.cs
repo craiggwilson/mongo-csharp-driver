@@ -13,15 +13,12 @@
 * limitations under the License.
 */
 
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Text;
-using MongoDB.Driver.Operations;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 
 namespace MongoDB.Driver.Linq
 {
@@ -206,11 +203,6 @@ namespace MongoDB.Driver.Linq
         }
 
         // internal methods
-        /// <summary>
-        /// Executes the query against the collection.
-        /// </summary>
-        /// <param name="collection">The collection.</param>
-        /// <returns></returns>
         internal override object Execute(MongoCollection collection)
         {
             if (_isDistinct)
@@ -314,6 +306,8 @@ namespace MongoDB.Driver.Linq
             var serializerType = typeof(DistinctCommandResultSerializer<>).MakeGenericType(_distinctValueSerializationInfo.NominalType);
             var serializer = (IBsonSerializer)Activator.CreateInstance(serializerType, _distinctValueSerializationInfo.Serializer);
 
+            // TODO: currently no way to hook into collection.Distinct with a custom serializer,
+            // so we do this manually.
             var cursor = MongoCursor.Create(
                 typeof(DistinctCommandResult<>).MakeGenericType(_distinctValueSerializationInfo.NominalType),
                 collection.Database.GetCollection("$cmd"), 
@@ -321,7 +315,7 @@ namespace MongoDB.Driver.Linq
                 collection.Settings.ReadPreference, 
                 serializer);
 
-            cursor.SetLimit(1);
+            cursor.SetLimit(1); // maybe should be -1?
 
             var result = cursor.OfType<CommandResult>().First();
 

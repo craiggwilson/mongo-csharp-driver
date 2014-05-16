@@ -14,11 +14,7 @@
 */
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
 
 namespace MongoDB.Driver.Linq.Expressions
 {
@@ -29,14 +25,11 @@ namespace MongoDB.Driver.Linq.Expressions
     [DebuggerDisplay("{ToString()}")]
     internal class GroupedAggregateExpression : LinqToMongoExpression
     {
+        // private fields
         private readonly Guid _groupCorrelationId;
         private readonly AggregationExpression _aggregation;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="GroupedAggregateExpression" /> class.
-        /// </summary>
-        /// <param name="groupCorrelationId">The group correlation identifier.</param>
-        /// <param name="aggregation">The aggregate.</param>
+        // constructors
         public GroupedAggregateExpression(Guid groupCorrelationId, AggregationExpression aggregation)
             : base(LinqToMongoExpressionType.GroupedAggregate, aggregation.Type)
         {
@@ -44,28 +37,18 @@ namespace MongoDB.Driver.Linq.Expressions
             _aggregation = aggregation;
         }
 
-        /// <summary>
-        /// Gets the aggregation.
-        /// </summary>
+        // public properties
         public AggregationExpression Aggregation
         {
             get { return _aggregation; }
         }
 
-        /// <summary>
-        /// Gets the group correlation identifier.
-        /// </summary>
         public Guid GroupCorrelationId
         {
             get { return _groupCorrelationId; }
         }
 
-        /// <summary>
-        /// Returns a <see cref="System.String" /> that represents this instance.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="System.String" /> that represents this instance.
-        /// </returns>
+        // public methods
         public override string ToString()
         {
             return LinqToMongoExpressionFormatter.ToString(this);

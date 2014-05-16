@@ -13,23 +13,14 @@
 * limitations under the License.
 */
 
-using MongoDB.Bson;
-using MongoDB.Bson.IO;
-using MongoDB.Bson.Serialization;
-using MongoDB.Driver.Linq.Expressions;
-using MongoDB.Driver.Linq.Processors;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
+using MongoDB.Driver.Linq.Expressions;
 
 namespace MongoDB.Driver.Linq.Translators
 {
-    /// <summary>
-    /// Builds the projection for a <see cref="QueryModel"/>.
-    /// </summary>
     internal class QueryProjectionBuilder : LinqToMongoExpressionVisitor
     {
         // private fields
@@ -37,13 +28,6 @@ namespace MongoDB.Driver.Linq.Translators
         private HashSet<FieldExpression> _projectedFields;
 
         // public methods
-        /// <summary>
-        /// Builds the projection.
-        /// </summary>
-        /// <param name="projector">The projector.</param>
-        /// <param name="documentType">Type of the document.</param>
-        /// <returns></returns>
-        /// <exception cref="System.InvalidOperationException">Should not be here if the projection isn't a field expression.</exception>
         public ExecutionModelProjection Build(Expression projector, Type documentType)
         {
             var fields = new FieldGatherer().Gather(projector, false);
@@ -69,22 +53,12 @@ namespace MongoDB.Driver.Linq.Translators
         }
 
         // protected methods
-        /// <summary>
-        /// Visits the document.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The DocumentExpression (possibly modified).</returns>
         protected override Expression VisitDocument(DocumentExpression node)
         {
             // strip out the documents when building the projection because we are still projecting from a source.
             return Visit(node.Expression);
         }
 
-        /// <summary>
-        /// Visits the field.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The FieldExpression (possibly modified).</returns>
         protected override Expression VisitField(FieldExpression node)
         {
             // we need to strip out all the computed fields, although none should exist at this point.
@@ -145,11 +119,6 @@ namespace MongoDB.Driver.Linq.Translators
             return base.VisitMethodCall(node);
         }
 
-        /// <summary>
-        /// Visits a ParameterExpression.
-        /// </summary>
-        /// <param name="node">The ParameterExpression.</param>
-        /// <returns>The ParameterExpression (possibly modified).</returns>
         protected override Expression VisitParameter(ParameterExpression node)
         {
             // all parameters left in the tree will always be the store or the document.

@@ -13,27 +13,14 @@
 * limitations under the License.
 */
 
-using MongoDB.Driver.Linq.Expressions;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Reflection;
-using MongoDB.Bson.Serialization;
 
 namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
 {
-    /// <summary>
-    /// Base class for binding specific pipeline methods.
-    /// </summary>
     internal abstract class PipelineOperationBinder : SerializationInfoBinder
     {
         // protected methods
-        /// <summary>
-        /// Registers the projector.
-        /// </summary>
-        /// <param name="projector">The projector.</param>
         protected void RegisterProjector(Expression projector)
         {
             switch (projector.NodeType)
@@ -45,8 +32,6 @@ namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
         }
 
         // private methods
-        
-
         private void MapNewExpressionMembers(NewExpression node)
         {
             // TODO: handle non-anonymous types.  Problems with this would

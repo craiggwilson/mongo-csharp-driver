@@ -13,20 +13,13 @@
 * limitations under the License.
 */
 
-using MongoDB.Driver.Linq.Expressions;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Reflection;
 using MongoDB.Bson.Serialization;
+using MongoDB.Driver.Linq.Expressions;
 
 namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
 {
-    /// <summary>
-    /// Binds project operations.
-    /// </summary>
     internal class ProjectBinder : ProjectingPipelineOperationBinder
     {
         public static readonly string ScalarProjectionFieldName = "_fld0";
@@ -36,12 +29,6 @@ namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
         { }
 
         // public methods
-        /// <summary>
-        /// Binds a Project operation.
-        /// </summary>
-        /// <param name="pipeline">The pipeline.</param>
-        /// <param name="selector">The selector.</param>
-        /// <returns></returns>
         public Expression Bind(PipelineExpression pipeline, LambdaExpression selector)
         {
             RegisterProjector(pipeline.Projector);

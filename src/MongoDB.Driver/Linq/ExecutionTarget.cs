@@ -14,9 +14,6 @@
 */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace MongoDB.Driver.Linq
 {
@@ -39,7 +36,7 @@ namespace MongoDB.Driver.Linq
         /// </summary>
         Pipeline = 2,
         /// <summary>
-        /// Linq queries should target the most more performant.
+        /// Linq queries should target the best model.
         /// </summary>
         Best = 7, // in case we add an M/R target...
     }

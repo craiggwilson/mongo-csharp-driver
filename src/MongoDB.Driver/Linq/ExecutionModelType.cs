@@ -13,11 +13,6 @@
 * limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace MongoDB.Driver.Linq
 {
     /// <summary>
@@ -30,8 +25,8 @@ namespace MongoDB.Driver.Linq
         /// </summary>
         Query,
         /// <summary>
-        /// Represents a query that must be executed with the aggregation framework.
+        /// Represents a query that must be executed using a pipeline.
         /// </summary>
-        AggregationFramework
+        Pipeline
     }
 }

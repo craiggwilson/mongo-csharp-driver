@@ -13,31 +13,16 @@
 * limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace MongoDB.Driver.Linq.Expressions
 {
-    /// <summary>
-    /// Finds the root queryable in a node.
-    /// </summary>
-    /// <remarks>
-    /// This will almost always be the deepest node in the tree.
-    /// </remarks>
     internal class RootQueryableFinder : LinqToMongoExpressionVisitor
     {
         // private fields
         private ConstantExpression _root;
 
         // public methods
-        /// <summary>
-        /// Finds the specified node.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The root queryable or null.</returns>
         public ConstantExpression Find(Expression node)
         {
             _root = null;
@@ -46,13 +31,6 @@ namespace MongoDB.Driver.Linq.Expressions
         }
 
         // protected methods
-        /// <summary>
-        /// Visits a ConstantExpression.
-        /// </summary>
-        /// <param name="node">The ConstantExpression.</param>
-        /// <returns>
-        /// The ConstantExpression (possibly modified).
-        /// </returns>
         protected override Expression VisitConstant(ConstantExpression node)
         {
             if (_root == null && node.Type.IsGenericType && node.Type.GetGenericTypeDefinition() == typeof(LinqToMongoQueryable<>))

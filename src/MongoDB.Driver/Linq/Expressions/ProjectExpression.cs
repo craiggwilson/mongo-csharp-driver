@@ -14,18 +14,11 @@
 */
 
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace MongoDB.Driver.Linq.Expressions
 {
-    /// <summary>
-    /// A project expression.
-    /// </summary>
     [DebuggerTypeProxy(typeof(ProjectExpressionDebugView))]
     [DebuggerDisplay("{ToString()}")]
     internal class ProjectExpression : LinqToMongoExpression
@@ -35,11 +28,6 @@ namespace MongoDB.Driver.Linq.Expressions
         private readonly Expression _source;
 
         // constructors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ProjectExpression" /> class.
-        /// </summary>
-        /// <param name="source">The source.</param>
-        /// <param name="projector">The projector.</param>
         public ProjectExpression(Expression source, Expression projector)
             : base(LinqToMongoExpressionType.Project, projector.Type)
         {
@@ -48,28 +36,17 @@ namespace MongoDB.Driver.Linq.Expressions
         }
 
         // public properties
-        /// <summary>
-        /// Gets the projector.
-        /// </summary>
         public Expression Projector
         {
             get { return _projector; }
         }
 
-        /// <summary>
-        /// Gets the source.
-        /// </summary>
         public Expression Source
         {
             get { return _source; }
         }
 
-        /// <summary>
-        /// Returns a <see cref="System.String" /> that represents this instance.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="System.String" /> that represents this instance.
-        /// </returns>
+        // public methods
         public override string ToString()
         {
             return LinqToMongoExpressionFormatter.ToString(this);

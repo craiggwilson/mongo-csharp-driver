@@ -13,13 +13,11 @@
 * limitations under the License.
 */
 
-using MongoDB.Driver.Linq.Expressions;
-using MongoDB.Driver.Linq.Translators;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
+using MongoDB.Driver.Linq.Expressions;
+using MongoDB.Driver.Linq.Translators;
 
 namespace MongoDB.Driver.Linq
 {
@@ -39,13 +37,6 @@ namespace MongoDB.Driver.Linq
         private Expression _provider;
 
         // public methods
-        /// <summary>
-        /// Builds the specified node.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <param name="provider">The provider.</param>
-        /// <param name="executionTarget">The query target.</param>
-        /// <returns>An executable expression.</returns>
         public Expression Build(Expression node, Expression provider, ExecutionTarget executionTarget)
         {
             _executionTarget = executionTarget;
@@ -54,20 +45,15 @@ namespace MongoDB.Driver.Linq
         }
 
         // protected methods
-        /// <summary>
-        /// Visits the pipeline.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The PipelineExpression (possibly modified).</returns>
         protected override Expression VisitPipeline(PipelineExpression node)
         {
             var executionModel = new ExecutionModelBuilder().Build(node, _executionTarget);
 
-            // this calls back into the AggQueryProvider.ExecuteQueryModel to execute
+            // this calls back into the LinqToMongoQueryProvider.Execute to execute
             // the actual query.
             Expression executor = Expression.Call(
                 _provider,
-                "ExecuteQueryModel",
+                "Execute",
                 Type.EmptyTypes,
                 Expression.Constant(executionModel, typeof(ExecutionModel)));
 

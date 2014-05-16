@@ -16,18 +16,13 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace MongoDB.Driver.Linq.Expressions
 {
-    /// <summary>
-    /// A result expression.
-    /// </summary>
     /// <remarks>
     /// Only one of these will exist in a bound expression tree.  It will also generally
-    /// exist as the root in the tree.
+    /// exist as the highest node in a tree.
     /// </remarks>
     [DebuggerTypeProxy(typeof(PipelineExpressionDebugView))]
     [DebuggerDisplay("{ToString()}")]
@@ -39,21 +34,10 @@ namespace MongoDB.Driver.Linq.Expressions
         private readonly LambdaExpression _aggregator;
 
         // constructors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PipelineExpression" /> class.
-        /// </summary>
-        /// <param name="source">The source.</param>
-        /// <param name="projector">The projector.</param>
         public PipelineExpression(Expression source, Expression projector)
             : this(source, projector, null)
         { }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="PipelineExpression" /> class.
-        /// </summary>
-        /// <param name="source">The source.</param>
-        /// <param name="projector">The projector.</param>
-        /// <param name="aggregator">The aggregator.</param>
         public PipelineExpression(Expression source, Expression projector, LambdaExpression aggregator)
             : base(LinqToMongoExpressionType.Pipeline, aggregator != null ? aggregator.Body.Type : typeof(IEnumerable<>).MakeGenericType(projector.Type))
         {
@@ -63,36 +47,22 @@ namespace MongoDB.Driver.Linq.Expressions
         }
 
         // public properties
-        /// <summary>
-        /// Gets the aggregator.
-        /// </summary>
         public LambdaExpression Aggregator
         {
             get { return _aggregator; }
         }
 
-        /// <summary>
-        /// Gets the projector.
-        /// </summary>
         public Expression Projector
         {
             get { return _projector; }
         }
 
-        /// <summary>
-        /// Gets the source.
-        /// </summary>
         public Expression Source
         {
             get { return _source; }
         }
 
-        /// <summary>
-        /// Returns a <see cref="System.String" /> that represents this instance.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="System.String" /> that represents this instance.
-        /// </returns>
+        // public methods
         public override string ToString()
         {
             return LinqToMongoExpressionFormatter.ToString(this);

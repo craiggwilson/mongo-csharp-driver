@@ -21,7 +21,6 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Text.RegularExpressions;
 using MongoDB.Bson;
-using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Options;
 using MongoDB.Driver.Builders;
@@ -29,17 +28,9 @@ using MongoDB.Driver.Linq.Expressions;
 
 namespace MongoDB.Driver.Linq.Translators
 {
-    /// <summary>
-    /// Translates an expression tree into an IMongoQuery.
-    /// </summary>
     internal class PredicateTranslator
     {
         // public methods
-        /// <summary>
-        /// Builds an IMongoQuery from an expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <returns>An IMongoQuery.</returns>
         public IMongoQuery BuildQuery(Expression expression)
         {
             IMongoQuery query = null;

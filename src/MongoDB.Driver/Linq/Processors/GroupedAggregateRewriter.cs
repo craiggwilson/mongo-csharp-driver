@@ -13,20 +13,15 @@
 * limitations under the License.
 */
 
-using MongoDB.Driver.Linq.Expressions;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using MongoDB.Bson.Serialization;
+using MongoDB.Driver.Linq.Expressions;
 
 namespace MongoDB.Driver.Linq.Processors
 {
-    /// <summary>
-    /// Rewrites Group expressions to correlate their aggregation expressions.
-    /// </summary>
     /// <remarks>
     /// A GroupedAggregateExpression is a temporary expression whose mere presence 
     /// indicates a need to move it around.  So, we find all of these that exist first
@@ -39,11 +34,6 @@ namespace MongoDB.Driver.Linq.Processors
         private ILookup<Guid, GroupedAggregateExpression> _lookup;
 
         // public methods
-        /// <summary>
-        /// Rewrites the specified node.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns></returns>
         public Expression Rewrite(Expression node)
         {
             _map = new Dictionary<GroupedAggregateExpression, Expression>();
@@ -51,11 +41,6 @@ namespace MongoDB.Driver.Linq.Processors
         }
 
         // protected methods
-        /// <summary>
-        /// Visits the field.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The FieldExpression (possibly modified).</returns>
         protected override Expression VisitField(FieldExpression node)
         {
             var exp = Visit(node.Expression);
@@ -67,11 +52,6 @@ namespace MongoDB.Driver.Linq.Processors
             return base.VisitField(node);
         }
 
-        /// <summary>
-        /// Visits the grouped aggregate.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The GroupedAggregateExpression (possibly modified).</returns>
         protected override Expression VisitGroupedAggregate(GroupedAggregateExpression node)
         {
             Expression mapped;
@@ -83,11 +63,6 @@ namespace MongoDB.Driver.Linq.Processors
             return base.VisitGroupedAggregate(node);
         }
 
-        /// <summary>
-        /// Visits the group.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The GroupExpression (possibly modified).</returns>
         protected override Expression VisitGroup(GroupExpression node)
         {
             if (_lookup != null && _lookup.Contains(node.CorrelationId))

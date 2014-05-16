@@ -13,14 +13,12 @@
 * limitations under the License.
 */
 
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Collections;
 using System.Reflection;
+using MongoDB.Bson;
+using MongoDB.Bson.Serialization;
 
 namespace MongoDB.Driver.Linq
 {
@@ -37,7 +35,7 @@ namespace MongoDB.Driver.Linq
         /// Initializes a new instance of the <see cref="PipelineModel" /> class.
         /// </summary>
         public PipelineModel()
-            : base(ExecutionModelType.AggregationFramework)
+            : base(ExecutionModelType.Pipeline)
         {
         }
 
@@ -92,6 +90,8 @@ namespace MongoDB.Driver.Linq
             var serializerType = typeof(AggregateCommandResultSerializer<>).MakeGenericType(Projection.Projector.Parameters[0].Type);
             var serializer = (IBsonSerializer)Activator.CreateInstance(serializerType, new [] { resultSerializer });
 
+            // TODO: We currently don't have a way to hook into the current collection.Aggregate method,
+            // with a custom serializer, so we have to do this manually for now.
             var resultType = typeof(AggregateCommandResult<>).MakeGenericType(Projection.Projector.Parameters[0].Type);
 
             var cursor = MongoCursor.Create(resultType,

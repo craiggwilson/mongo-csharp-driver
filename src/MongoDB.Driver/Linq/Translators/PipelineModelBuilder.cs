@@ -13,22 +13,16 @@
 * limitations under the License.
 */
 
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
-using MongoDB.Driver.Linq.Expressions;
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
+using MongoDB.Bson;
 using MongoDB.Driver.Builders;
+using MongoDB.Driver.Linq.Expressions;
 
 namespace MongoDB.Driver.Linq.Translators
 {
-    /// <summary>
-    /// Attempts to build an <see cref="PipelineModel"/> from a PipelineExpression.
-    /// </summary>
     internal class PipelineModelBuilder : LinqToMongoExpressionVisitor
     {
         // private static fields
@@ -41,11 +35,6 @@ namespace MongoDB.Driver.Linq.Translators
         private ExecutionModelProjection _projection;
 
         // public methods
-        /// <summary>
-        /// Builds an <see cref="PipelineModel"/>.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>An <see cref="PipelineModel"/> or null.</returns>
         public ExecutionModel Build(PipelineExpression node)
         {
             _pipeline = new List<BsonDocument>();
@@ -62,22 +51,12 @@ namespace MongoDB.Driver.Linq.Translators
             return model;
         }
 
-        /// <summary>
-        /// Visits the collection.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The CollectionExpression (possibly modified).</returns>
         protected override Expression VisitCollection(CollectionExpression node)
         {
             _documentType = ((IQueryable)((ConstantExpression)node.Queryable).Value).ElementType;
             return node;
         }
 
-        /// <summary>
-        /// Visits the distinct.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The DistinctExpression (possibly modified).</returns>
         protected override Expression VisitDistinct(DistinctExpression node)
         {
             Visit(node.Source);
@@ -98,11 +77,6 @@ namespace MongoDB.Driver.Linq.Translators
             return node;
         }
 
-        /// <summary>
-        /// Visits the group.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The GroupExpression (possibly modified).</returns>
         protected override Expression VisitGroup(GroupExpression node)
         {
             Visit(node.Source);
@@ -115,11 +89,6 @@ namespace MongoDB.Driver.Linq.Translators
             return node;
         }
 
-        /// <summary>
-        /// Visits the match.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The MatchExpression (possibly modified).</returns>
         protected override Expression VisitMatch(MatchExpression node)
         {
             Visit(node.Source);
@@ -132,11 +101,6 @@ namespace MongoDB.Driver.Linq.Translators
             return node;
         }
 
-        /// <summary>
-        /// Visits the pipeline.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The PipelineExpression (possibly modified).</returns>
         protected override Expression VisitPipeline(PipelineExpression node)
         {
             _aggregator = node.Aggregator;
@@ -179,11 +143,6 @@ namespace MongoDB.Driver.Linq.Translators
             return node;
         }
 
-        /// <summary>
-        /// Visits the project.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The ProjectExpression (possibly modified).</returns>
         protected override Expression VisitProject(ProjectExpression node)
         {
             Visit(node.Source);
@@ -195,11 +154,6 @@ namespace MongoDB.Driver.Linq.Translators
             return node;
         }
 
-        /// <summary>
-        /// Visits the root aggregation.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The RootAggregationExpression (possibly modified).</returns>
         protected override Expression VisitRootAggregation(RootAggregationExpression node)
         {
             Visit(node.Source);
@@ -225,11 +179,6 @@ namespace MongoDB.Driver.Linq.Translators
             return node;
         }
 
-        /// <summary>
-        /// Visits the skip limit.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The SkipLimitExpression (possibly modified).</returns>
         protected override Expression VisitSkipLimit(SkipLimitExpression node)
         {
             Visit(node.Source);
@@ -245,11 +194,6 @@ namespace MongoDB.Driver.Linq.Translators
             return node;
         }
 
-        /// <summary>
-        /// Visits the sort.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The SortExpression (possibly modified).</returns>
         protected override Expression VisitSort(SortExpression node)
         {
             Visit(node.Source);

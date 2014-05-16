@@ -17,15 +17,10 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace MongoDB.Driver.Linq.Expressions
 {
-    /// <summary>
-    /// A group expression.
-    /// </summary>
     [DebuggerTypeProxy(typeof(GroupExpressionDebugView))]
     [DebuggerDisplay("{ToString()}")]
     internal class GroupExpression : LinqToMongoExpression
@@ -37,14 +32,6 @@ namespace MongoDB.Driver.Linq.Expressions
         private readonly Expression _source;
 
         // constructors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="GroupExpression" /> class.
-        /// </summary>
-        /// <param name="correlationId">The correlation identifier.</param>
-        /// <param name="type">The type.</param>
-        /// <param name="source">The source.</param>
-        /// <param name="id">The id.</param>
-        /// <param name="aggregations">The aggregations.</param>
         public GroupExpression(Guid correlationId, Type type, Expression source, Expression id, IEnumerable<Expression> aggregations)
             : base(LinqToMongoExpressionType.Group, type)
         {
@@ -59,45 +46,27 @@ namespace MongoDB.Driver.Linq.Expressions
         }
 
         // public properties
-        /// <summary>
-        /// Gets the aggregations.
-        /// </summary>
         public ReadOnlyCollection<Expression> Aggregations
         {
             get { return _aggregations; }
         }
 
-        /// <summary>
-        /// Gets the correlation identifier.
-        /// </summary>
         public Guid CorrelationId
         {
             get { return _correlationId; }
         }
 
-        /// <summary>
-        /// Gets the id.
-        /// </summary>
         public Expression Id
         {
             get { return _id; }
         }
 
-        /// <summary>
-        /// Gets the source.
-        /// </summary>
         public Expression Source
         {
             get { return _source; }
         }
 
         // public methods
-        /// <summary>
-        /// Returns a <see cref="System.String" /> that represents this instance.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="System.String" /> that represents this instance.
-        /// </returns>
         public override string ToString()
         {
             return LinqToMongoExpressionFormatter.ToString(this);

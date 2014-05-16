@@ -14,17 +14,11 @@
 */
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace MongoDB.Driver.Linq.Expressions
 {
-    /// <summary>
-    /// A match expression.
-    /// </summary>
     [DebuggerTypeProxy(typeof(MatchExpressionDebugView))]
     [DebuggerDisplay("{ToString()}")]
     internal class MatchExpression : LinqToMongoExpression
@@ -34,11 +28,6 @@ namespace MongoDB.Driver.Linq.Expressions
         private readonly Expression _source;
 
         // constructors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MatchExpression" /> class.
-        /// </summary>
-        /// <param name="source">The source.</param>
-        /// <param name="match">The match.</param>
         public MatchExpression(Expression source, Expression match)
             : base(LinqToMongoExpressionType.Match, source.Type)
         {
@@ -47,29 +36,17 @@ namespace MongoDB.Driver.Linq.Expressions
         }
 
         // public properties
-        /// <summary>
-        /// Gets the match.
-        /// </summary>
         public Expression Match
         {
             get { return _match; }
         }
 
-        /// <summary>
-        /// Gets the source.
-        /// </summary>
         public Expression Source
         {
             get { return _source; }
         }
         
         // public methods
-        /// <summary>
-        /// Returns a <see cref="System.String" /> that represents this instance.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="System.String" /> that represents this instance.
-        /// </returns>
         public override string ToString()
         {
             return LinqToMongoExpressionFormatter.ToString(this);

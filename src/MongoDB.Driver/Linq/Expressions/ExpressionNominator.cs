@@ -13,12 +13,9 @@
 * limitations under the License.
 */
 
-using MongoDB.Driver.Linq.Expressions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace MongoDB.Driver.Linq.Expressions
 {
@@ -33,22 +30,12 @@ namespace MongoDB.Driver.Linq.Expressions
         private bool _isBlocked;
 
         // constructors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ExpressionNominator" /> class.
-        /// </summary>
-        /// <param name="predicate">The predicate.</param>
-        /// <exception cref="System.ArgumentNullException">predicate</exception>
         public ExpressionNominator(Func<Expression, bool> predicate)
         {
             _predicate = predicate;
         }
 
         // public methods
-        /// <summary>
-        /// Nominates a set of expression based on the provided node.
-        /// </summary>
-        /// <param name="node">The expression.</param>
-        /// <returns>The set of candidates.</returns>
         public HashSet<Expression> Nominate(Expression node)
         {
             _candidates = new HashSet<Expression>();
@@ -57,11 +44,6 @@ namespace MongoDB.Driver.Linq.Expressions
         }
 
         // protected methods
-        /// <summary>
-        /// Visits the specified expression.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <returns>The Expression (possibly modified).</returns>
         protected override Expression Visit(Expression expression)
         {
             if (expression != null)

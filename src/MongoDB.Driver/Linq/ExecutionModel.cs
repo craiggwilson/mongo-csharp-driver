@@ -13,12 +13,10 @@
 * limitations under the License.
 */
 
-using MongoDB.Bson;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace MongoDB.Driver.Linq
 {
@@ -58,7 +56,7 @@ namespace MongoDB.Driver.Linq
         }
 
         /// <summary>
-        /// Gets or sets the type of the document.
+        /// Gets or sets the type of document.
         /// </summary>
         public Type DocumentType
         {
@@ -75,9 +73,6 @@ namespace MongoDB.Driver.Linq
         }
 
         // internal properties
-        /// <summary>
-        /// Gets or sets the projection.
-        /// </summary>
         internal ExecutionModelProjection Projection
         {
             get { return _projection; }
@@ -85,24 +80,16 @@ namespace MongoDB.Driver.Linq
         }
 
         // internal methods
-        /// <summary>
-        /// Executes the query against the collection.
-        /// </summary>
-        /// <param name="collection">The collection.</param>
-        /// <returns></returns>
         internal abstract object Execute(MongoCollection collection);
 
-        // protected methods
-        /// <summary>
-        /// Creates an executor.
-        /// </summary>
-        /// <returns>A lambda expression that can be executed.</returns>
-        protected LambdaExpression CreateExecutor()
+        internal LambdaExpression CreateExecutor()
         {
             var documents = Expression.Parameter(typeof(IEnumerable<>).MakeGenericType(Projection.Projector.Parameters[0].Type), "all");
             
             // because we will always have a projector, Select is the natural operator
             // to apply that projection.
+            // TODO: is there any way to avoid this - maybe if Projection.Projector
+            // is an identity projector.
             Expression body = Expression.Call(
                 typeof(Enumerable),
                 "Select",

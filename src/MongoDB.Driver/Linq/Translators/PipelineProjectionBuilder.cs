@@ -13,23 +13,14 @@
 * limitations under the License.
 */
 
-using MongoDB.Bson;
-using MongoDB.Bson.IO;
-using MongoDB.Bson.Serialization;
-using MongoDB.Driver.Linq.Expressions;
-using MongoDB.Driver.Linq.Processors;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Collections.ObjectModel;
+using MongoDB.Bson.Serialization;
+using MongoDB.Driver.Linq.Expressions;
 
 namespace MongoDB.Driver.Linq.Translators
 {
-    /// <summary>
-    /// Builds the projection for an AggregationQueryModel.
-    /// </summary>
     internal class PipelineProjectionBuilder : LinqToMongoExpressionVisitor
     {
         // private fields
@@ -37,12 +28,6 @@ namespace MongoDB.Driver.Linq.Translators
         private ParameterExpression _parameter;
 
         // public methods
-        /// <summary>
-        /// Builds the projection.
-        /// </summary>
-        /// <param name="projector">The projector.</param>
-        /// <param name="documentType">Type of the document.</param>
-        /// <returns></returns>
         public ExecutionModelProjection Build(Expression projector, Type documentType)
         {
             if (projector.Type.IsGenericType &&
@@ -72,21 +57,11 @@ namespace MongoDB.Driver.Linq.Translators
         }
 
         // protected methods
-        /// <summary>
-        /// Visits the document.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The DocumentExpression (possibly modified).</returns>
         protected override Expression VisitDocument(DocumentExpression node)
         {
             return Visit(node.Expression);
         }
 
-        /// <summary>
-        /// Visits the field.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The FieldExpression (possibly modified).</returns>
         protected override Expression VisitField(FieldExpression node)
         {
             _serializationInfo.Add(node.SerializationInfo);
@@ -98,11 +73,6 @@ namespace MongoDB.Driver.Linq.Translators
                 Expression.Constant(null, typeof(object)));
         }
 
-        /// <summary>
-        /// Visits a ParameterExpression.
-        /// </summary>
-        /// <param name="node">The ParameterExpression.</param>
-        /// <returns>The ParameterExpression (possibly modified).</returns>
         protected override Expression VisitParameter(ParameterExpression node)
         {
             // all parameters left in the tree will always be the document.

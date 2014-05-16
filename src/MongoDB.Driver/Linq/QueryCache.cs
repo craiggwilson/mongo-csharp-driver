@@ -13,12 +13,7 @@
 * limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading;
 using MongoDB.Driver.Linq.Expressions;
 using MongoDB.Driver.Linq.Processors;
 
@@ -40,7 +35,7 @@ namespace MongoDB.Driver.Linq
 
         public Expression Find(Expression node, ConstantExpression queryable)
         {
-            // make a VB expression tree look like a C# expression tree.
+            // makes a VB expression tree look like a C# expression tree.
             // also does things like make the constant in a comparison expression
             // always be on the right side.
             node = new ExpressionNormalizer().Normalize(node);

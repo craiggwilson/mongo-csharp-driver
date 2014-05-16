@@ -13,19 +13,12 @@
 * limitations under the License.
 */
 
-using MongoDB.Driver.Linq.Expressions;
-using MongoDB.Driver.Linq.Processors;
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
+using MongoDB.Driver.Linq.Expressions;
 
 namespace MongoDB.Driver.Linq.Translators
 {
-    /// <summary>
-    /// Builds an ExecutionModel.
-    /// </summary>
     internal class ExecutionModelBuilder : LinqToMongoExpressionVisitor
     {
         // private fields
@@ -34,13 +27,6 @@ namespace MongoDB.Driver.Linq.Translators
         private Exception _lastException;
 
         // public methods
-        /// <summary>
-        /// Builds a QueryModel.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <param name="executionTarget">The query target.</param>
-        /// <returns>A QueryModel.</returns>
-        /// <exception cref="System.NotSupportedException">The query is too complex to run with the aggregation framework.</exception>
         public ExecutionModel Build(Expression node, ExecutionTarget executionTarget)
         {
             _executionTarget = executionTarget;
@@ -55,11 +41,6 @@ namespace MongoDB.Driver.Linq.Translators
         }
 
         // protected methods
-        /// <summary>
-        /// Visits the pipeline.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The PipelineExpression (possibly modified).</returns>
         protected override Expression VisitPipeline(PipelineExpression node)
         {
             if ((_executionTarget & ExecutionTarget.Query) == ExecutionTarget.Query)

@@ -13,37 +13,23 @@
 * limitations under the License.
 */
 
-using MongoDB.Bson.Serialization;
-using MongoDB.Driver.Linq.Expressions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
-using System.Text;
+using MongoDB.Bson.Serialization;
+using MongoDB.Driver.Linq.Expressions;
 
 namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
 {
-    /// <summary>
-    /// Binds group operations.
-    /// </summary>
     internal class GroupBinder : ProjectingPipelineOperationBinder
     {
         // constructors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="GroupBinder" /> class.
-        /// </summary>
-        /// <param name="groupMap">The group map.</param>
         public GroupBinder(Dictionary<Expression, GroupExpression> groupMap)
             : base(groupMap)
         { }
 
         // public methods
-        /// <summary>
-        /// Binds the distinct.
-        /// </summary>
-        /// <param name="pipeline">The pipeline.</param>
-        /// <returns>An expression representing the grouping.</returns>
         public Expression BindDistinct(PipelineExpression pipeline)
         {
             var distinct = new DistinctExpression(pipeline.Source, pipeline.Projector);
@@ -54,12 +40,6 @@ namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
                 pipeline.Aggregator);
         }
 
-        /// <summary>
-        /// Binds a GroupBy operation.
-        /// </summary>
-        /// <param name="pipeline">The pipeline.</param>
-        /// <param name="keySelector">The key selector.</param>
-        /// <returns>An expression representing the grouping.</returns>
         public Expression BindGroupBy(PipelineExpression pipeline, LambdaExpression keySelector)
         {
             RegisterProjector(pipeline.Projector);
@@ -147,6 +127,5 @@ namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
 
             throw LinqErrors.UnsupportedGroupingKey(key);
         }
-
     }
 }

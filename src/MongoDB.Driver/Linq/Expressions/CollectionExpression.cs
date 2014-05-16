@@ -14,17 +14,11 @@
 */
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace MongoDB.Driver.Linq.Expressions
 {
-    /// <summary>
-    /// An collection expression.
-    /// </summary>
     /// <remarks>
     /// This will almost always be the deepest expression in the tree.
     /// </remarks>
@@ -37,11 +31,6 @@ namespace MongoDB.Driver.Linq.Expressions
         private readonly Expression _queryable;
 
         // constructors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CollectionExpression" /> class.
-        /// </summary>
-        /// <param name="documentType">Type of the document.</param>
-        /// <param name="queryable">The queryable.</param>
         public CollectionExpression(Type documentType, Expression queryable)
             : base(LinqToMongoExpressionType.Collection, queryable.Type)
         {
@@ -50,29 +39,17 @@ namespace MongoDB.Driver.Linq.Expressions
         }
 
         // public properties
-        /// <summary>
-        /// Gets the type of the document.
-        /// </summary>
         public Type DocumentType
         {
             get { return _documentType; }
         }
 
-        /// <summary>
-        /// Gets the queryable.
-        /// </summary>
         public Expression Queryable
         {
             get { return _queryable; }
         }
 
         // public methods
-        /// <summary>
-        /// Returns a <see cref="System.String" /> that represents this instance.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="System.String" /> that represents this instance.
-        /// </returns>
         public override string ToString()
         {
             return LinqToMongoExpressionFormatter.ToString(this);

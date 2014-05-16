@@ -17,22 +17,14 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver.Linq.Expressions;
 
 namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
 {
-    /// <summary>
-    /// Base class for pipeline elements that result in a projection.
-    /// </summary>
     internal abstract class ProjectingPipelineOperationBinder : GroupAwarePipelineOperationBinder
     {
         // constructors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ProjectingPipelineOperationBinder" /> class.
-        /// </summary>
-        /// <param name="groupMap">The group map.</param>
         protected ProjectingPipelineOperationBinder(Dictionary<Expression, GroupExpression> groupMap)
             : base(groupMap)
         { }
@@ -94,11 +86,6 @@ namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
             return (IBsonSerializer)Activator.CreateInstance(serializerType, classMap);
         }
 
-        /// <summary>
-        /// Flattens the new expression.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>A NewExpression that has been flattened.</returns>
         /// <remarks>
         /// This taks a new expression that may include non-field expressions assigned
         /// to properties and turns them into fields assigned to properties.

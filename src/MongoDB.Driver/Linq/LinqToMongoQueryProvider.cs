@@ -13,18 +13,12 @@
 * limitations under the License.
 */
 
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
-using MongoDB.Driver.Linq.Expressions;
-using MongoDB.Driver.Linq.Processors;
-using MongoDB.Driver.Linq.Translators;
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
+using MongoDB.Driver.Linq.Expressions;
+using MongoDB.Driver.Linq.Translators;
 
 namespace MongoDB.Driver.Linq
 {
@@ -43,6 +37,9 @@ namespace MongoDB.Driver.Linq
         // constructors
         static LinqToMongoQueryProvider()
         {
+            // TODO: need to figure out optimal number for this.
+            // TODO: need to make this configurable
+            // TODO: perhaps may way to use 0 as the default, in case this doesn't work :(
             __cache = new QueryCache(10);
         }
 
@@ -180,7 +177,7 @@ namespace MongoDB.Driver.Linq
         /// <param name="executionModel">The query model.</param>
         /// <returns>The projected documents.</returns>
         /// <exception cref="System.NotSupportedException"></exception>
-        internal object ExecuteQueryModel(ExecutionModel executionModel)
+        internal object Execute(ExecutionModel executionModel)
         {
             return executionModel.Execute(_collection);
         }

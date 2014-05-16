@@ -13,18 +13,10 @@
 * limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace MongoDB.Driver.Linq.Expressions
 {
-    /// <summary>
-    /// An expression and it's direction to sort by.
-    /// </summary>
     internal class SortClause
     {
         // private fields
@@ -32,11 +24,6 @@ namespace MongoDB.Driver.Linq.Expressions
         private readonly Expression _expression;
 
         // constructors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SortClause" /> class.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="direction">The direction.</param>
         public SortClause(Expression expression, SortDirection direction)
         {
             _expression = expression;
@@ -44,17 +31,11 @@ namespace MongoDB.Driver.Linq.Expressions
         }
 
         // public properties
-        /// <summary>
-        /// Gets the direction.
-        /// </summary>
         public SortDirection Direction
         {
             get { return _direction; }
         }
 
-        /// <summary>
-        /// Gets the expression.
-        /// </summary>
         public Expression Expression
         {
             get { return _expression; }

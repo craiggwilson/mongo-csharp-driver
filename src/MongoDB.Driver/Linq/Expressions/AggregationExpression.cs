@@ -14,11 +14,8 @@
 */
 
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 
 namespace MongoDB.Driver.Linq.Expressions
 {
@@ -34,12 +31,6 @@ namespace MongoDB.Driver.Linq.Expressions
         private readonly Expression _argument;
 
         //constructors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AggregationExpression" /> class.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        /// <param name="aggregationType">Type of the aggregation.</param>
-        /// <param name="argument">The argument.</param>
         public AggregationExpression(Type type, AggregationType aggregationType, Expression argument)
             : base(LinqToMongoExpressionType.Aggregation, type)
         {
@@ -48,28 +39,17 @@ namespace MongoDB.Driver.Linq.Expressions
         }
 
         // public properties
-        /// <summary>
-        /// Gets the type of the aggregation.
-        /// </summary>
         public AggregationType AggregationType
         {
             get { return _aggregationType; }
         }
 
-        /// <summary>
-        /// Gets the argument.
-        /// </summary>
         public Expression Argument
         {
             get { return _argument; }
         }
 
-        /// <summary>
-        /// Returns a <see cref="System.String" /> that represents this instance.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="System.String" /> that represents this instance.
-        /// </returns>
+        // public methods
         public override string ToString()
         {
             return LinqToMongoExpressionFormatter.ToString(this);

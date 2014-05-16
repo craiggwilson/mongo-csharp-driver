@@ -13,73 +13,23 @@
 * limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace MongoDB.Driver.Linq.Expressions
 {
-    /// <summary>
-    /// The type of a custom aggregation expression.
-    /// </summary>
     internal enum LinqToMongoExpressionType
     {
-        /// <summary>
-        /// An aggregation expression.
-        /// </summary>
         Aggregation = 1000,
-        /// <summary>
-        /// A collection expression.
-        /// </summary>
         Collection,
-        /// <summary>
-        /// A distinct expression.
-        /// </summary>
         Distinct,
-        /// <summary>
-        /// A document expression.
-        /// </summary>
         Document,
-        /// <summary>
-        /// A field expression.
-        /// </summary>
         Field,
-        /// <summary>
-        /// A group expression.
-        /// </summary>
         Group,
-        /// <summary>
-        /// A grouped aggregate expression.
-        /// </summary>
         GroupedAggregate,
-        /// <summary>
-        /// A match expression.
-        /// </summary>
         Match,
-        /// <summary>
-        /// A pipeline expression.
-        /// </summary>
         Pipeline,
-        /// <summary>
-        /// A project expression.
-        /// </summary>
         Project,
-        /// <summary>
-        /// A root aggregation expression.
-        /// </summary>
         RootAggregation,
-        /// <summary>
-        /// A scalar expression.
-        /// </summary>
         Scalar,
-        /// <summary>
-        /// A skip/limit expression.
-        /// </summary>
         SkipLimit,
-        /// <summary>
-        /// A sort expression.
-        /// </summary>
         Sort
     }
 }

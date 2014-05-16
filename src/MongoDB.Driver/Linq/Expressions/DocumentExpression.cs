@@ -13,21 +13,15 @@
 * limitations under the License.
 */
 
-using MongoDB.Bson.Serialization;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
+using MongoDB.Bson.Serialization;
 
 namespace MongoDB.Driver.Linq.Expressions
 {
-    /// <summary>
-    /// A document expression.
-    /// </summary>
     /// <remarks>
-    /// This will generally be in the place of a ParameterExpression.  Hence, the Expression
+    /// This will generally be in the place of a ParameterExpression. Hence, the Expression
     /// property will almost always be a ParameterExpression.
     /// </remarks>
     [DebuggerTypeProxy(typeof(DocumentExpressionDebugView))]
@@ -40,12 +34,6 @@ namespace MongoDB.Driver.Linq.Expressions
         private readonly BsonSerializationInfo _serializationInfo;
 
         // constructors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DocumentExpression" /> class.
-        /// </summary>
-        /// <param name="expression">The expression.</param>
-        /// <param name="serializationInfo">The serialization info.</param>
-        /// <param name="isProjected">if set to <c>true</c> then the document is the result of a projection.</param>
         public DocumentExpression(Expression expression, BsonSerializationInfo serializationInfo, bool isProjected)
             : base(LinqToMongoExpressionType.Document, expression.Type)
         {
@@ -55,36 +43,22 @@ namespace MongoDB.Driver.Linq.Expressions
         }
 
         // public properties
-        /// <summary>
-        /// Gets the original expression.
-        /// </summary>
         public Expression Expression
         {
             get { return _expression; }
         }
 
-        /// <summary>
-        /// Gets a value indicating whether this serialization info is the result of a projection.
-        /// </summary>
         public bool IsProjected
         {
             get { return _isProjected; }
         }
 
-        /// <summary>
-        /// Gets the serialization info.
-        /// </summary>
         public BsonSerializationInfo SerializationInfo
         {
             get { return _serializationInfo; }
         }
 
-        /// <summary>
-        /// Returns a <see cref="System.String" /> that represents this instance.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="System.String" /> that represents this instance.
-        /// </returns>
+        // public methods
         public override string ToString()
         {
             return LinqToMongoExpressionFormatter.ToString(this);

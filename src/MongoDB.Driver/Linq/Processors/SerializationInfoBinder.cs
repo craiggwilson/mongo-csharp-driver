@@ -13,24 +13,16 @@
 * limitations under the License.
 */
 
-using MongoDB.Bson.Serialization;
-using MongoDB.Driver.Linq.Expressions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
-using System.Text;
-using MongoDB.Bson.Serialization.Options;
-using MongoDB.Bson;
-using System.Collections.ObjectModel;
+using MongoDB.Bson.Serialization;
+using MongoDB.Driver.Linq.Expressions;
 
 namespace MongoDB.Driver.Linq.Processors
 {
-    /// <summary>
-    /// Binds serialization info to nodes in order to simplify query and projection
-    /// generation.
-    /// </summary>
     internal class SerializationInfoBinder : LinqToMongoExpressionVisitor
     {
         // private fields
@@ -40,20 +32,12 @@ namespace MongoDB.Driver.Linq.Processors
         private readonly Dictionary<ParameterExpression, Expression> _parameterMap;
 
         // constructors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SerializationInfoBinder" /> class.
-        /// </summary>
         public SerializationInfoBinder()
         {
             _memberMap = new Dictionary<MemberInfo, Expression>();
             _parameterMap = new Dictionary<ParameterExpression, Expression>();
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SerializationInfoBinder" /> class.
-        /// </summary>
-        /// <param name="serializationInfo">The serialization info.</param>
-        /// <param name="isRootDocumentProjected">if set to <c>true</c> [is root document projected].</param>
         public SerializationInfoBinder(BsonSerializationInfo serializationInfo, bool isRootDocumentProjected)
             : this()
         {
@@ -62,42 +46,22 @@ namespace MongoDB.Driver.Linq.Processors
         }
 
         // public methods
-        /// <summary>
-        /// Binds the specified node.
-        /// </summary>
-        /// <param name="node">The node.</param>
-        /// <returns>The expression bound with serialization info.</returns>
         public Expression Bind(Expression node)
         {
             return Visit(node);
         }
 
-        /// <summary>
-        /// Registers the member replacement.
-        /// </summary>
-        /// <param name="member">The member.</param>
-        /// <param name="replacement">The replacement.</param>
         public void RegisterMemberReplacement(MemberInfo member, Expression replacement)
         {
             _memberMap[member] = replacement;
         }
 
-        /// <summary>
-        /// Registers the parameter replacement.
-        /// </summary>
-        /// <param name="parameter">The parameter.</param>
-        /// <param name="replacement">The replacement.</param>
         public void RegisterParameterReplacement(ParameterExpression parameter, Expression replacement)
         {
             _parameterMap[parameter] = replacement;
         }
 
         // protected methods
-        /// <summary>
-        /// Visits a BinaryExpression.
-        /// </summary>
-        /// <param name="node">The BinaryExpression.</param>
-        /// <returns>The BinaryExpression (possibly modified).</returns>
         protected override Expression VisitBinary(BinaryExpression node)
         {
             var newNode = base.VisitBinary(node);
@@ -127,11 +91,6 @@ namespace MongoDB.Driver.Linq.Processors
             return newNode;
         }
 
-        /// <summary>
-        /// Visits a MemberExpression.
-        /// </summary>
-        /// <param name="node">The MemberExpression.</param>
-        /// <returns>The MemberExpression (possibly modified).</returns>
         protected override Expression VisitMember(MemberExpression node)
         {
             Expression newNode;
@@ -165,11 +124,6 @@ namespace MongoDB.Driver.Linq.Processors
             return newNode;
         }
 
-        /// <summary>
-        /// Visits a MethodCallExpression.
-        /// </summary>
-        /// <param name="node">The MethodCallExpression.</param>
-        /// <returns>The MethodCallExpression (possibly modified).</returns>
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
             switch (node.Method.Name)
@@ -187,11 +141,6 @@ namespace MongoDB.Driver.Linq.Processors
             return base.VisitMethodCall(node);
         }
 
-        /// <summary>
-        /// Visits a ParameterExpression.
-        /// </summary>
-        /// <param name="node">The ParameterExpression.</param>
-        /// <returns>The ParameterExpression (possibly modified).</returns>
         protected override Expression VisitParameter(ParameterExpression node)
         {
             // this replacement is how the current projector gets tracked through the expression
@@ -214,11 +163,6 @@ namespace MongoDB.Driver.Linq.Processors
             return node;
         }
 
-        /// <summary>
-        /// Visits a UnaryExpression.
-        /// </summary>
-        /// <param name="node">The UnaryExpression.</param>
-        /// <returns>The UnaryExpression (possibly modified).</returns>
         protected override Expression VisitUnary(UnaryExpression node)
         {
             var newNode = base.VisitUnary(node);
@@ -417,11 +361,6 @@ namespace MongoDB.Driver.Linq.Processors
             return node;
         }
 
-        /// <summary>
-        /// Creates the serialization info.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        /// <returns></returns>
         private BsonSerializationInfo CreateSerializationInfo(Type type)
         {
             var serializer = BsonSerializer.LookupSerializer(type);

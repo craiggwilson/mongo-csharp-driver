@@ -13,37 +13,22 @@
 * limitations under the License.
 */
 
-using MongoDB.Driver.Linq.Expressions;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
 using MongoDB.Bson.Serialization;
+using MongoDB.Driver.Linq.Expressions;
 
 namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
 {
-    /// <summary>
-    /// Binds match operations.
-    /// </summary>
     internal class MatchBinder : GroupAwarePipelineOperationBinder
     {
         // constructors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MatchBinder" /> class.
-        /// </summary>
-        /// <param name="groupMap">The group map.</param>
         public MatchBinder(Dictionary<Expression, GroupExpression> groupMap)
             : base(groupMap)
         { }
 
         // public methods
-        /// <summary>
-        /// Binds a Match operation.
-        /// </summary>
-        /// <param name="pipeline">The pipeline.</param>
-        /// <param name="predicate">The predicate.</param>
-        /// <returns></returns>
         public Expression Bind(PipelineExpression pipeline, LambdaExpression predicate)
         {
             RegisterProjector(pipeline.Projector);
@@ -58,12 +43,6 @@ namespace MongoDB.Driver.Linq.Processors.PipelineOperationBinders
                 pipeline.Projector);
         }
 
-        /// <summary>
-        /// Binds an OfType operation.
-        /// </summary>
-        /// <param name="result">The result.</param>
-        /// <param name="type">The type.</param>
-        /// <returns></returns>
         public Expression BindOfType(PipelineExpression result, Type type)
         {
             // OfType is two operations in one. First we create MatchExpression

@@ -13,54 +13,24 @@
 * limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace MongoDB.Driver.Linq.Expressions
 {
     /// <summary>
-    /// The type of an AggregateExpression.
+    /// The type of an <see cref="AggregationExpression"/>.
     /// </summary>
     /// <remarks>
-    /// These are the aggregation expressions supported by MongoDB.  Count, for instance,
-    /// is not one of these as it is handled in MongoDB by a { $sum : 1 } and is therefore
-    /// represented here as a Sum aggregation expression.
+    /// These are the aggregation expressions supported by MongoDB. Count, for instance,
+    /// is not one of these as it is handled in MongoDB by a { $sum : 1 } and would therefore
+    /// be represented as a Sum aggregation expression.
     /// </remarks>
     internal enum AggregationType
     {
-        /// <summary>
-        /// An addToSet aggregate.
-        /// </summary>
-        AddToSet,
-        /// <summary>
-        /// An avg aggregate.
-        /// </summary>
         Average,
-        /// <summary>
-        /// A first aggregate.
-        /// </summary>
         First,
-        /// <summary>
-        /// A last aggregate.
-        /// </summary>
         Last,
-        /// <summary>
-        /// A min aggregate.
-        /// </summary>
         Min,
-        /// <summary>
-        /// A max aggregate.
-        /// </summary>
         Max,
-        /// <summary>
-        /// A push aggregate.
-        /// </summary>
         Push,
-        /// <summary>
-        /// A sum aggregate.
-        /// </summary>
         Sum        
     }
 }

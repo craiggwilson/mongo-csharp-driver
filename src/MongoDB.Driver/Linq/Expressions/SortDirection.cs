@@ -13,25 +13,11 @@
 * limitations under the License.
 */
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
 namespace MongoDB.Driver.Linq.Expressions
 {
-    /// <summary>
-    /// The direction of an Ordering.
-    /// </summary>
     internal enum SortDirection
     {
-        /// <summary>
-        /// Smallest first.
-        /// </summary>
         Ascending,
-        /// <summary>
-        /// Largest first.
-        /// </summary>
         Descending
     }
 }
