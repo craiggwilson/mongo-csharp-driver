@@ -151,6 +151,8 @@
     <Compile Include="Linq\ExplainTests.cs" />
     <Compile Include="Linq\LinqIntegrationTestBase.cs" />
     <Compile Include="Linq\LinqTestBase.cs" />
+    <Compile Include="Linq\MongoDocument.cs" />
+    <Compile Include="Linq\MongoDocumentClassSerializer.cs" />
     <Compile Include="Linq\PipelineModelTests.cs" />
     <Compile Include="Linq\Processors\SkipLimitReducerTests.cs" />
     <Compile Include="Linq\QueryModelTests.cs" />

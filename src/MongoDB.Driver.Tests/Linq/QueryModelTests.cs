@@ -6,10 +6,17 @@ using NUnit.Framework;
 
 namespace MongoDB.Driver.Tests.Linq
 {
+    using MongoDB.Driver.Linq;
+
     [TestFixture]
     [Category("Linq")]
     public class QueryModelTests : LinqTestBase
     {
+        private class B
+        {
+            public int I { get; set; }
+        }
+
         private class A
         {
             public int I { get; set; }
@@ -19,8 +26,9 @@ namespace MongoDB.Driver.Tests.Linq
             public string S { get; set; }
 
             public int[] AI { get; set; }
-        }
 
+            public List<B> BL { get; set; }
+        }
 
         [Test]
         public void TestToStringQueryProjectSkipLimit()
@@ -41,6 +49,58 @@ namespace MongoDB.Driver.Tests.Linq
 
             var s = query.ToString();
             Assert.AreEqual("distinct(\"I\")", s);
+        }
+
+        [Test]
+        public void TestBsonDocumentBackedClass_LooselyTyped_Member()
+        {
+            // This test can be made to pass/fail by changing the register member call in mongodocumentclassserializer
+            // from BooleanSerializer to BsonValueSerializer
+            var mongoDocs = Configuration.TestDatabase.GetCollection<MongoDocument>("mongoDocs");
+            var query = CreateQueryable<MongoDocument>(mongoDocs, ExecutionTarget.Query);
+
+            query = query.Where(o => o["IsArchived"] == false);
+
+            var model = this.GetQueryModel(query);
+        }
+
+        [Test]
+        public void TestBsonDocumentBackedClass_StronglyTyped_Member()
+        {
+            // This test can be made to pass/fail by changing the register member call in mongodocumentclassserializer
+            // from BooleanSerializer to BsonValueSerializer
+            var mongoDocs = Configuration.TestDatabase.GetCollection<MongoDocument>("mongoDocs");
+            var query = CreateQueryable<MongoDocument>(mongoDocs, ExecutionTarget.Query);
+
+            query = query.Where(o => o.IsArchived == false);
+
+            var model = this.GetQueryModel(query);
+        }
+
+        [Test]
+        public void TestComplexArrayOrderingProjection()
+        {
+            var zipInfos = Configuration.TestDatabase.GetCollection<A>("zipinfos");
+            var query = CreateQueryable<A>(zipInfos, ExecutionTarget.Query);
+
+            var projection =
+                query.Select(
+                    o => new { Data = o.BL.OrderBy(b => b.I).Select(b => new { I = b.I }) });
+
+            var model = this.GetQueryModel(projection);
+        }
+
+        [Test]
+        public void TestPrimitiveArrayOrderingProjection()
+        {
+            var zipInfos = Configuration.TestDatabase.GetCollection<A>("zipinfos");
+            var query = CreateQueryable<A>(zipInfos, ExecutionTarget.Query);
+
+            var projection =
+                query.Select(
+                    o => new { Data = o.AI.OrderBy(c => c).Select(c => new { Value = c }) });
+
+            var model = this.GetQueryModel(projection);
         }
     }
 }
