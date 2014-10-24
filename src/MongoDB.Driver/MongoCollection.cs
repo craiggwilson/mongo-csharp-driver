@@ -40,8 +40,11 @@ namespace MongoDB.Driver
     {
         // private fields
         private MongoServer _server;
+
         private MongoDatabase _database;
+
         private MongoCollectionSettings _settings;
+
         private string _name;
 
         // constructors
@@ -87,7 +90,10 @@ namespace MongoDB.Driver
         /// </summary>
         public virtual MongoDatabase Database
         {
-            get { return _database; }
+            get
+            {
+                return _database;
+            }
         }
 
         /// <summary>
@@ -95,7 +101,10 @@ namespace MongoDB.Driver
         /// </summary>
         public virtual string FullName
         {
-            get { return _database.Name + "." + _name; }
+            get
+            {
+                return _database.Name + "." + _name;
+            }
         }
 
         /// <summary>
@@ -103,7 +112,10 @@ namespace MongoDB.Driver
         /// </summary>
         public virtual string Name
         {
-            get { return _name; }
+            get
+            {
+                return _name;
+            }
         }
 
         /// <summary>
@@ -111,16 +123,40 @@ namespace MongoDB.Driver
         /// </summary>
         public virtual MongoCollectionSettings Settings
         {
-            get { return _settings; }
+            get
+            {
+                return _settings;
+            }
         }
 
         // public methods
+
         /// <summary>
-        /// Represents an aggregate framework query. The command is not sent to the server until the result is enumerated.
+        /// The aggregate.
         /// </summary>
-        /// <param name="args">The args.</param>
-        /// <returns>A sequence of documents.</returns>
+        /// <param name="args">
+        /// The args.
+        /// </param>
+        /// <returns>
+        /// The <see cref="IEnumerable"/>.
+        /// </returns>
         public virtual IEnumerable<BsonDocument> Aggregate(AggregateArgs args)
+        {
+            return this.Aggregate<BsonDocument>(args);
+        }
+    
+        /// <summary>
+        /// Represents an generic aggregate framework query. The command is not sent to the server until the result is enumerated.
+        /// </summary>
+        /// <typeparam name="TDocument">
+        /// </typeparam>
+        /// <param name="args">
+        /// The args.
+        /// </param>
+        /// <returns>
+        /// A sequence of documents.
+        /// </returns>
+        public virtual IEnumerable<TDocument> Aggregate<TDocument>(AggregateArgs args)
         {
             if (args == null) { throw new ArgumentNullException("args"); }
             if (args.Pipeline == null) { throw new ArgumentException("Pipeline is null.", "args"); }
@@ -131,10 +167,10 @@ namespace MongoDB.Driver
             if (lastStage != null && lastStage.GetElement(0).Name == "$out")
             {
                 outputCollectionName = lastStage["$out"].AsString;
-                RunAggregateCommand(args);
+                RunAggregateCommand<TDocument>(args);
             }
 
-            return new AggregateEnumerableResult(this, args, outputCollectionName);
+            return new AggregateEnumerableResult<TDocument>(this, args, outputCollectionName);
         }
 
         /// <summary>
@@ -145,10 +181,25 @@ namespace MongoDB.Driver
         /// An AggregateResult.
         /// </returns>
         [Obsolete("Use the overload with an AggregateArgs parameter.")]
-        public virtual AggregateResult Aggregate(IEnumerable<BsonDocument> pipeline)
+        public virtual AggregateResult<TDocument> Aggregate<TDocument>(IEnumerable<BsonDocument> pipeline)
         {
             var args = new AggregateArgs { Pipeline = pipeline, OutputMode = AggregateOutputMode.Inline };
-            return RunAggregateCommand(args);
+            return RunAggregateCommand<TDocument>(args);
+        }
+
+        /// <summary>
+        /// The aggregate.
+        /// </summary>
+        /// <param name="pipeline">
+        /// The pipeline.
+        /// </param>
+        /// <returns>
+        /// The <see cref="AggregateResult"/>.
+        /// </returns>
+        public virtual AggregateResult<BsonDocument> Aggregate(params BsonDocument[] pipeline)
+        {
+            var args = new AggregateArgs { Pipeline = pipeline, OutputMode = AggregateOutputMode.Inline };
+            return RunAggregateCommand<BsonDocument>(args);
         }
 
         /// <summary>
@@ -157,10 +208,10 @@ namespace MongoDB.Driver
         /// <param name="pipeline">The pipeline operations.</param>
         /// <returns>An AggregateResult.</returns>
         [Obsolete("Use the overload with an AggregateArgs parameter.")]
-        public virtual AggregateResult Aggregate(params BsonDocument[] pipeline)
+        public virtual AggregateResult<TDocument> Aggregate<TDocument>(params BsonDocument[] pipeline)
         {
             var args = new AggregateArgs { Pipeline = pipeline, OutputMode = AggregateOutputMode.Inline };
-            return RunAggregateCommand(args);
+            return RunAggregateCommand<TDocument>(args);
         }
 
         /// <summary>
@@ -2163,7 +2214,7 @@ namespace MongoDB.Driver
             };
         }
 
-        internal AggregateResult RunAggregateCommand(AggregateArgs args)
+        internal AggregateResult<TDocument> RunAggregateCommand<TDocument>(AggregateArgs args)
         {
             BsonDocument cursor = null;
             if (args.OutputMode == AggregateOutputMode.Cursor)
@@ -2183,7 +2234,7 @@ namespace MongoDB.Driver
                 { "maxTimeMS", () => args.MaxTime.Value.TotalMilliseconds, args.MaxTime.HasValue } // optional
             };
 
-            return RunCommandAs<AggregateResult>(aggregateCommand);
+            return RunCommandAs<AggregateResult<TDocument>>(aggregateCommand);
         }
 
         // private methods
@@ -2440,7 +2491,7 @@ namespace MongoDB.Driver
         private TCommandResult RunCommandAs<TCommandResult>(IMongoCommand command) where TCommandResult : CommandResult
         {
             var resultSerializer = BsonSerializer.LookupSerializer<TCommandResult>();
-            return RunCommandAs<TCommandResult>(command, resultSerializer);
+            return RunCommandAs(command, resultSerializer);
         }
 
         private TCommandResult RunCommandAs<TCommandResult>(

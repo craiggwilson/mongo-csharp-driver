@@ -23,7 +23,9 @@ using MongoDB.Driver.Operations;
 
 namespace MongoDB.Driver
 {
-    internal class AggregateEnumerableResult : IEnumerable<BsonDocument>
+    using MongoDB.Bson.Serialization;
+
+    internal class AggregateEnumerableResult<TDocument> : IEnumerable<TDocument>
     {
         // private fields
         private readonly MongoCollection _collection;
@@ -42,17 +44,18 @@ namespace MongoDB.Driver
         }
 
         // public methods
-        public IEnumerator<BsonDocument> GetEnumerator()
+        public IEnumerator<TDocument> GetEnumerator()
         {
             if (_outputCollectionName != null)
             {
                 var database = _collection.Database;
                 var collectionSettings = new MongoCollectionSettings { ReadPreference = ReadPreference.Primary };
-                var collection = database.GetCollection<BsonDocument>(_outputCollectionName, collectionSettings);
+                var collection = database.GetCollection<TDocument>(_outputCollectionName, collectionSettings);
+
                 return collection.FindAll().GetEnumerator();
             }
 
-            var result = _collection.RunAggregateCommand(_args);
+            var result = _collection.RunAggregateCommand<TDocument>(_args);
             if (result.CursorId != 0)
             {
                 var connectionProvider = new ServerInstanceConnectionProvider(result.ServerInstance);
@@ -61,7 +64,8 @@ namespace MongoDB.Driver
                     Encoding = _collection.Settings.ReadEncoding ?? MongoDefaults.ReadEncoding,
                     GuidRepresentation = _collection.Settings.GuidRepresentation
                 };
-                return new CursorEnumerator<BsonDocument>(
+
+                return new CursorEnumerator<TDocument>(
                     connectionProvider,
                     _collection.FullName,
                     result.ResultDocuments,
@@ -69,7 +73,7 @@ namespace MongoDB.Driver
                     _args.BatchSize ?? 0,
                     0,
                     readerSettings,
-                    BsonDocumentSerializer.Instance);
+                    BsonSerializer.LookupSerializer<TDocument>());
             }
             else if (result.ResultDocuments != null)
             {
