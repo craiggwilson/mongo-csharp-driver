@@ -176,15 +176,17 @@ namespace MongoDB.Driver
         /// <summary>
         /// Runs an aggregation framework command.
         /// </summary>
-        /// <param name="pipeline">The pipeline operations.</param>
+        /// <param name="pipeline">
+        /// The pipeline operations.
+        /// </param>
         /// <returns>
         /// An AggregateResult.
         /// </returns>
         [Obsolete("Use the overload with an AggregateArgs parameter.")]
-        public virtual AggregateResult<TDocument> Aggregate<TDocument>(IEnumerable<BsonDocument> pipeline)
+        public virtual AggregateResult<BsonDocument> Aggregate(IEnumerable<BsonDocument> pipeline)
         {
             var args = new AggregateArgs { Pipeline = pipeline, OutputMode = AggregateOutputMode.Inline };
-            return RunAggregateCommand<TDocument>(args);
+            return RunAggregateCommand<BsonDocument>(args);
         }
 
         /// <summary>
@@ -194,26 +196,14 @@ namespace MongoDB.Driver
         /// The pipeline.
         /// </param>
         /// <returns>
-        /// The <see cref="AggregateResult"/>.
+        /// The result of the aggregation pipeline/>.
         /// </returns>
         public virtual AggregateResult<BsonDocument> Aggregate(params BsonDocument[] pipeline)
         {
             var args = new AggregateArgs { Pipeline = pipeline, OutputMode = AggregateOutputMode.Inline };
             return RunAggregateCommand<BsonDocument>(args);
         }
-
-        /// <summary>
-        /// Runs an aggregation framework command.
-        /// </summary>
-        /// <param name="pipeline">The pipeline operations.</param>
-        /// <returns>An AggregateResult.</returns>
-        [Obsolete("Use the overload with an AggregateArgs parameter.")]
-        public virtual AggregateResult<TDocument> Aggregate<TDocument>(params BsonDocument[] pipeline)
-        {
-            var args = new AggregateArgs { Pipeline = pipeline, OutputMode = AggregateOutputMode.Inline };
-            return RunAggregateCommand<TDocument>(args);
-        }
-
+        
         /// <summary>
         /// Runs an aggregate command with explain set and returns the explain result.
         /// </summary>

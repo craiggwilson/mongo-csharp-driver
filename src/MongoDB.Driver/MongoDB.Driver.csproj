@@ -92,6 +92,7 @@
     <Compile Include="Builders\UpdateCurrentDateType.cs" />
     <Compile Include="CommandResults\AggregateCommandResult.cs" />
     <Compile Include="CommandResults\AggregateCommandResultSerializer.cs" />
+    <Compile Include="CommandResults\AggregateResultSerializer.cs" />
     <Compile Include="Communication\FeatureDetection\AndDependency.cs" />
     <Compile Include="Communication\FeatureDetection\InstanceTypeDependency.cs" />
     <Compile Include="Communication\FeatureDetection\NotDependency.cs" />

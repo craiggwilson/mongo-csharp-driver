@@ -13,46 +13,21 @@
 * limitations under the License.
 */
 
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using MongoDB.Bson;
+
 using MongoDB.Bson.Serialization.Attributes;
 
 namespace MongoDB.Driver
 {
-    using MongoDB.Bson.IO;
-    using MongoDB.Bson.Serialization;
-
-    /// <summary>
-    /// Represents the results of a Aggregate command.
-    /// </summary>
-    [Serializable]
-    [BsonSerializer(typeof(CommandResultSerializer<AggregateResult>))]
-
-    public class AggregateResult : CommandResult
-    {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="AggregateResult"/> class.
-        /// </summary>
-        /// <param name="response">
-        /// The response.
-        /// </param>
-        /// <exception cref="NotImplementedException">
-        /// </exception>
-        protected AggregateResult(BsonDocument response)
-            : base(response)
-        {
-            throw new NotImplementedException();
-        }
-    }
+    using MongoDB.Bson;
 
     /// <summary>
     /// The aggregate result.
     /// </summary>
     /// <typeparam name="TDocument">
     /// </typeparam>
-    public class AggregateResult<TDocument> : AggregateResult
+    [BsonSerializer(typeof(AggregateResultSerializer<>))]
+    public class AggregateResult<TDocument> : CommandResult
     {
         // private fields
         private readonly long _cursorId;
@@ -60,38 +35,24 @@ namespace MongoDB.Driver
 
         // constructors
         /// <summary>
-        /// Initializes a new instance of the <see cref="AggregateResult&lt;TDocument&gt;" /> class.
+        /// Initializes a new instance of the <see cref="AggregateResult&lt;TDocument&gt;"/> class.
         /// </summary>
-        /// <param name="response">The response.</param>
-        public AggregateResult(BsonDocument response)
+        /// <param name="response">
+        /// The response.
+        /// </param>
+        /// <param name="resultDocuments">
+        /// The result Documents.
+        /// </param>
+        public AggregateResult(BsonDocument response, IEnumerable<TDocument> resultDocuments)
             : base(response)
         {
-            var serializer = BsonSerializer.LookupSerializer<TDocument>();
-
             if (response.Contains("cursor"))
             {
                 var cursorDocument = response["cursor"];
                 _cursorId = cursorDocument["id"].ToInt64();
-                
-                _resultDocuments = cursorDocument["firstBatch"].AsBsonArray.Select(
-                    v =>
-                        {
-                            var reader = new BsonDocumentReader(v.AsBsonDocument);
-                            var context = BsonDeserializationContext.CreateRoot<TDocument>(reader);
-                            return serializer.Deserialize(context);
-                        });
             }
 
-            if (response.Contains("result"))
-            {
-                _resultDocuments = response["result"].AsBsonArray.Select(
-                    v =>
-                        {
-                            var reader = new BsonDocumentReader(v.AsBsonDocument);
-                            var context = BsonDeserializationContext.CreateRoot<TDocument>(reader);
-                            return serializer.Deserialize(context);
-                        });
-            }
+            this._resultDocuments = resultDocuments;
         }
 
         // public properties

@@ -83,6 +83,36 @@ namespace MongoDB.Driver.Tests
         }
 
         [Test]
+        public void TestAggregateTyped()
+        {
+            if (_primary.Supports(FeatureId.AggregateCursor))
+            {
+                _collection.RemoveAll();
+                _collection.DropAllIndexes();
+
+                _collection.Insert(new Place { Name = "London", Type = "City" });
+                _collection.Insert(new Place { Name = "Reading", Type = "Town" });
+                _collection.Insert(new Place { Name = "Stroud", Type = "Town" });
+                _collection.Insert(new Place { Name = "Birmingham", Type = "City" });
+
+                var query = _collection.Aggregate<Place>(new AggregateArgs
+                {
+                    Pipeline = new BsonDocument[]
+                    {
+                        new BsonDocument("$match", new BsonDocument { { "Type", "Town" } })
+                    },
+                    OutputMode = AggregateOutputMode.Inline
+                });
+
+                var results = query.ToList();
+
+                Assert.AreEqual(2, results.Count);
+                Assert.AreEqual("Reading", results.ElementAt(0).Name);
+                Assert.AreEqual("Stroud", results.ElementAt(1).Name);
+            }
+        }
+
+        [Test]
         public void TestAggregateAllowDiskUsage()
         {
             if (_primary.Supports(FeatureId.AggregateAllowDiskUse))
@@ -138,6 +168,37 @@ namespace MongoDB.Driver.Tests
                 Assert.AreEqual(1, dictionary[1]);
                 Assert.AreEqual(1, dictionary[2]);
                 Assert.AreEqual(2, dictionary[3]);
+            }
+        }
+
+        [Test]
+        public void TestAggregateCursorTyped()
+        {
+            if (_primary.Supports(FeatureId.AggregateCursor))
+            {
+                _collection.RemoveAll();
+                _collection.DropAllIndexes();
+
+                _collection.Insert(new Place { Name = "London", Type = "City" });
+                _collection.Insert(new Place { Name = "Reading", Type = "Town" });
+                _collection.Insert(new Place { Name = "Stroud", Type = "Town" });
+                _collection.Insert(new Place { Name = "Birmingham", Type = "City" });
+
+                var query = _collection.Aggregate<Place>(new AggregateArgs
+                {
+                    Pipeline = new BsonDocument[]
+                    {
+                        new BsonDocument("$match", new BsonDocument { { "Type", "City" } })
+                    },
+                    OutputMode = AggregateOutputMode.Cursor,
+                    BatchSize = 1
+                });
+
+                var results = query.ToList();
+
+                Assert.AreEqual(2, results.Count);
+                Assert.AreEqual("London", results.ElementAt(0).Name);
+                Assert.AreEqual("Birmingham", results.ElementAt(1).Name);
             }
         }
 
