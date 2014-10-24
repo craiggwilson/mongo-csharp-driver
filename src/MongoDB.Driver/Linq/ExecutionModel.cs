@@ -72,6 +72,17 @@ namespace MongoDB.Driver.Linq
             get { return _modelType; }
         }
 
+        /// <summary>
+        /// Executes against the given collection
+        /// </summary>
+        /// <param name="collection">
+        /// The collection.
+        /// </param>
+        /// <returns>
+        /// Results
+        /// </returns>
+        public abstract object Execute(MongoCollection collection);
+
         // internal properties
         internal ExecutionModelProjection Projection
         {
@@ -80,8 +91,7 @@ namespace MongoDB.Driver.Linq
         }
 
         // internal methods
-        internal abstract object Execute(MongoCollection collection);
-
+      
         internal LambdaExpression CreateExecutor()
         {
             var documents = Expression.Parameter(typeof(IEnumerable<>).MakeGenericType(Projection.Projector.Parameters[0].Type), "all");

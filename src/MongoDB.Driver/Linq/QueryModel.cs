@@ -202,8 +202,16 @@ namespace MongoDB.Driver.Linq
             return sb.ToString();
         }
 
-        // internal methods
-        internal override object Execute(MongoCollection collection)
+        /// <summary>
+        /// Executes against the given collection
+        /// </summary>
+        /// <param name="collection">
+        /// The collection.
+        /// </param>
+        /// <returns>
+        /// Query results
+        /// </returns>
+        public override object Execute(MongoCollection collection)
         {
             if (_isDistinct)
             {

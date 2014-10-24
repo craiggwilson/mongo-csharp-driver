@@ -62,14 +62,16 @@ namespace MongoDB.Driver.Linq
             return "aggregate(" + array.ToString() + ")";
         }
 
-        // internal methods
         /// <summary>
-        /// Executes the specified collection.
+        /// Executes against the given collection
         /// </summary>
-        /// <param name="collection">The collection.</param>
-        /// <returns></returns>
-        /// <exception cref="MongoQueryException"></exception>
-        internal override object Execute(MongoCollection collection)
+        /// <param name="collection">
+        /// The collection.
+        /// </param>
+        /// <returns>
+        /// Pipeline results
+        /// </returns>
+        public override object Execute(MongoCollection collection)
         {
             var command = new QueryDocument
             {

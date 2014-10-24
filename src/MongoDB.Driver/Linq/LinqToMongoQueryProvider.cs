@@ -140,7 +140,7 @@ namespace MongoDB.Driver.Linq
         /// This method is used when the result of the operation
         /// is a scalar value.
         /// </remarks>
-        public TResult Execute<TResult>(Expression expression)
+        public virtual TResult Execute<TResult>(Expression expression)
         {
             if (expression == null)
             {
@@ -156,7 +156,7 @@ namespace MongoDB.Driver.Linq
         /// </summary>
         /// <param name="expression">The node.</param>
         /// <returns>The result.</returns>
-        public object Execute(Expression expression)
+        public virtual object Execute(Expression expression)
         {
             if (expression == null)
             {
