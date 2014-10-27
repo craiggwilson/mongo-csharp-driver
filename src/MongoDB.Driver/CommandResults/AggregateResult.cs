@@ -30,8 +30,8 @@ namespace MongoDB.Driver
     /// </typeparam>
     public class AggregateResult<TDocument> : AggregateResult
     {
-        internal AggregateResult(BsonDocument response, IEnumerable results)
-            : base(response, results)
+        internal AggregateResult(BsonDocument response, IEnumerable resultDocuments)
+            : base(response, resultDocuments)
         {
         }
 
@@ -41,9 +41,9 @@ namespace MongoDB.Driver
         /// <value>
         /// The values.
         /// </value>
-        public new IEnumerable<TDocument> Results
+        public new IEnumerable<TDocument> ResultDocuments
         {
-            get { return base.Results.Cast<TDocument>(); }
+            get { return base.ResultDocuments.Cast<TDocument>(); }
         }
     }
 
@@ -57,15 +57,15 @@ namespace MongoDB.Driver
         // private fields
         private readonly long _cursorId;
 
-        private readonly IEnumerable _results;
+        private readonly IEnumerable _resultDocuments;
 
         // constructors
         /// <summary>
         /// Initializes a new instance of the <see cref="AggregateResult" /> class.
         /// </summary>
         /// <param name="response">The response.</param>
-        /// <param name="results">The values.</param>
-        internal AggregateResult(BsonDocument response, IEnumerable results)
+        /// <param name="resultDocuments">The values.</param>
+        internal AggregateResult(BsonDocument response, IEnumerable resultDocuments)
             : base(response)
         {
             if (response.Contains("cursor"))
@@ -74,7 +74,7 @@ namespace MongoDB.Driver
                 _cursorId = cursorDocument["id"].ToInt64();
             }
 
-            _results = results;
+            this._resultDocuments = resultDocuments;
         }
 
         // public properties
@@ -95,9 +95,9 @@ namespace MongoDB.Driver
         /// <value>
         /// The values.
         /// </value>
-        public IEnumerable Results
+        public IEnumerable ResultDocuments
         {
-            get { return _results; }
+            get { return this._resultDocuments; }
         }
     }
 }

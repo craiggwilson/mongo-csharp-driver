@@ -71,16 +71,16 @@ namespace MongoDB.Driver
                 return new CursorEnumerator<TDocument>(
                     connectionProvider,
                     _collection.FullName,
-                    result.Results,
+                    result.ResultDocuments,
                     result.CursorId,
                     _args.BatchSize ?? 0,
                     0,
                     readerSettings,
                     BsonSerializer.LookupSerializer<TDocument>());
             }
-            else if (result.Results != null)
+            else if (result.ResultDocuments != null)
             {
-                return result.Results.GetEnumerator();
+                return result.ResultDocuments.GetEnumerator();
             }
             else
             {

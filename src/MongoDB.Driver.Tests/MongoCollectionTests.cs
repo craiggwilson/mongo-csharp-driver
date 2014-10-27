@@ -69,7 +69,7 @@ namespace MongoDB.Driver.Tests
                 );
 #pragma warning restore
                 var dictionary = new Dictionary<int, int>();
-                foreach (var result in commandResult.Results)
+                foreach (var result in commandResult.ResultDocuments)
                 {
                     var x = result["_id"].AsInt32;
                     var count = result["count"].AsInt32;
