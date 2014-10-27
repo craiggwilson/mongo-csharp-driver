@@ -75,25 +75,42 @@ namespace MongoDB.Driver.Linq
         /// </returns>
         public override object Execute(MongoCollection collection)
         {
-            IBsonSerializer resultSerializer = null;
-            var args = new AggregateArgs { OutputMode = AggregateOutputMode.Cursor };
-            args.Pipeline = _pipeline;
+            var args = new AggregateArgs { OutputMode = AggregateOutputMode.Cursor, Pipeline = this._pipeline };
+            return this.Execute(collection, args);
+        }
 
+        /// <summary>
+        /// Executes against the given collection with the supplied arguments
+        /// </summary>
+        /// <param name="collection">
+        /// The collection.
+        /// </param>
+        /// <param name="args">
+        /// The aggregate arguments.
+        /// </param>
+        /// <returns>
+        /// The <see cref="object"/>.
+        /// </returns>
+        /// <exception cref="Exception">
+        /// </exception>
+        public object Execute(MongoCollection collection, AggregateArgs args)
+        {
+            IBsonSerializer resultSerializer = null;
             IEnumerable results;
-            if (Projection.Projector.Parameters[0].Type == typeof(IProjectionValueStore))
+            if (this.Projection.Projector.Parameters[0].Type == typeof(IProjectionValueStore))
             {
-                resultSerializer = new ProjectionValueStoreDeserializer(Projection.FieldSerializationInfo);
+                resultSerializer = new ProjectionValueStoreDeserializer(this.Projection.FieldSerializationInfo);
                 results = collection.Aggregate<IProjectionValueStore>(args, resultSerializer);
             }
             else
             {
-                resultSerializer = BsonSerializer.LookupSerializer(Projection.Projector.Parameters[0].Type);
+                resultSerializer = BsonSerializer.LookupSerializer(this.Projection.Projector.Parameters[0].Type);
                 results = collection.Aggregate<object>(args, resultSerializer);
             }
-            
+
             try
             {
-                return CreateExecutor().Compile().DynamicInvoke(results);
+                return this.CreateExecutor().Compile().DynamicInvoke(results);
             }
             catch (TargetInvocationException tie)
             {
