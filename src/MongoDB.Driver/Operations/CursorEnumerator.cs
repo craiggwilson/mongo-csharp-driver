@@ -31,7 +31,7 @@ namespace MongoDB.Driver.Operations
         private readonly IConnectionProvider _connectionProvider;
         private readonly int _limit;
         private readonly BsonBinaryReaderSettings _readerSettings;
-        private readonly IBsonSerializer<TDocument> _serializer;
+        private readonly IBsonSerializer _serializer;
 
         private long _count = 0;
         private List<TDocument> _currentBatch;
@@ -49,7 +49,7 @@ namespace MongoDB.Driver.Operations
             int batchSize,
             int limit,
             BsonBinaryReaderSettings readerSettings,
-            IBsonSerializer<TDocument> serializer)
+            IBsonSerializer serializer)
         {
             _connectionProvider = connectionProvider;
             _collectionFullName = collectionFullName;

@@ -76,7 +76,7 @@ namespace MongoDB.Driver
                     _args.BatchSize ?? 0,
                     0,
                     readerSettings,
-                    BsonSerializer.LookupSerializer<TDocument>());
+                    _serializer);
             }
             else if (result.ResultDocuments != null)
             {

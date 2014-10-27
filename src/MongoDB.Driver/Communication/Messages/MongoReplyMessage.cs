@@ -26,7 +26,7 @@ namespace MongoDB.Driver.Internal
     {
         // private fields
         private readonly BsonBinaryReaderSettings _readerSettings;
-        private readonly IBsonSerializer<TDocument> _serializer;
+        private readonly IBsonSerializer _serializer;
         private ResponseFlags _responseFlags;
         private long _cursorId;
         private int _startingFrom;
@@ -34,7 +34,7 @@ namespace MongoDB.Driver.Internal
         private List<TDocument> _documents;
 
         // constructors
-        internal MongoReplyMessage(BsonBinaryReaderSettings readerSettings, IBsonSerializer<TDocument> serializer)
+        internal MongoReplyMessage(BsonBinaryReaderSettings readerSettings, IBsonSerializer serializer)
             : base(MessageOpcode.Reply)
         {
             _readerSettings = readerSettings;
@@ -79,7 +79,7 @@ namespace MongoDB.Driver.Internal
                 {
                     var context = BsonDeserializationContext.CreateRoot<TDocument>(bsonReader, b => b.AllowDuplicateElementNames = allowDuplicateElementNames);
                     var document = _serializer.Deserialize(context);
-                    _documents.Add(document);
+                    _documents.Add((TDocument)document);
                 }
             }
         }
