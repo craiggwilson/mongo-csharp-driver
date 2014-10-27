@@ -94,17 +94,24 @@ namespace MongoDB.Driver.Linq
       
         internal LambdaExpression CreateExecutor()
         {
-            var documents = Expression.Parameter(typeof(IEnumerable<>).MakeGenericType(Projection.Projector.Parameters[0].Type), "all");
+            var documents = Expression.Parameter(typeof(IEnumerable<object>), "all");
             
             // because we will always have a projector, Select is the natural operator
             // to apply that projection.
             // TODO: is there any way to avoid this - maybe if Projection.Projector
             // is an identity projector.
+
             Expression body = Expression.Call(
+                typeof(Enumerable),
+                "Cast",
+                new[] { Projection.Projector.Parameters[0].Type },
+                documents);
+
+            body = Expression.Call(
                 typeof(Enumerable),
                 "Select",
                 new[] { Projection.Projector.Parameters[0].Type, Projection.Projector.Body.Type },
-                documents,
+                body,
                 Projection.Projector);
 
             // the aggregator gets applied to the result once all documents have been projected.

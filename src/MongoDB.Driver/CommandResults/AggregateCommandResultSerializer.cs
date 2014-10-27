@@ -23,21 +23,22 @@ using System.Collections.Generic;
 
 namespace MongoDB.Driver
 {
+    using System.Collections;
+
     /// <summary>
     /// Represents a serializer for a AggregateCommandResult with values of type TValue.
     /// </summary>
-    /// <typeparam name="TValue">The type of the value.</typeparam>
-    public class AggregateCommandResultSerializer<TValue> : ClassSerializerBase<AggregateCommandResult<TValue>>
+    public class AggregateCommandResultSerializer<TDocument> : ClassSerializerBase<AggregateResult<TDocument>>
     {
         // private fields
-        private readonly IBsonSerializer<TValue> _resultSerializer;
+        private readonly IBsonSerializer _resultSerializer;
 
         // constructors
         /// <summary>
-        /// Initializes a new instance of the <see cref="AggregateCommandResultSerializer{TValue}" /> class.
+        /// Initializes a new instance of the <see cref="AggregateCommandResultSerializer{TDocument}" /> class.
         /// </summary>
         /// <param name="resultSerializer">The result serializer.</param>
-        public AggregateCommandResultSerializer(IBsonSerializer<TValue> resultSerializer)
+        public AggregateCommandResultSerializer(IBsonSerializer resultSerializer)
         {
             _resultSerializer = resultSerializer;
         }
@@ -47,12 +48,12 @@ namespace MongoDB.Driver
         /// </summary>
         /// <param name="context">The context.</param>
         /// <returns>An object.</returns>
-        protected override AggregateCommandResult<TValue> DeserializeValue(BsonDeserializationContext context)
+        protected override AggregateResult<TDocument> DeserializeValue(BsonDeserializationContext context)
         {
             var bsonReader = context.Reader;
 
             var response = new BsonDocument();
-            IEnumerable<TValue> results = null;
+            IEnumerable results = null;
 
             bsonReader.ReadStartDocument();
             while (bsonReader.ReadBsonType() != BsonType.EndOfDocument)
@@ -61,31 +62,43 @@ namespace MongoDB.Driver
                 if (name == "result")
                 {
                     results = ReadResults(context);
+                    continue;
                 }
-                else
+
+                if (name == "cursor")
                 {
-                    var value = context.DeserializeWithChildContext(BsonValueSerializer.Instance);
-                    response.Add(name, value);
+                    bsonReader.ReadStartDocument();
+                    response.Add("cursor", new BsonDocument("id", bsonReader.ReadInt64("id")));
+                    bsonReader.ReadString("ns");
+
+                    results = ReadResults(context);
+                    bsonReader.ReadEndDocument();
+
+                    continue;
                 }
+
+                var value = context.DeserializeWithChildContext(BsonValueSerializer.Instance);
+                response.Add(name, value);
             }
+
             bsonReader.ReadEndDocument();
 
-            return new AggregateCommandResult<TValue>(response, results);
+            return new AggregateResult<TDocument>(response, results);
         }
 
         // private methods
-        private IEnumerable<TValue> ReadResults(BsonDeserializationContext context)
+        private IEnumerable ReadResults(BsonDeserializationContext context)
         {
             var bsonReader = context.Reader;
-            var values = new List<TValue>();
+            var values = new List<object>();
 
             bsonReader.ReadStartArray();
             while (bsonReader.ReadBsonType() != BsonType.EndOfDocument)
             {
                 values.Add(context.DeserializeWithChildContext(_resultSerializer));
             }
-            bsonReader.ReadEndArray();
 
+            bsonReader.ReadEndArray();
             return values;
         }
     }

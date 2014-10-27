@@ -30,16 +30,19 @@ namespace MongoDB.Driver
         // private fields
         private readonly MongoCollection _collection;
         private readonly AggregateArgs _args;
+        private readonly IBsonSerializer _serializer;
         private readonly string _outputCollectionName;
 
         // constructors
         public AggregateEnumerableResult(
             MongoCollection collection,
             AggregateArgs args,
+            IBsonSerializer serializer,
             string outputCollectionName)
         {
             _collection = collection;
             _args = args; // TODO: make a defensive copy?
+            _serializer = serializer;
             _outputCollectionName = outputCollectionName;
         }
 
@@ -55,7 +58,7 @@ namespace MongoDB.Driver
                 return collection.FindAll().GetEnumerator();
             }
 
-            var result = _collection.RunAggregateCommand<TDocument>(_args);
+            var result = _collection.RunAggregateCommand<TDocument>(_args, _serializer);
             if (result.CursorId != 0)
             {
                 var connectionProvider = new ServerInstanceConnectionProvider(result.ServerInstance);
@@ -68,16 +71,16 @@ namespace MongoDB.Driver
                 return new CursorEnumerator<TDocument>(
                     connectionProvider,
                     _collection.FullName,
-                    result.ResultDocuments,
+                    result.Results,
                     result.CursorId,
                     _args.BatchSize ?? 0,
                     0,
                     readerSettings,
                     BsonSerializer.LookupSerializer<TDocument>());
             }
-            else if (result.ResultDocuments != null)
+            else if (result.Results != null)
             {
-                return result.ResultDocuments.GetEnumerator();
+                return result.Results.GetEnumerator();
             }
             else
             {

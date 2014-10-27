@@ -1,4 +1,4 @@
-﻿/* Copyright 2010-2014 MongoDB Inc.
+﻿/* Copyright 2010-2013 10gen Inc.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -13,37 +13,59 @@
 * limitations under the License.
 */
 
-using System.Collections.Generic;
-
+using System;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using System.Collections.Generic;
 
 namespace MongoDB.Driver
 {
-    using MongoDB.Bson;
+    using System.Collections;
+    using System.Linq;
 
     /// <summary>
-    /// The aggregate result.
+    /// The result of an aggregate command where the document type is known.
     /// </summary>
     /// <typeparam name="TDocument">
     /// </typeparam>
-    [BsonSerializer(typeof(AggregateResultSerializer<>))]
-    public class AggregateResult<TDocument> : CommandResult
+    public class AggregateResult<TDocument> : AggregateResult
+    {
+        internal AggregateResult(BsonDocument response, IEnumerable results)
+            : base(response, results)
+        {
+        }
+
+        /// <summary>
+        /// Gets the values.
+        /// </summary>
+        /// <value>
+        /// The values.
+        /// </value>
+        public new IEnumerable<TDocument> Results
+        {
+            get { return base.Results.Cast<TDocument>(); }
+        }
+    }
+
+    /// <summary>
+    /// The result of an aggregate command.
+    /// </summary>
+    [Serializable]
+    [BsonSerializer(typeof(AggregateCommandResultSerializer<>))]
+    public class AggregateResult : CommandResult
     {
         // private fields
         private readonly long _cursorId;
-        private readonly IEnumerable<TDocument> _resultDocuments;
+
+        private readonly IEnumerable _results;
 
         // constructors
         /// <summary>
-        /// Initializes a new instance of the <see cref="AggregateResult&lt;TDocument&gt;"/> class.
+        /// Initializes a new instance of the <see cref="AggregateResult" /> class.
         /// </summary>
-        /// <param name="response">
-        /// The response.
-        /// </param>
-        /// <param name="resultDocuments">
-        /// The result Documents.
-        /// </param>
-        public AggregateResult(BsonDocument response, IEnumerable<TDocument> resultDocuments)
+        /// <param name="response">The response.</param>
+        /// <param name="results">The values.</param>
+        internal AggregateResult(BsonDocument response, IEnumerable results)
             : base(response)
         {
             if (response.Contains("cursor"))
@@ -52,7 +74,7 @@ namespace MongoDB.Driver
                 _cursorId = cursorDocument["id"].ToInt64();
             }
 
-            this._resultDocuments = resultDocuments;
+            _results = results;
         }
 
         // public properties
@@ -68,11 +90,14 @@ namespace MongoDB.Driver
         }
 
         /// <summary>
-        /// Gets the result documents (either the Inline results or the first batch if a cursor was used).
+        /// Gets the values.
         /// </summary>
-        public IEnumerable<TDocument> ResultDocuments
+        /// <value>
+        /// The values.
+        /// </value>
+        public IEnumerable Results
         {
-            get { return _resultDocuments; }
+            get { return _results; }
         }
     }
 }

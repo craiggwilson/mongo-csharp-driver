@@ -90,9 +90,8 @@
     <Compile Include="AggregateEnumerableResult.cs" />
     <Compile Include="Builders\BuilderHelper.cs" />
     <Compile Include="Builders\UpdateCurrentDateType.cs" />
-    <Compile Include="CommandResults\AggregateCommandResult.cs" />
+    <Compile Include="CommandResults\AggregateResult.cs" />
     <Compile Include="CommandResults\AggregateCommandResultSerializer.cs" />
-    <Compile Include="CommandResults\AggregateResultSerializer.cs" />
     <Compile Include="Communication\FeatureDetection\AndDependency.cs" />
     <Compile Include="Communication\FeatureDetection\InstanceTypeDependency.cs" />
     <Compile Include="Communication\FeatureDetection\NotDependency.cs" />
@@ -226,7 +225,6 @@
     <Compile Include="Builders\SortByBuilder.cs" />
     <Compile Include="Builders\UpdateBuilder.cs" />
     <Compile Include="CanCommandBeSentToSecondary.cs" />
-    <Compile Include="CommandResults\AggregateResult.cs" />
     <Compile Include="CommandResults\CollectionStatsResult.cs" />
     <Compile Include="CommandResults\CommandResult.cs" />
     <Compile Include="CommandResults\CommandResultSerializer.cs" />

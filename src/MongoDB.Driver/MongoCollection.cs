@@ -132,7 +132,7 @@ namespace MongoDB.Driver
         // public methods
 
         /// <summary>
-        /// The aggregate.
+        /// Represents an generic aggregate framework query. The command is not sent to the server until the result is enumerated.
         /// </summary>
         /// <param name="args">
         /// The args.
@@ -144,7 +144,23 @@ namespace MongoDB.Driver
         {
             return this.Aggregate<BsonDocument>(args);
         }
-    
+
+        /// <summary>
+        /// Represents an generic aggregate framework query. The command is not sent to the server until the result is enumerated.
+        /// </summary>
+        /// <param name="args">
+        /// The args.
+        /// </param>
+        /// <typeparam name="TDocument">
+        /// </typeparam>
+        /// <returns>
+        /// The <see cref="IEnumerable"/>.
+        /// </returns>
+        public virtual IEnumerable<TDocument> Aggregate<TDocument>(AggregateArgs args)
+        {
+            return this.Aggregate<TDocument>(args, BsonSerializer.LookupSerializer<TDocument>());
+        }
+
         /// <summary>
         /// Represents an generic aggregate framework query. The command is not sent to the server until the result is enumerated.
         /// </summary>
@@ -153,10 +169,11 @@ namespace MongoDB.Driver
         /// <param name="args">
         /// The args.
         /// </param>
+        /// <param name="serializer"></param>
         /// <returns>
         /// A sequence of documents.
         /// </returns>
-        public virtual IEnumerable<TDocument> Aggregate<TDocument>(AggregateArgs args)
+        public virtual IEnumerable<TDocument> Aggregate<TDocument>(AggregateArgs args, IBsonSerializer serializer)
         {
             if (args == null) { throw new ArgumentNullException("args"); }
             if (args.Pipeline == null) { throw new ArgumentException("Pipeline is null.", "args"); }
@@ -167,10 +184,10 @@ namespace MongoDB.Driver
             if (lastStage != null && lastStage.GetElement(0).Name == "$out")
             {
                 outputCollectionName = lastStage["$out"].AsString;
-                RunAggregateCommand<TDocument>(args);
+                RunAggregateCommand<TDocument>(args, serializer);
             }
 
-            return new AggregateEnumerableResult<TDocument>(this, args, outputCollectionName);
+            return new AggregateEnumerableResult<TDocument>(this, args, serializer, outputCollectionName);
         }
 
         /// <summary>
@@ -186,7 +203,7 @@ namespace MongoDB.Driver
         public virtual AggregateResult<BsonDocument> Aggregate(IEnumerable<BsonDocument> pipeline)
         {
             var args = new AggregateArgs { Pipeline = pipeline, OutputMode = AggregateOutputMode.Inline };
-            return RunAggregateCommand<BsonDocument>(args);
+            return RunAggregateCommand<BsonDocument>(args, BsonDocumentSerializer.Instance);
         }
 
         /// <summary>
@@ -201,7 +218,7 @@ namespace MongoDB.Driver
         public virtual AggregateResult<BsonDocument> Aggregate(params BsonDocument[] pipeline)
         {
             var args = new AggregateArgs { Pipeline = pipeline, OutputMode = AggregateOutputMode.Inline };
-            return RunAggregateCommand<BsonDocument>(args);
+            return RunAggregateCommand<BsonDocument>(args, BsonDocumentSerializer.Instance);
         }
         
         /// <summary>
@@ -2204,27 +2221,45 @@ namespace MongoDB.Driver
             };
         }
 
-        internal AggregateResult<TDocument> RunAggregateCommand<TDocument>(AggregateArgs args)
+        internal AggregateResult<TDocument> RunAggregateCommand<TDocument>(AggregateArgs args, IBsonSerializer serializer)
         {
             BsonDocument cursor = null;
+            var aggregateCommand = this.BuildAggregateCommand(args, cursor);
+
+            var commandResult = RunCommandAs(
+                aggregateCommand,
+                new AggregateCommandResultSerializer<TDocument>(serializer));
+
+            if (!commandResult.Ok)
+            {
+                throw new MongoLinqException(string.Format("Aggregate failed. {0}", commandResult.ErrorMessage));
+            }
+
+            return commandResult;
+        }
+        
+        private CommandDocument BuildAggregateCommand(AggregateArgs args, BsonDocument cursor)
+        {
             if (args.OutputMode == AggregateOutputMode.Cursor)
             {
-                cursor = new BsonDocument
-                {
-                    { "batchSize", () => args.BatchSize.Value, args.BatchSize.HasValue }
-                };
+                cursor = new BsonDocument { { "batchSize", () => args.BatchSize.Value, args.BatchSize.HasValue } };
             }
 
             var aggregateCommand = new CommandDocument
-            {
-                { "aggregate", _name },
-                { "pipeline", new BsonArray(args.Pipeline.Cast<BsonValue>()) },
-                { "cursor", cursor, cursor != null }, // optional
-                { "allowDiskUse", () => args.AllowDiskUse.Value, args.AllowDiskUse.HasValue }, // optional
-                { "maxTimeMS", () => args.MaxTime.Value.TotalMilliseconds, args.MaxTime.HasValue } // optional
-            };
-
-            return RunCommandAs<AggregateResult<TDocument>>(aggregateCommand);
+                                       {
+                                           { "aggregate", this._name },
+                                           { "pipeline", new BsonArray(args.Pipeline.Cast<BsonValue>()) },
+                                           { "cursor", cursor, cursor != null }, // optional
+                                           {
+                                               "allowDiskUse", () => args.AllowDiskUse.Value,
+                                               args.AllowDiskUse.HasValue
+                                           }, // optional
+                                           {
+                                               "maxTimeMS", () => args.MaxTime.Value.TotalMilliseconds,
+                                               args.MaxTime.HasValue
+                                           } // optional
+                                       };
+            return aggregateCommand;
         }
 
         // private methods

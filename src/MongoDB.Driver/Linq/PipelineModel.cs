@@ -22,6 +22,8 @@ using MongoDB.Bson.Serialization;
 
 namespace MongoDB.Driver.Linq
 {
+    using System.Collections;
+
     /// <summary>
     /// Execution model that represents a query executed with the aggregation framework.
     /// </summary>
@@ -32,7 +34,7 @@ namespace MongoDB.Driver.Linq
 
         // constructors
         /// <summary>
-        /// Initializes a new instance of the <see cref="PipelineModel" /> class.
+        /// Initializes a new instance of the <see cref="PipelineModel"/> class.
         /// </summary>
         public PipelineModel()
             : base(ExecutionModelType.Pipeline)
@@ -73,45 +75,22 @@ namespace MongoDB.Driver.Linq
         /// </returns>
         public override object Execute(MongoCollection collection)
         {
-            var command = new QueryDocument
-            {
-                { "aggregate", collection.Name },
-                { "pipeline", new BsonArray(_pipeline) }
-            };
+            IBsonSerializer resultSerializer = null;
+            var args = new AggregateArgs { OutputMode = AggregateOutputMode.Cursor };
+            args.Pipeline = _pipeline;
 
-            IBsonSerializer resultSerializer;
+            IEnumerable results;
             if (Projection.Projector.Parameters[0].Type == typeof(IProjectionValueStore))
             {
                 resultSerializer = new ProjectionValueStoreDeserializer(Projection.FieldSerializationInfo);
+                results = collection.Aggregate<IProjectionValueStore>(args, resultSerializer);
             }
             else
             {
                 resultSerializer = BsonSerializer.LookupSerializer(Projection.Projector.Parameters[0].Type);
+                results = collection.Aggregate<object>(args, resultSerializer);
             }
-
-            var serializerType = typeof(AggregateCommandResultSerializer<>).MakeGenericType(Projection.Projector.Parameters[0].Type);
-            var serializer = (IBsonSerializer)Activator.CreateInstance(serializerType, new [] { resultSerializer });
-
-            // TODO: We currently don't have a way to hook into the current collection.Aggregate method,
-            // with a custom serializer, so we have to do this manually for now.
-            var resultType = typeof(AggregateCommandResult<>).MakeGenericType(Projection.Projector.Parameters[0].Type);
-
-            var cursor = MongoCursor.Create(resultType,
-                collection.Database.GetCollection("$cmd"),
-                command,
-                collection.Settings.ReadPreference,
-                serializer);
-
-            cursor.SetLimit(1);
-
-            var result = cursor.OfType<CommandResult>().First();
-
-            if (!result.Ok)
-            {
-                throw new MongoLinqException(string.Format("Aggregate failed. {0}", result.ErrorMessage));
-            }
-
-            var results = result.GetType().GetProperty("Results").GetValue(result, null);
+            
             try
             {
                 return CreateExecutor().Compile().DynamicInvoke(results);
