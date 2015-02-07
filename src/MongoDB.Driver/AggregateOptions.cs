@@ -10,6 +10,7 @@ namespace MongoDB.Driver
     /// <summary>
     /// Options for an aggregate operation.
     /// </summary>
+    /// <preliminary/>
     public abstract class AggregateOptionsBase
     {
         // fields
@@ -22,6 +23,8 @@ namespace MongoDB.Driver
         /// <summary>
         /// Gets or sets a value indicating whether to allow disk use.
         /// </summary>
+        /// <mongoManual href="reference/command/aggregate/">aggregate</mongoManual>
+        /// <mongoServerRelease from="2.6" />
         public bool? AllowDiskUse
         {
             get { return _allowDiskUse; }
@@ -29,8 +32,14 @@ namespace MongoDB.Driver
         }
 
         /// <summary>
-        /// Gets or sets the size of a batch.
+        /// (Preliminary) Gets or sets the size of a batch.<para>Since server release 2.6.</para>
         /// </summary>
+        /// <remarks>
+        /// <list type="definition">
+        /// <item><term>MongoDB Documentation</term><description><see href="http://docs.mongodb.org/manual/reference/command/aggregate/">aggregate</see></description></item>
+        /// <item><term>Server Version</term><description><see href="http://docs.mongodb.org/manual/release-notes/2.6">&gt;=2.6</see></description></item>
+        /// </list>
+        /// </remarks>
         public int? BatchSize
         {
             get { return _batchSize; }
