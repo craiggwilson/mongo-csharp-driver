@@ -10,13 +10,6 @@ namespace MongoDB.Query.Structure.Parsing
     {
         Word,
         Asterick,
-        LParen,
-        RParen,
-        Equal,
-        LessThan,
-        LessThanOrEqual,
-        GreaterThan,
-        GreaterThanOrEqual,
         EOF
     }
 }

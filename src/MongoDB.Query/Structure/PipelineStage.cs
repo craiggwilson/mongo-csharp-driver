@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace MongoDB.Query.Structure
 {
-    public abstract class Node
+    public abstract class PipelineStage : Node
     {
-        public abstract NodeKind Kind { get; }
+        public abstract string Name { get; }
     }
 }

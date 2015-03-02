@@ -9,6 +9,11 @@ namespace MongoDB.Query.Structure.Parsing
     [Serializable]
     public class ParseException : Exception
     {
+        public static ParseException Create(string format, params object[] args)
+        {
+            return new ParseException(string.Format(format, args));
+        }
+
         public ParseException() { }
         public ParseException(string message) : base(message) { }
         public ParseException(string message, Exception inner) : base(message, inner) { }

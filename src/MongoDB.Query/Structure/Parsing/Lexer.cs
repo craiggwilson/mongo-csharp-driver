@@ -53,25 +53,26 @@ namespace MongoDB.Query.Structure.Parsing
 
             switch(c)
             {
-                case '(':
-                    return new Token(TokenKind.LParen, c);
-                case ')':
-                    return new Token(TokenKind.RParen, c);
                 case '*':
-                    return new Token(TokenKind.Asterick, c);
-                case '=':
-
+                    return new Token(TokenKind.Asterick, _input.Consume());
+                default:
+                    return ReadWord();
             }
         }
 
         private Token ReadEndOfFile()
         {
-            return new Token(TokenKind.EOF, null);
+            return new Token(TokenKind.EOF, "<<EOF>>");
         }
 
-        private Token ReadTerminal()
+        private Token ReadWord()
         {
-
+            _input.Mark();
+            while (char.IsLetterOrDigit(_input.LA(0)))
+            {
+                _input.Consume();
+            }
+            return new Token(TokenKind.Word, new string(_input.ClearMark()));
         }
 
         private void ReadWhiteSpace()
