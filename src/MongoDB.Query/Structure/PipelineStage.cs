@@ -6,8 +6,32 @@ using System.Threading.Tasks;
 
 namespace MongoDB.Query.Structure
 {
-    public abstract class PipelineStage : Node
+    public class PipelineStage : Node
     {
-        public abstract string Name { get; }
+        private readonly string _document;
+        private readonly string _pipelineOperator;
+
+        public PipelineStage(string pipelineOperator, string document)
+        {
+            _pipelineOperator = pipelineOperator;
+            _document = document;
+        }
+
+        public string Document
+        {
+            get { return _document; }
+        }
+
+        public override NodeKind Kind
+        {
+            get { return NodeKind.PipelineStage; }
+        }
+
+        public string PipelineOperator
+        {
+            get { return _pipelineOperator; }
+        }
+
+
     }
 }

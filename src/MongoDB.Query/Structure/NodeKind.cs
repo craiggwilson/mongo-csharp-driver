@@ -9,7 +9,6 @@ namespace MongoDB.Query.Structure
     public enum NodeKind
     {
         Pipeline,
-        ProjectStage,
-        Field
+        PipelineStage
     }
 }

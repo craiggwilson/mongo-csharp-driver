@@ -22,15 +22,37 @@ namespace MongoDB.Query.Structure.Parsing
         }
 
         [Test]
-        public void Minimal_with_project_asterick()
+        public void Minimal_with_project()
         {
-            var subject = new Parser(new Lexer("FROM a PROJECT *"));
+            var subject = new Parser(new Lexer("FROM a PROJECT {x:1, y:1}"));
 
             var pipeline = subject.Parse();
             pipeline.CollectionName.Should().Be("a");
             pipeline.Stages.Should().HaveCount(1);
-            pipeline.Stages[0].Name.Should().Be("PROJECT");
-            ((ProjectPipelineStage)pipeline.Stages[0]).Nodes.Should().HaveCount(0);
+            pipeline.Stages[0].Document.Should().Be("{x:1, y:1}");
+        }
+
+        [Test]
+        public void Minimal_with_match()
+        {
+            var subject = new Parser(new Lexer("FROM a MATCH {x:1, y:1}"));
+
+            var pipeline = subject.Parse();
+            pipeline.CollectionName.Should().Be("a");
+            pipeline.Stages.Should().HaveCount(1);
+            pipeline.Stages[0].Document.Should().Be("{x:1, y:1}");
+        }
+
+        [Test]
+        public void Match_and_project()
+        {
+            var subject = new Parser(new Lexer("FROM a MATCH {x:1, y:1} PROJECT {x:1}"));
+
+            var pipeline = subject.Parse();
+            pipeline.CollectionName.Should().Be("a");
+            pipeline.Stages.Should().HaveCount(2);
+            pipeline.Stages[0].Document.Should().Be("{x:1, y:1}");
+            pipeline.Stages[1].Document.Should().Be("{x:1}");
         }
 
         private void AssertNext(Lexer lexer, TokenKind tokenKind, string text)

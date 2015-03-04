@@ -4,11 +4,13 @@ using System.Collections.Generic;
 using System.Data;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Bindings;
 using MongoDB.Driver.Core.Clusters;
 using MongoDB.Driver.Core.Configuration;
+using MongoDB.Driver.Core.Misc;
 using MongoDB.Driver.Core.Operations;
 
 namespace MongoDB.AdoNet
@@ -70,13 +72,23 @@ namespace MongoDB.AdoNet
             }
         }
 
-        //public TResult ExecuteReadOperation<TResult>(IReadOperation<TResult> operation, ReadPreference readPreference)
-        //{
-        //    using (var binding = new ReadPreferenceBinding(_cluster, readPreference))
-        //    {
-
-        //    }
-        //}
+        public TResult ExecuteOperation<TResult>(IReadOperation<TResult> operation)
+        {
+            ReadPreference readPreference;
+            var mode = _connectionString.ReadPreference ?? ReadPreferenceMode.Primary;
+            if(mode != ReadPreferenceMode.Primary && _connectionString.ReadPreferenceTags != null)
+            {
+                readPreference = new ReadPreference(mode, Optional.Create<IEnumerable<TagSet>>(_connectionString.ReadPreferenceTags));
+            }
+            else
+            {
+                readPreference = new ReadPreference(mode);
+            }
+            using (var binding = new ReadPreferenceBinding(_cluster, readPreference))
+            {
+                return operation.ExecuteAsync(binding, CancellationToken.None).GetAwaiter().GetResult();
+            }
+        }
 
         private class ConnectionStringEqualityComparer : IEqualityComparer<ConnectionString>
         {

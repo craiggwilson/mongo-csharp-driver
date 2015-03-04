@@ -53,10 +53,6 @@
     <Compile Include="Structure\Parsing\LexerTests.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\MongoDB.Bson\MongoDB.Bson.csproj">
-      <Project>{0e9a3a2a-49cd-4f6c-847c-dc79b4b65ce6}</Project>
-      <Name>MongoDB.Bson</Name>
-    </ProjectReference>
     <ProjectReference Include="..\MongoDB.Query\MongoDB.Query.csproj">
       <Project>{02896e8e-ee56-47ac-b870-db2857aa6318}</Project>
       <Name>MongoDB.Query</Name>

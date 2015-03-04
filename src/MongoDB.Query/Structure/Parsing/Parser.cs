@@ -9,16 +9,10 @@ namespace MongoDB.Query.Structure.Parsing
     public class Parser
     {
         private readonly IInputStream<Token> _input;
-        private readonly Dictionary<string, Func<PipelineStage>> _stageParsers;
 
         public Parser(IInputStream<Token> input)
         {
             _input = input;
-            _stageParsers = new Dictionary<string, Func<PipelineStage>>(StringComparer.OrdinalIgnoreCase)
-            {
-                { "PROJECT", ReadProjectStage },
-                { "MATCH", ReadMatchStage },
-            };
         }
 
         public Pipeline Parse()
@@ -45,45 +39,23 @@ namespace MongoDB.Query.Structure.Parsing
             var list = new List<PipelineStage>();
             while (true)
             {
-                var token = Consume();
-                if(token.Kind == TokenKind.EOF)
+                if(_input.LA(0).Kind == TokenKind.EOF)
                 {
                     break;
                 }
 
-                Func<PipelineStage> stageParser;
-                if (!_stageParsers.TryGetValue(token.Text, out stageParser))
-                {
-                    throw ParseException.Create("Expected a pipeline operator, but found {0}.", token.Text);
-                }
-
-                list.Add(stageParser());
+                list.Add(ReadStage());
             }
 
             return list;
         }
 
-        private ProjectPipelineStage ReadMatchStage()
+        private PipelineStage ReadStage()
         {
-            var token = Consume();
+            var operatorToken = Consume(TokenKind.Word);
+            var documentToken = Consume(TokenKind.Document);
 
-            if(token.Kind == TokenKind.Word)
-            {
-                ReadPredicate();
-            }
-
-            throw new NotSupportedException();
-        }
-
-        private ProjectPipelineStage ReadProjectStage()
-        {
-            var token = Consume();
-            if(token.Kind == TokenKind.Asterick)
-            {
-                return new ProjectPipelineStage(Enumerable.Empty<Node>());
-            }
-
-            throw new NotSupportedException();
+            return new PipelineStage(operatorToken.Text, documentToken.Text);
         }
 
         private Token ConsumeWord(string text)

@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using MongoDB.Driver.Core.Clusters;
 using MongoDB.Driver.Core.Configuration;
+using MongoDB.Driver.Core.Operations;
 
 namespace MongoDB.AdoNet
 {
@@ -87,10 +88,15 @@ namespace MongoDB.AdoNet
 
         public override void Open()
         {
-            if (_internalConnection != null)
+            if (_internalConnection == null)
             {
                 _internalConnection = MongoInternalConnection.GetOpenConnection(_connectionString);
             }
+        }
+
+        public TResult ExecuteOperation<TResult>(IReadOperation<TResult> operation)
+        {
+            return GetOpenConnection().ExecuteOperation(operation);
         }
 
         protected override DbTransaction BeginDbTransaction(IsolationLevel isolationLevel)

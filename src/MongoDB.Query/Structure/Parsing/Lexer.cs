@@ -53,8 +53,8 @@ namespace MongoDB.Query.Structure.Parsing
 
             switch(c)
             {
-                case '*':
-                    return new Token(TokenKind.Asterick, _input.Consume());
+                case '{':
+                    return ReadDocument();
                 default:
                     return ReadWord();
             }
@@ -63,6 +63,35 @@ namespace MongoDB.Query.Structure.Parsing
         private Token ReadEndOfFile()
         {
             return new Token(TokenKind.EOF, "<<EOF>>");
+        }
+
+        private Token ReadDocument()
+        {
+            _input.Mark();
+            int count = 0;
+            while(true)
+            {
+                // TODO: Need to account for opening and closing 
+                // braces inside quotes as well as escaped variants 
+                var c = _input.Consume();
+                if(c == '{')
+                {
+                    count++;
+                }
+                else if (c == '}')
+                {
+                    count--;
+                    if(count == 0)
+                    {
+                        break;
+                    }
+                }
+                else if (c == '\0')
+                {
+                    throw ParseException.Create("Unexpected EOF.");
+                }
+            }
+            return new Token(TokenKind.Document, new string(_input.ClearMark()));
         }
 
         private Token ReadWord()

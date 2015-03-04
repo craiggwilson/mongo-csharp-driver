@@ -8,8 +8,8 @@ namespace MongoDB.Query.Structure.Parsing
 {
     public enum TokenKind
     {
+        Document,
         Word,
-        Asterick,
         EOF
     }
 }
