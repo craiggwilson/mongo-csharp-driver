@@ -54,3 +54,4 @@ src/packages
 artifacts
 packages
 Tools/FAKE
+Tools/Brutal.Dev.StrongNameSigner

@@ -2,6 +2,7 @@
 open System
 open Fake
 open Fake.AssemblyInfoFile
+open Fake.NuGet.Install
 
 let config = getBuildParamOrDefault "config" "Release"
 let baseVersion = getBuildParamOrDefault "baseVersion" "2.1.0"
@@ -27,14 +28,15 @@ let shortVersion = semVersion.Substring(0, 3) // this works assuming we don't ha
 
 let baseDir = currentDirectory
 let buildDir = baseDir @@ "build"
-let landingDocsDir = baseDir @@ "docs" @@ "landing"
-let refDocsDir = baseDir @@ "docs" @@ "reference"
+let landingDocsDir = baseDir @@ "Docs" @@ "landing"
+let refDocsDir = baseDir @@ "Docs" @@ "reference"
 let srcDir = baseDir @@ "src"
-let toolsDir = baseDir @@ "tools"
+let toolsDir = baseDir @@ "Tools"
 
 let artifactsDir = baseDir @@ "artifacts"
 let binDir = artifactsDir @@ "bin"
 let binDir45 = binDir @@ "net45"
+let binDir45Signed = binDir @@ "net45signed"
 let testResultsDir = artifactsDir @@ "test_results"
 let tempDir = artifactsDir @@ "tmp"
 
@@ -64,6 +66,7 @@ let apiDocsArtifactFile = artifactsDir @@ "CSharpDriver-" + semVersion + ".chm"
 let apiDocsArtifactZipFile = artifactsDir @@ "ApiDocs-" + semVersion + "-html.zip"
 let refDocsArtifactZipFile = artifactsDir @@ "RefDocs-" + semVersion + "-html.zip"
 let zipArtifactFile = artifactsDir @@ "CSharpDriver-" + semVersion + ".zip"
+let zipSignedArtifactFile = artifactsDir @@ "CSharpDriver-" + semVersion + "-Signed.zip"
 
 MSBuildDefaults <- { MSBuildDefaults with Verbosity = Some(Minimal) }
 
@@ -101,7 +104,7 @@ Target "AssemblyInfo" (fun _ ->
             AssemblyMetadata = ["githash", githash]})
 )
 
-Target "Build" (fun _ ->
+Target "Compile" (fun _ ->
     !! "./**/packages.config"
     |> Seq.iter (RestorePackage (fun x -> { x with OutputPath = srcDir @@ "packages" }))
 
@@ -112,6 +115,40 @@ Target "Build" (fun _ ->
     [slnFile]
         |> MSBuild binDir45 "Build" properties
         |> Log "Build: "
+)
+
+Target "Sign" (fun _ ->
+  if not <| directoryExists binDir45 then new Exception(sprintf "Directory %s does not exist." binDir45) |> raise
+
+  ensureDirectory binDir45Signed
+  CleanDir binDir45Signed
+
+  "Brutal.Dev.StrongNameSigner" 
+      |> NugetInstall (fun p -> 
+         { p with 
+             ExcludeVersion = true
+             OutputDirectory = toolsDir })
+
+  let strongNamingTool = toolsDir @@ "Brutal.Dev.StrongNameSigner" @@ "tools" @@ "StrongNameSigner.Console.exe"
+
+  let files =
+      [ binDir45 @@ "MongoDB.Bson.dll"
+        binDir45 @@ "MongoDB.Driver.Core.dll"
+        binDir45 @@ "MongoDB.Driver.dll"
+        binDir45 @@ "MongoDB.Driver.Legacy.dll"]
+
+  files
+      |> CopyFiles binDir45Signed
+  
+  let result = 
+      ExecProcess (fun info ->
+          info.FileName <- strongNamingTool
+          info.Arguments <- "-in " + binDir45Signed + " -k " + (getBuildParam "signingKeyFile")) 
+          (TimeSpan.FromMinutes 1.0)
+
+  if result <> 0 then failwithf "%s returned with a non-zero exit code" strongNamingTool
+
+  !!(binDir45Signed @@ "*.unsigned") |> DeleteFiles
 )
 
 Target "Test" (fun _ ->
@@ -195,30 +232,48 @@ Target "ApiDocs" (fun _ ->
 
 Target "Zip" (fun _ ->
     DeleteFile zipArtifactFile
+    ensureDirectory tempDir
+    CleanDir tempDir
 
     checkFileExists apiDocsArtifactFile
     checkFileExists licenseFile
     checkFileExists releaseNotesFile
 
-    let files =
-        [ binDir45 @@ "MongoDB.Bson.dll"
-          binDir45 @@ "MongoDB.Bson.pdb"
-          binDir45 @@ "MongoDB.Bson.xml"
-          binDir45 @@ "MongoDB.Driver.Core.dll"
-          binDir45 @@ "MongoDB.Driver.Core.pdb"
-          binDir45 @@ "MongoDB.Driver.Core.xml"
-          binDir45 @@ "MongoDB.Driver.dll"
-          binDir45 @@ "MongoDB.Driver.pdb"
-          binDir45 @@ "MongoDB.Driver.xml"
-          binDir45 @@ "MongoDB.Driver.Legacy.dll"
-          binDir45 @@ "MongoDB.Driver.Legacy.pdb"
-          binDir45 @@ "MongoDB.Driver.Legacy.xml"
-          licenseFile
-          releaseNotesFile 
-          apiDocsArtifactFile ]
+    [ binDir45 @@ "MongoDB.Bson.dll"
+      binDir45 @@ "MongoDB.Bson.pdb"
+      binDir45 @@ "MongoDB.Bson.xml"
+      binDir45 @@ "MongoDB.Driver.Core.dll"
+      binDir45 @@ "MongoDB.Driver.Core.pdb"
+      binDir45 @@ "MongoDB.Driver.Core.xml"
+      binDir45 @@ "MongoDB.Driver.dll"
+      binDir45 @@ "MongoDB.Driver.pdb"
+      binDir45 @@ "MongoDB.Driver.xml"
+      binDir45 @@ "MongoDB.Driver.Legacy.dll"
+      binDir45 @@ "MongoDB.Driver.Legacy.pdb"
+      binDir45 @@ "MongoDB.Driver.Legacy.xml"
+      licenseFile
+      releaseNotesFile 
+      apiDocsArtifactFile ]
+        |> CopyFiles tempDir
 
-    files
-        |> CreateZip artifactsDir zipArtifactFile "" DefaultZipLevel true
+    let signedDir = tempDir @@ "signed"
+    if TestDir binDir45Signed then
+        ensureDirectory signedDir
+
+        [ binDir45Signed @@ "MongoDB.Bson.dll"
+          binDir45Signed @@ "MongoDB.Driver.Core.dll"
+          binDir45Signed @@ "MongoDB.Driver.dll"
+          binDir45Signed @@ "MongoDB.Driver.Legacy.dll" ]
+            |> CopyFiles signedDir
+
+    !! (tempDir @@ "**" @@ "*.*")
+        |> CreateZip tempDir zipArtifactFile "" DefaultZipLevel false
+
+    try
+      CleanDir tempDir
+      DeleteDir tempDir
+    with
+      | _ -> ()
 )
 
 let createNuGetPackage file deps symbols =
@@ -264,8 +319,8 @@ Target "NuGetPush" (fun _ ->
 
 FinalTarget "Teardown" (fun _ ->
     let cmd = sprintf "checkout %s" asmFile
-    let result = Git.CommandHelper.runSimpleGitCommand baseDir cmd
-    ()
+    Git.CommandHelper.runSimpleGitCommand baseDir cmd
+      |> ignore
 )
 
 
@@ -273,9 +328,12 @@ Target "NoOp" DoNothing
 Target "Docs" DoNothing
 Target "Package" DoNothing
 Target "Publish" DoNothing
+Target "Build" DoNothing
 
 "Clean"
     ==> "AssemblyInfo"
+    ==> "Compile"
+    =?> ("Sign", hasBuildParam "signingKeyFile")
     ==> "Build"
 
 "RefDocs"
