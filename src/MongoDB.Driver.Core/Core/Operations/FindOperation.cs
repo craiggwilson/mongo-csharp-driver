@@ -288,6 +288,12 @@ namespace MongoDB.Driver.Core.Operations
                 wrappedQuery.Merge(_modifiers, overwriteExistingElements: false);
             }
 
+            BsonElement query;
+            if (wrappedQuery.ElementCount == 1 && wrappedQuery.TryGetElement("$query", out query))
+            {
+                wrappedQuery = (BsonDocument)query.Value;
+            }
+
             return wrappedQuery;
         }
 
