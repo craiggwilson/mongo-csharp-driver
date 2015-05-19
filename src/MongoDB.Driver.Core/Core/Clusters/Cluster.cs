@@ -46,7 +46,6 @@ namespace MongoDB.Driver.Core.Clusters
         private ClusterDescription _description;
         private TaskCompletionSource<bool> _descriptionChangedTaskCompletionSource;
         private readonly object _descriptionLock = new object();
-        private readonly IClusterListener _listener;
         private Timer _rapidHeartbeatTimer;
         private readonly object _serverSelectionWaitQueueLock = new object();
         private int _serverSelectionWaitQueueSize;
@@ -54,12 +53,14 @@ namespace MongoDB.Driver.Core.Clusters
         private readonly ClusterSettings _settings;
         private readonly InterlockedInt32 _state;
 
+        private readonly Action<ClusterAfterDescriptionChangedEvent> _publishAfterDescriptionChangedEvent;
+
         // constructors
-        protected Cluster(ClusterSettings settings, IClusterableServerFactory serverFactory, IClusterListener listener)
+        protected Cluster(ClusterSettings settings, IClusterableServerFactory serverFactory, IEventPublisherProvider eventPublisherProvider)
         {
             _settings = Ensure.IsNotNull(settings, "settings");
             _serverFactory = Ensure.IsNotNull(serverFactory, "serverFactory");
-            _listener = listener;
+            Ensure.IsNotNull(eventPublisherProvider, "eventPublisherProvider");
             _state = new InterlockedInt32(State.Initial);
 
             _clusterId = new ClusterId();
@@ -67,6 +68,8 @@ namespace MongoDB.Driver.Core.Clusters
             _descriptionChangedTaskCompletionSource = new TaskCompletionSource<bool>();
 
             _rapidHeartbeatTimer = new Timer(RapidHeartbeatTimerCallback, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
+
+            eventPublisherProvider.TryGetPublisher(out _publishAfterDescriptionChangedEvent);
         }
 
         // events
@@ -87,11 +90,6 @@ namespace MongoDB.Driver.Core.Clusters
                     return _description;
                 }
             }
-        }
-
-        protected IClusterListener Listener
-        {
-            get { return _listener; }
         }
 
         public ClusterSettings Settings
@@ -177,9 +175,9 @@ namespace MongoDB.Driver.Core.Clusters
 
         protected void OnDescriptionChanged(ClusterDescription oldDescription, ClusterDescription newDescription)
         {
-            if (_listener != null)
+            if (_publishAfterDescriptionChangedEvent != null)
             {
-                _listener.ClusterAfterDescriptionChanged(new ClusterAfterDescriptionChangedEvent(oldDescription, newDescription));
+                _publishAfterDescriptionChangedEvent(new ClusterAfterDescriptionChangedEvent(oldDescription, newDescription));
             }
 
             var handler = DescriptionChanged;

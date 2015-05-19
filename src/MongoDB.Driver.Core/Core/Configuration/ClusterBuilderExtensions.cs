@@ -232,7 +232,7 @@ namespace MongoDB.Driver.Core.Configuration
                 PerformanceCounterListener.InstallPerformanceCounters();
             }
 
-            return builder.AddListener(new PerformanceCounterListener(applicationName));
+            return builder.Subscribe(new PerformanceCounterListener(applicationName));
         }
     }
 }

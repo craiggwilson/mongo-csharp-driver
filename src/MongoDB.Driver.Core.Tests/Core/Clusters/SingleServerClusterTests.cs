@@ -29,7 +29,7 @@ namespace MongoDB.Driver.Core.Clusters
     [TestFixture]
     public class SingleServerClusterTests
     {
-        private IClusterListener _clusterListener;
+        private IEventPublisherProvider _eventPublisherProvider;
         private IClusterableServerFactory _serverFactory;
         private ClusterSettings _settings;
 
@@ -38,24 +38,24 @@ namespace MongoDB.Driver.Core.Clusters
         {
             _settings = new ClusterSettings();
             _serverFactory = Substitute.For<IClusterableServerFactory>();
-            _clusterListener = Substitute.For<IClusterListener>();
+            _eventPublisherProvider = Substitute.For<IEventPublisherProvider>();
         }
 
         [Test]
         public void Constructor_should_throw_if_more_than_one_endpoint_is_specified()
         {
             _settings = _settings.With(endPoints: new[] { new DnsEndPoint("localhost", 27017), new DnsEndPoint("localhost", 27018) });
-            Action act = () => new SingleServerCluster(_settings, _serverFactory, _clusterListener);
+            Action act = () => new SingleServerCluster(_settings, _serverFactory, _eventPublisherProvider);
 
             act.ShouldThrow<ArgumentException>();
         }
-        
+
         [Test]
         public void Initialize_should_throw_if_disposed()
         {
             var subject = CreateSubject();
             subject.Dispose();
-            
+
             Action act = () => subject.Initialize();
 
             act.ShouldThrow<ObjectDisposedException>();
@@ -132,7 +132,7 @@ namespace MongoDB.Driver.Core.Clusters
 
         private SingleServerCluster CreateSubject()
         {
-            return new SingleServerCluster(_settings, _serverFactory, _clusterListener);
+            return new SingleServerCluster(_settings, _serverFactory, _eventPublisherProvider);
         }
     }
 }

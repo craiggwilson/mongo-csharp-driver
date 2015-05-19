@@ -32,13 +32,27 @@ namespace MongoDB.Driver.Core.Clusters
         private IClusterableServer _server;
         private readonly InterlockedInt32 _state;
 
+        private readonly Action<ClusterBeforeClosingEvent> _publishBeforeClosingEvent;
+        private readonly Action<ClusterAfterClosingEvent> _publishAfterClosingEvent;
+        private readonly Action<ClusterBeforeOpeningEvent> _publishBeforeOpeningEvent;
+        private readonly Action<ClusterAfterOpeningEvent> _publishAfterOpeningEvent;
+        private readonly Action<ClusterBeforeAddingServerEvent> _publishBeforeAddingServerEvent;
+        private readonly Action<ClusterAfterAddingServerEvent> _publishAfterAddingServerEvent;
+
         // constructor
-        internal SingleServerCluster(ClusterSettings settings, IClusterableServerFactory serverFactory, IClusterListener listener)
-            : base(settings, serverFactory, listener)
+        internal SingleServerCluster(ClusterSettings settings, IClusterableServerFactory serverFactory, IEventPublisherProvider eventPublisherProvider)
+            : base(settings, serverFactory, eventPublisherProvider)
         {
             Ensure.IsEqualTo(settings.EndPoints.Count, 1, "settings.EndPoints.Count");
 
             _state = new InterlockedInt32(State.Initial);
+
+            eventPublisherProvider.TryGetPublisher(out _publishBeforeClosingEvent);
+            eventPublisherProvider.TryGetPublisher(out _publishAfterClosingEvent);
+            eventPublisherProvider.TryGetPublisher(out _publishBeforeOpeningEvent);
+            eventPublisherProvider.TryGetPublisher(out _publishAfterOpeningEvent);
+            eventPublisherProvider.TryGetPublisher(out _publishBeforeAddingServerEvent);
+            eventPublisherProvider.TryGetPublisher(out _publishAfterAddingServerEvent);
         }
 
         // methods
@@ -48,9 +62,9 @@ namespace MongoDB.Driver.Core.Clusters
             {
                 if (disposing)
                 {
-                    if (Listener != null)
+                    if (_publishBeforeClosingEvent != null)
                     {
-                        Listener.ClusterBeforeClosing(new ClusterBeforeClosingEvent(ClusterId));
+                        _publishBeforeClosingEvent(new ClusterBeforeClosingEvent(ClusterId));
                     }
 
                     var stopwatch = Stopwatch.StartNew();
@@ -61,9 +75,9 @@ namespace MongoDB.Driver.Core.Clusters
                     }
                     stopwatch.Stop();
 
-                    if (Listener != null)
+                    if (_publishAfterClosingEvent != null)
                     {
-                        Listener.ClusterAfterClosing(new ClusterAfterClosingEvent(ClusterId, stopwatch.Elapsed));
+                        _publishAfterClosingEvent(new ClusterAfterClosingEvent(ClusterId, stopwatch.Elapsed));
                     }
                 }
             }
@@ -75,10 +89,13 @@ namespace MongoDB.Driver.Core.Clusters
             base.Initialize();
             if (_state.TryChange(State.Initial, State.Open))
             {
-                if (Listener != null)
+                if (_publishBeforeOpeningEvent != null)
                 {
-                    Listener.ClusterBeforeOpening(new ClusterBeforeOpeningEvent(ClusterId, Settings));
-                    Listener.ClusterBeforeAddingServer(new ClusterBeforeAddingServerEvent(ClusterId, Settings.EndPoints[0]));
+                    _publishBeforeOpeningEvent(new ClusterBeforeOpeningEvent(ClusterId, Settings));
+                }
+                if (_publishBeforeAddingServerEvent != null)
+                {
+                    _publishBeforeAddingServerEvent(new ClusterBeforeAddingServerEvent(ClusterId, Settings.EndPoints[0]));
                 }
 
                 var stopwatch = Stopwatch.StartNew();
@@ -87,10 +104,13 @@ namespace MongoDB.Driver.Core.Clusters
                 _server.Initialize();
                 stopwatch.Stop();
 
-                if (Listener != null)
+                if (_publishAfterAddingServerEvent != null)
                 {
-                    Listener.ClusterAfterAddingServer(new ClusterAfterAddingServerEvent(_server.ServerId, stopwatch.Elapsed));
-                    Listener.ClusterAfterOpening(new ClusterAfterOpeningEvent(ClusterId, Settings, stopwatch.Elapsed));
+                    _publishAfterAddingServerEvent(new ClusterAfterAddingServerEvent(_server.ServerId, stopwatch.Elapsed));
+                }
+                if (_publishAfterOpeningEvent != null)
+                {
+                    _publishAfterOpeningEvent(new ClusterAfterOpeningEvent(ClusterId, Settings, stopwatch.Elapsed));
                 }
             }
         }

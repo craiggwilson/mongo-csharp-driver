@@ -35,7 +35,7 @@ namespace MongoDB.Driver.Core.ConnectionPools
     {
         private IConnectionFactory _connectionFactory;
         private DnsEndPoint _endPoint;
-        private IConnectionPoolListener _listener;
+        private IEventPublisherProvider _eventPublisherProvider;
         private ServerId _serverId;
         private ConnectionPoolSettings _settings;
         private ExclusiveConnectionPool _subject;
@@ -45,7 +45,7 @@ namespace MongoDB.Driver.Core.ConnectionPools
         {
             _connectionFactory = Substitute.For<IConnectionFactory>();
             _endPoint = new DnsEndPoint("localhost", 27017);
-            _listener = Substitute.For<IConnectionPoolListener>();
+            _eventPublisherProvider = Substitute.For<IEventPublisherProvider>();
             _serverId = new ServerId(new ClusterId(), _endPoint);
             _settings = new ConnectionPoolSettings(
                 maintenanceInterval: Timeout.InfiniteTimeSpan,
@@ -59,13 +59,13 @@ namespace MongoDB.Driver.Core.ConnectionPools
                 _endPoint,
                 _settings,
                 _connectionFactory,
-                _listener);
+                _eventPublisherProvider);
         }
 
         [Test]
         public void Constructor_should_throw_when_serverId_is_null()
         {
-            Action act = () => new ExclusiveConnectionPool(null, _endPoint, _settings, _connectionFactory, _listener);
+            Action act = () => new ExclusiveConnectionPool(null, _endPoint, _settings, _connectionFactory, _eventPublisherProvider);
 
             act.ShouldThrow<ArgumentNullException>();
         }
@@ -73,7 +73,7 @@ namespace MongoDB.Driver.Core.ConnectionPools
         [Test]
         public void Constructor_should_throw_when_endPoint_is_null()
         {
-            Action act = () => new ExclusiveConnectionPool(_serverId, null, _settings, _connectionFactory, _listener);
+            Action act = () => new ExclusiveConnectionPool(_serverId, null, _settings, _connectionFactory, _eventPublisherProvider);
 
             act.ShouldThrow<ArgumentNullException>();
         }
@@ -81,15 +81,23 @@ namespace MongoDB.Driver.Core.ConnectionPools
         [Test]
         public void Constructor_should_throw_when_settings_is_null()
         {
-            Action act = () => new ExclusiveConnectionPool(_serverId, _endPoint, null, _connectionFactory, _listener);
+            Action act = () => new ExclusiveConnectionPool(_serverId, _endPoint, null, _connectionFactory, _eventPublisherProvider);
 
             act.ShouldThrow<ArgumentNullException>();
         }
 
         [Test]
-        public void Constructor_should_throw_when_settings_is_connectionFactory()
+        public void Constructor_should_throw_when_connectionFactory_is_null()
         {
-            Action act = () => new ExclusiveConnectionPool(_serverId, _endPoint, _settings, null, _listener);
+            Action act = () => new ExclusiveConnectionPool(_serverId, _endPoint, _settings, null, _eventPublisherProvider);
+
+            act.ShouldThrow<ArgumentNullException>();
+        }
+
+        [Test]
+        public void Constructor_should_throw_when_eventPublisherProvider_is_null()
+        {
+            Action act = () => new ExclusiveConnectionPool(_serverId, _endPoint, _settings, _connectionFactory, null);
 
             act.ShouldThrow<ArgumentNullException>();
         }
@@ -261,7 +269,7 @@ namespace MongoDB.Driver.Core.ConnectionPools
             _subject.Initialize();
 
             SpinWait.SpinUntil(
-                () => _subject.CreatedCount == _settings.MinConnections && 
+                () => _subject.CreatedCount == _settings.MinConnections &&
                     _subject.AvailableCount == _settings.MaxConnections &&
                     _subject.DormantCount == _settings.MinConnections &&
                     _subject.UsedCount == 0,

@@ -40,7 +40,7 @@ namespace MongoDB.Driver.Core.Connections
     {
         private IConnectionInitializer _connectionInitializer;
         private DnsEndPoint _endPoint;
-        private IConnectionListener _listener;
+        private EventCapturer _capturedEvents;
         private MessageEncoderSettings _messageEncoderSettings = new MessageEncoderSettings();
         private IStreamFactory _streamFactory;
         private BinaryConnection _subject;
@@ -48,7 +48,7 @@ namespace MongoDB.Driver.Core.Connections
         [SetUp]
         public void Setup()
         {
-            _listener = Substitute.For<IConnectionListener>();
+            _capturedEvents = new EventCapturer();
             _streamFactory = Substitute.For<IStreamFactory>();
 
             _endPoint = new DnsEndPoint("localhost", 27017);
@@ -67,7 +67,7 @@ namespace MongoDB.Driver.Core.Connections
                 settings: new ConnectionSettings(),
                 streamFactory: _streamFactory,
                 connectionInitializer: _connectionInitializer,
-                listener: _listener);
+                eventPublisherProvider: _capturedEvents);
         }
 
         [Test]
@@ -75,8 +75,8 @@ namespace MongoDB.Driver.Core.Connections
         {
             _subject.Dispose();
 
-            _listener.ReceivedWithAnyArgs().ConnectionBeforeClosing(default(ConnectionBeforeClosingEvent));
-            _listener.ReceivedWithAnyArgs().ConnectionAfterClosing(default(ConnectionAfterClosingEvent));
+            _capturedEvents.Next().Should().BeOfType<ConnectionBeforeClosingEvent>();
+            _capturedEvents.Next().Should().BeOfType<ConnectionAfterClosingEvent>();
         }
 
         [Test]
@@ -103,9 +103,9 @@ namespace MongoDB.Driver.Core.Connections
                 .WithInnerException<SocketException>()
                 .And.ConnectionId.Should().Be(_subject.ConnectionId);
 
-            _listener.ReceivedWithAnyArgs().ConnectionBeforeOpening(default(ConnectionBeforeOpeningEvent));
-            _listener.ReceivedWithAnyArgs().ConnectionErrorOpening(default(ConnectionErrorOpeningEvent));
-            _listener.ReceivedWithAnyArgs().ConnectionFailed(default(ConnectionFailedEvent));
+            _capturedEvents.Next().Should().BeOfType<ConnectionBeforeOpeningEvent>();
+            _capturedEvents.Next().Should().BeOfType<ConnectionErrorOpeningEvent>();
+            _capturedEvents.Next().Should().BeOfType<ConnectionFailedEvent>();
         }
 
         [Test]
@@ -121,8 +121,8 @@ namespace MongoDB.Driver.Core.Connections
         {
             _subject.OpenAsync(CancellationToken.None).Wait();
 
-            _listener.ReceivedWithAnyArgs().ConnectionBeforeOpening(default(ConnectionBeforeOpeningEvent));
-            _listener.ReceivedWithAnyArgs().ConnectionAfterOpening(default(ConnectionAfterOpeningEvent));
+            _capturedEvents.Next().Should().BeOfType<ConnectionBeforeOpeningEvent>();
+            _capturedEvents.Next().Should().BeOfType<ConnectionAfterOpeningEvent>();
         }
 
         [Test]
@@ -185,6 +185,7 @@ namespace MongoDB.Driver.Core.Connections
                     .ReturnsForAnyArgs(Task.FromResult<Stream>(stream));
 
                 _subject.OpenAsync(CancellationToken.None).Wait();
+                _capturedEvents.Clear();
 
                 var messageToReceive = MessageHelper.BuildSuccessReply<BsonDocument>(new BsonDocument(), BsonDocumentSerializer.Instance, responseTo: 10);
                 MessageHelper.WriteResponsesToStream(stream, new[] { messageToReceive });
@@ -197,8 +198,8 @@ namespace MongoDB.Driver.Core.Connections
 
                 actual.Should().BeEquivalentTo(expected);
 
-                _listener.ReceivedWithAnyArgs().ConnectionBeforeReceivingMessage(default(ConnectionBeforeReceivingMessageEvent));
-                _listener.ReceivedWithAnyArgs().ConnectionAfterReceivingMessage(default(ConnectionAfterReceivingMessageEvent));
+                _capturedEvents.Next().Should().BeOfType<ConnectionBeforeReceivingMessageEvent>();
+                _capturedEvents.Next().Should().BeOfType<ConnectionAfterReceivingMessageEvent>();
             }
         }
 
@@ -274,6 +275,7 @@ namespace MongoDB.Driver.Core.Connections
                     .ReturnsForAnyArgs(writeTcs.Task);
 
                 await _subject.OpenAsync(CancellationToken.None);
+                _capturedEvents.Clear();
 
                 var encoderSelector = new ReplyMessageEncoderSelector<BsonDocument>(BsonDocumentSerializer.Instance);
                 var task1 = _subject.ReceiveMessageAsync(1, encoderSelector, _messageEncoderSettings, CancellationToken.None);
@@ -291,8 +293,11 @@ namespace MongoDB.Driver.Core.Connections
                     .WithInnerException<SocketException>()
                     .And.ConnectionId.Should().Be(_subject.ConnectionId);
 
-                _listener.ReceivedWithAnyArgs(2).ConnectionBeforeReceivingMessage(default(ConnectionBeforeReceivingMessageEvent));
-                _listener.ReceivedWithAnyArgs(2).ConnectionErrorReceivingMessage(default(ConnectionErrorReceivingMessageEvent));
+                _capturedEvents.Next().Should().BeOfType<ConnectionBeforeReceivingMessageEvent>();
+                _capturedEvents.Next().Should().BeOfType<ConnectionBeforeReceivingMessageEvent>();
+                _capturedEvents.Next().Should().BeOfType<ConnectionFailedEvent>();
+                _capturedEvents.Next().Should().BeOfType<ConnectionErrorReceivingMessageEvent>();
+                _capturedEvents.Next().Should().BeOfType<ConnectionErrorReceivingMessageEvent>();
             }
         }
 
@@ -313,6 +318,7 @@ namespace MongoDB.Driver.Core.Connections
                     .ReturnsForAnyArgs(writeTcs.Task);
 
                 await _subject.OpenAsync(CancellationToken.None);
+                _capturedEvents.Clear();
 
                 var encoderSelector = new ReplyMessageEncoderSelector<BsonDocument>(BsonDocumentSerializer.Instance);
                 var task1 = _subject.ReceiveMessageAsync(1, encoderSelector, _messageEncoderSettings, CancellationToken.None);
@@ -330,8 +336,9 @@ namespace MongoDB.Driver.Core.Connections
                 act2.ShouldThrow<MongoConnectionClosedException>()
                     .And.ConnectionId.Should().Be(_subject.ConnectionId);
 
-                _listener.ReceivedWithAnyArgs().ConnectionBeforeReceivingMessage(default(ConnectionBeforeReceivingMessageEvent));
-                _listener.ReceivedWithAnyArgs().ConnectionErrorReceivingMessage(default(ConnectionErrorReceivingMessageEvent));
+                _capturedEvents.Next().Should().BeOfType<ConnectionBeforeReceivingMessageEvent>();
+                _capturedEvents.Next().Should().BeOfType<ConnectionFailedEvent>();
+                _capturedEvents.Next().Should().BeOfType<ConnectionErrorReceivingMessageEvent>();
             }
         }
 
@@ -376,14 +383,16 @@ namespace MongoDB.Driver.Core.Connections
                 var message2 = MessageHelper.BuildQueryMessage(query: new BsonDocument("y", 2));
 
                 _subject.OpenAsync(CancellationToken.None).Wait();
+                _capturedEvents.Clear();
+
                 _subject.SendMessagesAsync(new[] { message1, message2 }, _messageEncoderSettings, CancellationToken.None).Wait();
 
                 var expectedRequests = MessageHelper.TranslateMessagesToBsonDocuments(new[] { message1, message2 });
                 var sentRequests = MessageHelper.TranslateMessagesToBsonDocuments(stream.ToArray());
 
                 sentRequests.Should().BeEquivalentTo(expectedRequests);
-                _listener.ReceivedWithAnyArgs().ConnectionBeforeSendingMessages(default(ConnectionBeforeSendingMessagesEvent));
-                _listener.ReceivedWithAnyArgs().ConnectionAfterSendingMessages(default(ConnectionAfterSendingMessagesEvent));
+                _capturedEvents.Next().Should().BeOfType<ConnectionBeforeSendingMessagesEvent>();
+                _capturedEvents.Next().Should().BeOfType<ConnectionAfterSendingMessagesEvent>();
             }
         }
 
@@ -404,6 +413,7 @@ namespace MongoDB.Driver.Core.Connections
                     .ReturnsForAnyArgs(writeTcs.Task);
 
                 await _subject.OpenAsync(CancellationToken.None);
+                _capturedEvents.Clear();
 
                 var message1 = new KillCursorsMessage(1, new[] { 1L });
                 var task1 = _subject.SendMessageAsync(message1, _messageEncoderSettings, CancellationToken.None);
@@ -421,9 +431,11 @@ namespace MongoDB.Driver.Core.Connections
                 Func<Task> act2 = () => task2;
                 act2.ShouldThrow<MongoConnectionClosedException>();
 
-                _listener.ReceivedWithAnyArgs().ConnectionBeforeSendingMessages(default(ConnectionBeforeSendingMessagesEvent));
-                _listener.ReceivedWithAnyArgs().ConnectionErrorSendingMessages(default(ConnectionErrorSendingMessagesEvent));
-                _listener.ReceivedWithAnyArgs().ConnectionFailed(default(ConnectionFailedEvent));
+                _capturedEvents.Next().Should().BeOfType<ConnectionBeforeSendingMessagesEvent>();
+                _capturedEvents.Next().Should().BeOfType<ConnectionBeforeSendingMessagesEvent>();
+                _capturedEvents.Next().Should().BeOfType<ConnectionFailedEvent>();
+                _capturedEvents.Next().Should().BeOfType<ConnectionErrorSendingMessagesEvent>();
+                _capturedEvents.Next().Should().BeOfType<ConnectionErrorSendingMessagesEvent>();
             }
         }
     }

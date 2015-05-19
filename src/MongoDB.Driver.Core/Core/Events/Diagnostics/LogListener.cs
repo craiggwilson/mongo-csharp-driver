@@ -31,7 +31,7 @@ namespace MongoDB.Driver.Core.Events.Diagnostics
     /// <summary>
     /// Represents a log listener that writes log messages to a TextWriter.
     /// </summary>
-    public class LogListener : IClusterListener, IServerListener, IConnectionPoolListener, IConnectionListener
+    public class LogListener
     {
         private readonly LogEnricher _enricher;
         private readonly LogLevel _level;
@@ -51,275 +51,383 @@ namespace MongoDB.Driver.Core.Events.Diagnostics
         }
 
         // Clusters
-        /// <inheritdoc/>
-        public void ClusterBeforeClosing(ClusterBeforeClosingEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ClusterBeforeClosingEvent @event)
         {
             Log(LogLevel.Debug, "{0}: closing.", Label(@event.ClusterId));
         }
 
-        /// <inheritdoc/>
-        public void ClusterAfterClosing(ClusterAfterClosingEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ClusterAfterClosingEvent @event)
         {
             Log(LogLevel.Info, "{0}: closed in {1}ms.", Label(@event.ClusterId), @event.Elapsed.TotalMilliseconds.ToString());
         }
 
-        /// <inheritdoc/>
-        public void ClusterBeforeOpening(ClusterBeforeOpeningEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ClusterBeforeOpeningEvent @event)
         {
             Log(LogLevel.Debug, "{0}: opening.", Label(@event.ClusterId));
         }
 
-        /// <inheritdoc/>
-        public void ClusterAfterOpening(ClusterAfterOpeningEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ClusterAfterOpeningEvent @event)
         {
             Log(LogLevel.Info, "{0}: opened in {1}ms.", Label(@event.ClusterId), @event.Elapsed.TotalMilliseconds.ToString());
         }
 
-        /// <inheritdoc/>
-        public void ClusterBeforeAddingServer(ClusterBeforeAddingServerEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ClusterBeforeAddingServerEvent @event)
         {
             Log(LogLevel.Debug, "{0}: adding server at endpoint {1}.", Label(@event.ClusterId), Format(@event.EndPoint));
         }
 
-        /// <inheritdoc/>
-        public void ClusterAfterAddingServer(ClusterAfterAddingServerEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ClusterAfterAddingServerEvent @event)
         {
             Log(LogLevel.Info, "{0}: added server {1} in {2}ms.", Label(@event.ServerId.ClusterId), Format(@event.ServerId), @event.Elapsed.TotalMilliseconds.ToString());
         }
 
-        /// <inheritdoc/>
-        public void ClusterBeforeRemovingServer(ClusterBeforeRemovingServerEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ClusterBeforeRemovingServerEvent @event)
         {
             Log(LogLevel.Debug, "{0}: removing server {1}. Reason: {2}", Label(@event.ServerId.ClusterId), Format(@event.ServerId), @event.Reason);
         }
 
-        /// <inheritdoc/>
-        public void ClusterAfterRemovingServer(ClusterAfterRemovingServerEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ClusterAfterRemovingServerEvent @event)
         {
             Log(LogLevel.Info, "{0}: removed server {1} in {2}ms. Reason: {3}", Label(@event.ServerId.ClusterId), Format(@event.ServerId), @event.Elapsed.TotalMilliseconds.ToString(), @event.Reason);
         }
 
-        /// <inheritdoc/>
-        public void ClusterAfterDescriptionChanged(ClusterAfterDescriptionChangedEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ClusterAfterDescriptionChangedEvent @event)
         {
             Log(LogLevel.Info, "{0}: {1}", Label(@event.OldDescription.ClusterId), @event.NewDescription);
         }
 
         // Servers
-        /// <inheritdoc/>
-        public void ServerBeforeClosing(ServerBeforeClosingEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ServerBeforeClosingEvent @event)
         {
             Log(LogLevel.Debug, "{0}: closing.", Label(@event.ServerId));
         }
 
-        /// <inheritdoc/>
-        public void ServerAfterClosing(ServerAfterClosingEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ServerAfterClosingEvent @event)
         {
             Log(LogLevel.Info, "{0}: closed in {1}ms.", Label(@event.ServerId), @event.Elapsed.TotalMilliseconds);
         }
 
-        /// <inheritdoc/>
-        public void ServerBeforeOpening(ServerBeforeOpeningEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ServerBeforeOpeningEvent @event)
         {
             Log(LogLevel.Debug, "{0}: opening.", Label(@event.ServerId));
         }
 
-        /// <inheritdoc/>
-        public void ServerAfterOpening(ServerAfterOpeningEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ServerAfterOpeningEvent @event)
         {
             Log(LogLevel.Info, "{0}: opened in {1}ms.", Label(@event.ServerId), @event.Elapsed.TotalMilliseconds);
         }
 
-        /// <inheritdoc/>
-        public void ServerBeforeHeartbeating(ServerBeforeHeartbeatingEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ServerBeforeHeartbeatingEvent @event)
         {
             Log(LogLevel.Debug, "{0}: sending heartbeat.", Label(@event.ConnectionId));
         }
 
-        /// <inheritdoc/>
-        public void ServerAfterHeartbeating(ServerAfterHeartbeatingEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ServerAfterHeartbeatingEvent @event)
         {
             Log(LogLevel.Info, "{0}: sent heartbeat in {1}ms.", Label(@event.ConnectionId), @event.Elapsed.TotalMilliseconds);
         }
 
-        /// <inheritdoc/>
-        public void ServerErrorHeartbeating(ServerErrorHeartbeatingEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ServerErrorHeartbeatingEvent @event)
         {
             Log(LogLevel.Error, "{0}: error sending heartbeat. Exception: {1}", Label(@event.ConnectionId), @event.Exception);
         }
 
-        /// <inheritdoc/>
-        public void ServerAfterDescriptionChanged(ServerAfterDescriptionChangedEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ServerAfterDescriptionChangedEvent @event)
         {
             Log(LogLevel.Info, "{0}: {1}", Label(@event.OldDescription.ServerId), @event.NewDescription);
         }
 
         // Connection Pools
-        /// <inheritdoc/>
-        public void ConnectionPoolBeforeClosing(ConnectionPoolBeforeClosingEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ConnectionPoolBeforeClosingEvent @event)
         {
             Log(LogLevel.Debug, "{0}-pool: closing.", Label(@event.ServerId));
         }
 
-        /// <inheritdoc/>
-        public void ConnectionPoolAfterClosing(ConnectionPoolAfterClosingEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ConnectionPoolAfterClosingEvent @event)
         {
             Log(LogLevel.Info, "{0}-pool: closed.", Label(@event.ServerId));
         }
 
-        /// <inheritdoc/>
-        public void ConnectionPoolBeforeOpening(ConnectionPoolBeforeOpeningEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ConnectionPoolBeforeOpeningEvent @event)
         {
             Log(LogLevel.Debug, "{0}-pool: opening.", Label(@event.ServerId));
         }
 
-        /// <inheritdoc/>
-        public void ConnectionPoolAfterOpening(ConnectionPoolAfterOpeningEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ConnectionPoolAfterOpeningEvent @event)
         {
             Log(LogLevel.Info, "{0}-pool: opened.", Label(@event.ServerId));
         }
 
-        /// <inheritdoc/>
-        public void ConnectionPoolBeforeAddingAConnection(ConnectionPoolBeforeAddingAConnectionEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ConnectionPoolBeforeAddingAConnectionEvent @event)
         {
             Log(LogLevel.Debug, "{0}-pool: adding connection.", Label(@event.ServerId));
         }
 
-        /// <inheritdoc/>
-        public void ConnectionPoolAfterAddingAConnection(ConnectionPoolAfterAddingAConnectionEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ConnectionPoolAfterAddingAConnectionEvent @event)
         {
             Log(LogLevel.Info, "{0}-pool: added connection {1} in {2}ms.", Label(@event.ConnectionId.ServerId), Format(@event.ConnectionId), @event.Elapsed.TotalMilliseconds.ToString());
         }
 
-        /// <inheritdoc/>
-        public void ConnectionPoolBeforeRemovingAConnection(@ConnectionPoolBeforeRemovingAConnectionEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(@ConnectionPoolBeforeRemovingAConnectionEvent @event)
         {
             Log(LogLevel.Debug, "{0}-pool: removing connection {1}.", Label(@event.ConnectionId.ServerId), Format(@event.ConnectionId));
         }
 
-        /// <inheritdoc/>
-        public void ConnectionPoolAfterRemovingAConnection(ConnectionPoolAfterRemovingAConnectionEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ConnectionPoolAfterRemovingAConnectionEvent @event)
         {
             Log(LogLevel.Info, "{0}-pool: removed connection {1} in {2}ms.", Label(@event.ConnectionId.ServerId), Format(@event.ConnectionId), @event.Elapsed.TotalMilliseconds);
         }
 
-        /// <inheritdoc/>
-        public void ConnectionPoolBeforeEnteringWaitQueue(ConnectionPoolBeforeEnteringWaitQueueEvent @event)
-        {
-            // not worth logging
-        }
-
-        /// <inheritdoc/>
-        public void ConnectionPoolErrorEnteringWaitQueue(ConnectionPoolErrorEnteringWaitQueueEvent @event)
-        {
-            // not worth logging
-        }
-
-        /// <inheritdoc/>
-        public void ConnectionPoolAfterEnteringWaitQueue(ConnectionPoolAfterEnteringWaitQueueEvent @event)
-        {
-            // not worth logging
-        }
-
-        /// <inheritdoc/>
-        public void ConnectionPoolBeforeCheckingOutAConnection(ConnectionPoolBeforeCheckingOutAConnectionEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ConnectionPoolBeforeCheckingOutAConnectionEvent @event)
         {
             Log(LogLevel.Debug, "{0}-pool: checking out a connection.", Label(@event.ServerId));
         }
 
-        /// <inheritdoc/>
-        public void ConnectionPoolAfterCheckingOutAConnection(ConnectionPoolAfterCheckingOutAConnectionEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ConnectionPoolAfterCheckingOutAConnectionEvent @event)
         {
             Log(LogLevel.Info, "{0}-pool: checked out connection {1} in {2}ms.", Label(@event.ConnectionId.ServerId), Format(@event.ConnectionId), @event.Elapsed.TotalMilliseconds.ToString());
         }
 
-        /// <inheritdoc/>
-        public void ConnectionPoolErrorCheckingOutAConnection(ConnectionPoolErrorCheckingOutAConnectionEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ConnectionPoolErrorCheckingOutAConnectionEvent @event)
         {
             Log(LogLevel.Error, "{0}-pool: error checking out a connection. Exception: {1}", Label(@event.ServerId), @event.Exception);
         }
 
-        /// <inheritdoc/>
-        public void ConnectionPoolBeforeCheckingInAConnection(ConnectionPoolBeforeCheckingInAConnectionEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ConnectionPoolBeforeCheckingInAConnectionEvent @event)
         {
             Log(LogLevel.Debug, "{0}-pool: checking in connection {1}.", Label(@event.ConnectionId.ServerId), Format(@event.ConnectionId));
         }
 
-        /// <inheritdoc/>
-        public void ConnectionPoolAfterCheckingInAConnection(ConnectionPoolAfterCheckingInAConnectionEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ConnectionPoolAfterCheckingInAConnectionEvent @event)
         {
             Log(LogLevel.Info, "{0}-pool: checked in connection {1} in {2}ms.", Label(@event.ConnectionId.ServerId), Format(@event.ConnectionId), @event.Elapsed.TotalMilliseconds.ToString());
         }
 
         // Connections
-        /// <inheritdoc/>
-        public void ConnectionFailed(ConnectionFailedEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ConnectionFailedEvent @event)
         {
             Log(LogLevel.Error, "{0}: failed. Exception: {1}", Label(@event.ConnectionId), @event.Exception);
         }
 
-        /// <inheritdoc/>
-        public void ConnectionBeforeClosing(ConnectionBeforeClosingEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ConnectionBeforeClosingEvent @event)
         {
             Log(LogLevel.Debug, "{0}: closing.", Label(@event.ConnectionId));
         }
 
-        /// <inheritdoc/>
-        public void ConnectionAfterClosing(ConnectionAfterClosingEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ConnectionAfterClosingEvent @event)
         {
             Log(LogLevel.Info, "{0}: closed.", Label(@event.ConnectionId));
         }
 
-        /// <inheritdoc/>
-        public void ConnectionBeforeOpening(ConnectionBeforeOpeningEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ConnectionBeforeOpeningEvent @event)
         {
             Log(LogLevel.Debug, "{0}: opening.", Label(@event.ConnectionId));
         }
 
-        /// <inheritdoc/>
-        public void ConnectionAfterOpening(ConnectionAfterOpeningEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ConnectionAfterOpeningEvent @event)
         {
             Log(LogLevel.Info, "{0}: opened in {1}ms.", Label(@event.ConnectionId), @event.Elapsed.TotalMilliseconds.ToString());
         }
 
-        /// <inheritdoc/>
-        public void ConnectionErrorOpening(ConnectionErrorOpeningEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ConnectionErrorOpeningEvent @event)
         {
             Log(LogLevel.Error, "{0}: unable to open. Exception: {1}", Label(@event.ConnectionId), @event.Exception);
         }
 
-        /// <inheritdoc/>
-        public void ConnectionBeforeReceivingMessage(ConnectionBeforeReceivingMessageEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ConnectionBeforeReceivingMessageEvent @event)
         {
             Log(LogLevel.Debug, "{0}: receiving message in response to {1}.", Label(@event.ConnectionId), @event.ResponseTo.ToString());
         }
 
-        /// <inheritdoc/>
-        public void ConnectionAfterReceivingMessage(ConnectionAfterReceivingMessageEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ConnectionAfterReceivingMessageEvent @event)
         {
             Log(LogLevel.Info, "{0}: received message in response to {1} of length {2} bytes in {3}ms.", Label(@event.ConnectionId), @event.ReceivedMessage.ResponseTo.ToString(), @event.Length.ToString(), @event.Elapsed.TotalMilliseconds.ToString());
         }
 
-        /// <inheritdoc/>
-        public void ConnectionErrorReceivingMessage(ConnectionErrorReceivingMessageEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ConnectionErrorReceivingMessageEvent @event)
         {
             Log(LogLevel.Error, "{0}: error receiving message in response to {1}. Exception: {2}.", Label(@event.ConnectionId), @event.ResponseTo.ToString(), @event.Exception);
         }
 
-        /// <inheritdoc/>
-        public void ConnectionBeforeSendingMessages(ConnectionBeforeSendingMessagesEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ConnectionBeforeSendingMessagesEvent @event)
         {
             Log(LogLevel.Debug, "{0}: sending messages [{1}].", Label(@event.ConnectionId), string.Join(",", @event.Messages.Select(x => x.RequestId)));
         }
 
-        /// <inheritdoc/>
-        public void ConnectionAfterSendingMessages(ConnectionAfterSendingMessagesEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ConnectionAfterSendingMessagesEvent @event)
         {
             Log(LogLevel.Info, "{0}: sent messages [{1}] of length {2} bytes in {3}ms.", Label(@event.ConnectionId), string.Join(",", @event.Messages.Select(x => x.RequestId)), @event.Length.ToString(), @event.Elapsed.TotalMilliseconds.ToString());
         }
 
-        /// <inheritdoc/>
-        public void ConnectionErrorSendingMessages(ConnectionErrorSendingMessagesEvent @event)
+        /// <summary>
+        /// Handles the specified event.
+        /// </summary>
+        /// <param name="event">The event.</param>
+        public void Handle(ConnectionErrorSendingMessagesEvent @event)
         {
             Log(LogLevel.Error, "{0}: error sending messages [{1}]. Exception: {2}", Label(@event.ConnectionId), string.Join(",", @event.Messages.Select(x => x.RequestId)), @event.Exception);
         }
@@ -369,7 +477,7 @@ namespace MongoDB.Driver.Core.Events.Diagnostics
 
         private string Format(EndPoint endPoint)
         {
-            var dnsEndPoint = endPoint as DnsEndPoint; 
+            var dnsEndPoint = endPoint as DnsEndPoint;
             if (dnsEndPoint != null)
             {
                 return string.Concat(

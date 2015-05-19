@@ -44,7 +44,7 @@ namespace MongoDB.Driver.Core.Servers
         private EndPoint _endPoint;
         private MockConnection _heartbeatConnection;
         private IConnectionFactory _heartbeatConnectionFactory;
-        private IServerListener _listener;
+        private IEventPublisherProvider _eventPublisherProvider;
         private ServerSettings _settings;
         private ClusterableServer _subject;
 
@@ -65,16 +65,16 @@ namespace MongoDB.Driver.Core.Servers
             _heartbeatConnectionFactory.CreateConnection(null, null)
                 .ReturnsForAnyArgs(_heartbeatConnection);
 
-            _listener = Substitute.For<IServerListener>();
+            _eventPublisherProvider = Substitute.For<IEventPublisherProvider>();
             _settings = new ServerSettings(heartbeatInterval: Timeout.InfiniteTimeSpan);
 
-            _subject = new ClusterableServer(_clusterId, _clusterConnectionMode, _settings, _endPoint, _connectionPoolFactory, _heartbeatConnectionFactory, _listener);
+            _subject = new ClusterableServer(_clusterId, _clusterConnectionMode, _settings, _endPoint, _connectionPoolFactory, _heartbeatConnectionFactory, _eventPublisherProvider);
         }
 
         [Test]
         public void Constructor_should_throw_when_settings_is_null()
         {
-            Action act = () => new ClusterableServer(_clusterId, _clusterConnectionMode, null, _endPoint, _connectionPoolFactory, _heartbeatConnectionFactory, _listener);
+            Action act = () => new ClusterableServer(_clusterId, _clusterConnectionMode, null, _endPoint, _connectionPoolFactory, _heartbeatConnectionFactory, _eventPublisherProvider);
 
             act.ShouldThrow<ArgumentNullException>();
         }
@@ -82,7 +82,7 @@ namespace MongoDB.Driver.Core.Servers
         [Test]
         public void Constructor_should_throw_when_clusterId_is_null()
         {
-            Action act = () => new ClusterableServer(null, _clusterConnectionMode, _settings, _endPoint, _connectionPoolFactory, _heartbeatConnectionFactory, _listener);
+            Action act = () => new ClusterableServer(null, _clusterConnectionMode, _settings, _endPoint, _connectionPoolFactory, _heartbeatConnectionFactory, _eventPublisherProvider);
 
             act.ShouldThrow<ArgumentNullException>();
         }
@@ -90,7 +90,7 @@ namespace MongoDB.Driver.Core.Servers
         [Test]
         public void Constructor_should_throw_when_endPoint_is_null()
         {
-            Action act = () => new ClusterableServer(_clusterId, _clusterConnectionMode, _settings, null, _connectionPoolFactory, _heartbeatConnectionFactory, _listener);
+            Action act = () => new ClusterableServer(_clusterId, _clusterConnectionMode, _settings, null, _connectionPoolFactory, _heartbeatConnectionFactory, _eventPublisherProvider);
 
             act.ShouldThrow<ArgumentNullException>();
         }
@@ -98,7 +98,7 @@ namespace MongoDB.Driver.Core.Servers
         [Test]
         public void Constructor_should_throw_when_connectionPoolFactory_is_null()
         {
-            Action act = () => new ClusterableServer(_clusterId, _clusterConnectionMode, _settings, _endPoint, null, _heartbeatConnectionFactory, _listener);
+            Action act = () => new ClusterableServer(_clusterId, _clusterConnectionMode, _settings, _endPoint, null, _heartbeatConnectionFactory, _eventPublisherProvider);
 
             act.ShouldThrow<ArgumentNullException>();
         }
@@ -106,17 +106,17 @@ namespace MongoDB.Driver.Core.Servers
         [Test]
         public void Constructor_should_throw_when_heartbeatConnectionFactory_is_null()
         {
-            Action act = () => new ClusterableServer(_clusterId, _clusterConnectionMode, _settings, _endPoint, _connectionPoolFactory, null, _listener);
+            Action act = () => new ClusterableServer(_clusterId, _clusterConnectionMode, _settings, _endPoint, _connectionPoolFactory, null, _eventPublisherProvider);
 
             act.ShouldThrow<ArgumentNullException>();
         }
 
         [Test]
-        public void Constructor_should_not_throw_when_listener_is_null()
+        public void Constructor_should_throw_when_eventPublisherProvider_is_null()
         {
             Action act = () => new ClusterableServer(_clusterId, _clusterConnectionMode, _settings, _endPoint, _connectionPoolFactory, _heartbeatConnectionFactory, null);
 
-            act.ShouldNotThrow();
+            act.ShouldThrow<ArgumentNullException>();
         }
 
         [Test]
