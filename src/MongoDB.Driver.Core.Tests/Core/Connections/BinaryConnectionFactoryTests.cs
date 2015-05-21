@@ -37,12 +37,12 @@ namespace MongoDB.Driver.Core.Connections
         public void Constructor_should_throw_an_ArgumentNullException_when_connectionSettings_is_null()
         {
             var streamFactory = Substitute.For<IStreamFactory>();
-            var eventPublisherProvider = Substitute.For<IEventPublisherProvider>();
+            var eventSubscriber = Substitute.For<IEventSubscriber>();
 
             Action act = () => new BinaryConnectionFactory(
                 null,
                 streamFactory,
-                eventPublisherProvider);
+                eventSubscriber);
 
             act.ShouldThrow<ArgumentNullException>();
         }
@@ -50,12 +50,12 @@ namespace MongoDB.Driver.Core.Connections
         [Test]
         public void Constructor_should_throw_an_ArgumentNullException_when_streamFactory_is_null()
         {
-            var eventPublisherProvider = Substitute.For<IEventPublisherProvider>();
+            var eventSubscriber = Substitute.For<IEventSubscriber>();
 
             Action act = () => new BinaryConnectionFactory(
                 new ConnectionSettings(),
                 null,
-                eventPublisherProvider);
+                eventSubscriber);
 
             act.ShouldThrow<ArgumentNullException>();
         }
@@ -64,11 +64,11 @@ namespace MongoDB.Driver.Core.Connections
         public void CreateConnection_should_throw_an_ArgumentNullException_when_serverId_is_null()
         {
             var streamFactory = Substitute.For<IStreamFactory>();
-            var eventPublisherProvider = Substitute.For<IEventPublisherProvider>();
+            var eventSubscriber = Substitute.For<IEventSubscriber>();
             var subject = new BinaryConnectionFactory(
                 new ConnectionSettings(),
                 streamFactory,
-                eventPublisherProvider);
+                eventSubscriber);
 
             Action act = () => subject.CreateConnection(null, new DnsEndPoint("localhost", 27017));
             act.ShouldThrow<ArgumentNullException>();
@@ -78,11 +78,11 @@ namespace MongoDB.Driver.Core.Connections
         public void CreateConnection_should_throw_an_ArgumentNullException_when_endPoint_is_null()
         {
             var streamFactory = Substitute.For<IStreamFactory>();
-            var eventPublisherProvider = Substitute.For<IEventPublisherProvider>();
+            var eventSubscriber = Substitute.For<IEventSubscriber>();
             var subject = new BinaryConnectionFactory(
                 new ConnectionSettings(),
                 streamFactory,
-                eventPublisherProvider);
+                eventSubscriber);
 
             var serverId = new ServerId(new ClusterId(), new DnsEndPoint("localhost", 27017));
 
@@ -94,11 +94,11 @@ namespace MongoDB.Driver.Core.Connections
         public void CreateConnection_should_return_a_BinaryConnection()
         {
             var streamFactory = Substitute.For<IStreamFactory>();
-            var eventPublisherProvider = Substitute.For<IEventPublisherProvider>();
+            var eventSubscriber = Substitute.For<IEventSubscriber>();
             var subject = new BinaryConnectionFactory(
                 new ConnectionSettings(),
                 streamFactory,
-                eventPublisherProvider);
+                eventSubscriber);
 
             var serverId = new ServerId(new ClusterId(), new DnsEndPoint("localhost", 27017));
 

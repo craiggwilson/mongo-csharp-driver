@@ -67,7 +67,7 @@ namespace MongoDB.Driver.Core.Connections
                 settings: new ConnectionSettings(),
                 streamFactory: _streamFactory,
                 connectionInitializer: _connectionInitializer,
-                eventPublisherProvider: _capturedEvents);
+                eventSubscriber: _capturedEvents);
         }
 
         [Test]

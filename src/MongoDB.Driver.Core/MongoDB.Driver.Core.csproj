@@ -88,7 +88,7 @@
     <Compile Include="Core\Events\ClusterBeforeClosingEvent.cs" />
     <Compile Include="Core\Events\ConnectionAfterClosingEvent.cs" />
     <Compile Include="Core\Events\EventAggregator.cs" />
-    <Compile Include="Core\Events\IEventPublisherProvider.cs" />
+    <Compile Include="Core\Events\IEventSubscriber.cs" />
     <Compile Include="Core\Events\ServerAfterClosingEvent.cs" />
     <Compile Include="Core\Events\ServerAfterDescriptionChangedEvent.cs" />
     <Compile Include="Core\Events\ServerErrorHeartbeatingEvent.cs" />

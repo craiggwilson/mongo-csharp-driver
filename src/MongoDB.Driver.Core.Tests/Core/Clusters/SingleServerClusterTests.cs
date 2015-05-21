@@ -29,7 +29,7 @@ namespace MongoDB.Driver.Core.Clusters
     [TestFixture]
     public class SingleServerClusterTests
     {
-        private IEventPublisherProvider _eventPublisherProvider;
+        private IEventSubscriber _eventSubscriber;
         private IClusterableServerFactory _serverFactory;
         private ClusterSettings _settings;
 
@@ -38,14 +38,14 @@ namespace MongoDB.Driver.Core.Clusters
         {
             _settings = new ClusterSettings();
             _serverFactory = Substitute.For<IClusterableServerFactory>();
-            _eventPublisherProvider = Substitute.For<IEventPublisherProvider>();
+            _eventSubscriber = Substitute.For<IEventSubscriber>();
         }
 
         [Test]
         public void Constructor_should_throw_if_more_than_one_endpoint_is_specified()
         {
             _settings = _settings.With(endPoints: new[] { new DnsEndPoint("localhost", 27017), new DnsEndPoint("localhost", 27018) });
-            Action act = () => new SingleServerCluster(_settings, _serverFactory, _eventPublisherProvider);
+            Action act = () => new SingleServerCluster(_settings, _serverFactory, _eventSubscriber);
 
             act.ShouldThrow<ArgumentException>();
         }
@@ -132,7 +132,7 @@ namespace MongoDB.Driver.Core.Clusters
 
         private SingleServerCluster CreateSubject()
         {
-            return new SingleServerCluster(_settings, _serverFactory, _eventPublisherProvider);
+            return new SingleServerCluster(_settings, _serverFactory, _eventSubscriber);
         }
     }
 }

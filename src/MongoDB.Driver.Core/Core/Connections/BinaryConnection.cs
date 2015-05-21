@@ -22,7 +22,6 @@ using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Bson.IO;
-using MongoDB.Bson.Serialization;
 using MongoDB.Driver.Core.Configuration;
 using MongoDB.Driver.Core.Events;
 using MongoDB.Driver.Core.Misc;
@@ -56,28 +55,28 @@ namespace MongoDB.Driver.Core.Connections
         private Stream _stream;
         private readonly IStreamFactory _streamFactory;
 
-        private readonly Action<ConnectionFailedEvent> _publishFailedEvent;
-        private readonly Action<ConnectionBeforeClosingEvent> _publishBeforeClosingEvent;
-        private readonly Action<ConnectionAfterClosingEvent> _publishAfterClosingEvent;
-        private readonly Action<ConnectionBeforeOpeningEvent> _publishBeforeOpeningEvent;
-        private readonly Action<ConnectionAfterOpeningEvent> _publishAfterOpeningEvent;
-        private readonly Action<ConnectionErrorOpeningEvent> _publishErrorOpeningEvent;
-        private readonly Action<ConnectionBeforeReceivingMessageEvent> _publishBeforeReceivingMessageEvent;
-        private readonly Action<ConnectionAfterReceivingMessageEvent> _publishAfterReceivingMessageEvent;
-        private readonly Action<ConnectionErrorReceivingMessageEvent> _publishErrorReceivingMessageEvent;
-        private readonly Action<ConnectionBeforeSendingMessagesEvent> _publishBeforeSendingMessagesEvent;
-        private readonly Action<ConnectionAfterSendingMessagesEvent> _publishAfterSendingMessagesEvent;
-        private readonly Action<ConnectionErrorSendingMessagesEvent> _publishErrorSendingMessagesEvent;
+        private readonly Action<ConnectionFailedEvent> _failedEventHandler;
+        private readonly Action<ConnectionBeforeClosingEvent> _beforeClosingEventHandler;
+        private readonly Action<ConnectionAfterClosingEvent> _afterClosingEventHandler;
+        private readonly Action<ConnectionBeforeOpeningEvent> _beforeOpeningEventHandler;
+        private readonly Action<ConnectionAfterOpeningEvent> _afterOpeningEventHandler;
+        private readonly Action<ConnectionErrorOpeningEvent> _errorOpeningEventHandler;
+        private readonly Action<ConnectionBeforeReceivingMessageEvent> _beforeReceivingMessageEventHandler;
+        private readonly Action<ConnectionAfterReceivingMessageEvent> _afterReceivingMessageEventHandler;
+        private readonly Action<ConnectionErrorReceivingMessageEvent> _errorReceivingMessageEventHandler;
+        private readonly Action<ConnectionBeforeSendingMessagesEvent> _beforeSendingMessagesEventHandler;
+        private readonly Action<ConnectionAfterSendingMessagesEvent> _afterSendingMessagesEventHandler;
+        private readonly Action<ConnectionErrorSendingMessagesEvent> _errorSendingMessagesEventHandler;
 
         // constructors
-        public BinaryConnection(ServerId serverId, EndPoint endPoint, ConnectionSettings settings, IStreamFactory streamFactory, IConnectionInitializer connectionInitializer, IEventPublisherProvider eventPublisherProvider)
+        public BinaryConnection(ServerId serverId, EndPoint endPoint, ConnectionSettings settings, IStreamFactory streamFactory, IConnectionInitializer connectionInitializer, IEventSubscriber eventSubscriber)
         {
             Ensure.IsNotNull(serverId, "serverId");
             _endPoint = Ensure.IsNotNull(endPoint, "endPoint");
             _settings = Ensure.IsNotNull(settings, "settings");
             _streamFactory = Ensure.IsNotNull(streamFactory, "streamFactory");
             _connectionInitializer = Ensure.IsNotNull(connectionInitializer, "connectionInitializer");
-            Ensure.IsNotNull(eventPublisherProvider, "eventPublisherProvider");
+            Ensure.IsNotNull(eventSubscriber, "eventSubscriber");
 
             _backgroundTaskCancellationTokenSource = new CancellationTokenSource();
             _backgroundTaskCancellationToken = _backgroundTaskCancellationTokenSource.Token;
@@ -87,19 +86,19 @@ namespace MongoDB.Driver.Core.Connections
             _sendLock = new SemaphoreSlim(1);
             _state = new InterlockedInt32(State.Initial);
 
-            eventPublisherProvider.TryGetPublisher(out _publishFailedEvent);
-            eventPublisherProvider.TryGetPublisher(out _publishAfterClosingEvent);
-            eventPublisherProvider.TryGetPublisher(out _publishBeforeClosingEvent);
-            eventPublisherProvider.TryGetPublisher(out _publishAfterClosingEvent);
-            eventPublisherProvider.TryGetPublisher(out _publishBeforeOpeningEvent);
-            eventPublisherProvider.TryGetPublisher(out _publishAfterOpeningEvent);
-            eventPublisherProvider.TryGetPublisher(out _publishErrorOpeningEvent);
-            eventPublisherProvider.TryGetPublisher(out _publishBeforeReceivingMessageEvent);
-            eventPublisherProvider.TryGetPublisher(out _publishAfterReceivingMessageEvent);
-            eventPublisherProvider.TryGetPublisher(out _publishErrorReceivingMessageEvent);
-            eventPublisherProvider.TryGetPublisher(out _publishBeforeSendingMessagesEvent);
-            eventPublisherProvider.TryGetPublisher(out _publishAfterSendingMessagesEvent);
-            eventPublisherProvider.TryGetPublisher(out _publishErrorSendingMessagesEvent);
+            eventSubscriber.TryGetEventHandler(out _failedEventHandler);
+            eventSubscriber.TryGetEventHandler(out _afterClosingEventHandler);
+            eventSubscriber.TryGetEventHandler(out _beforeClosingEventHandler);
+            eventSubscriber.TryGetEventHandler(out _afterClosingEventHandler);
+            eventSubscriber.TryGetEventHandler(out _beforeOpeningEventHandler);
+            eventSubscriber.TryGetEventHandler(out _afterOpeningEventHandler);
+            eventSubscriber.TryGetEventHandler(out _errorOpeningEventHandler);
+            eventSubscriber.TryGetEventHandler(out _beforeReceivingMessageEventHandler);
+            eventSubscriber.TryGetEventHandler(out _afterReceivingMessageEventHandler);
+            eventSubscriber.TryGetEventHandler(out _errorReceivingMessageEventHandler);
+            eventSubscriber.TryGetEventHandler(out _beforeSendingMessagesEventHandler);
+            eventSubscriber.TryGetEventHandler(out _afterSendingMessagesEventHandler);
+            eventSubscriber.TryGetEventHandler(out _errorSendingMessagesEventHandler);
         }
 
         // properties
@@ -150,9 +149,9 @@ namespace MongoDB.Driver.Core.Connections
         {
             if (_state.TryChange(State.Open, State.Failed))
             {
-                if (_publishFailedEvent != null)
+                if (_failedEventHandler != null)
                 {
-                    _publishFailedEvent(new ConnectionFailedEvent(_connectionId, exception));
+                    _failedEventHandler(new ConnectionFailedEvent(_connectionId, exception));
                 }
             }
         }
@@ -169,9 +168,9 @@ namespace MongoDB.Driver.Core.Connections
             {
                 if (disposing)
                 {
-                    if (_publishBeforeClosingEvent != null)
+                    if (_beforeClosingEventHandler != null)
                     {
-                        _publishBeforeClosingEvent(new ConnectionBeforeClosingEvent(_connectionId));
+                        _beforeClosingEventHandler(new ConnectionBeforeClosingEvent(_connectionId));
                     }
 
                     _backgroundTaskCancellationTokenSource.Cancel();
@@ -191,9 +190,9 @@ namespace MongoDB.Driver.Core.Connections
                         }
                     }
 
-                    if (_publishAfterClosingEvent != null)
+                    if (_afterClosingEventHandler != null)
                     {
-                        _publishAfterClosingEvent(new ConnectionAfterClosingEvent(_connectionId));
+                        _afterClosingEventHandler(new ConnectionAfterClosingEvent(_connectionId));
                     }
                 }
             }
@@ -216,9 +215,9 @@ namespace MongoDB.Driver.Core.Connections
 
         private async Task OpenAsyncHelper(CancellationToken cancellationToken)
         {
-            if (_publishBeforeOpeningEvent != null)
+            if (_beforeOpeningEventHandler != null)
             {
-                _publishBeforeOpeningEvent(new ConnectionBeforeOpeningEvent(_connectionId, _settings));
+                _beforeOpeningEventHandler(new ConnectionBeforeOpeningEvent(_connectionId, _settings));
             }
 
             try
@@ -231,9 +230,9 @@ namespace MongoDB.Driver.Core.Connections
                 _connectionId = _description.ConnectionId;
                 _state.TryChange(State.Open);
 
-                if (_publishAfterOpeningEvent != null)
+                if (_afterOpeningEventHandler != null)
                 {
-                    _publishAfterOpeningEvent(new ConnectionAfterOpeningEvent(_connectionId, _settings, stopwatch.Elapsed));
+                    _afterOpeningEventHandler(new ConnectionAfterOpeningEvent(_connectionId, _settings, stopwatch.Elapsed));
                 }
             }
             catch (Exception ex)
@@ -242,14 +241,14 @@ namespace MongoDB.Driver.Core.Connections
 
                 var wrappedException = WrapException(ex, "opening a connection to the server");
 
-                if (_publishErrorOpeningEvent != null)
+                if (_errorOpeningEventHandler != null)
                 {
-                    _publishErrorOpeningEvent(new ConnectionErrorOpeningEvent(_connectionId, _settings, wrappedException));
+                    _errorOpeningEventHandler(new ConnectionErrorOpeningEvent(_connectionId, _settings, wrappedException));
                 }
 
-                if (_publishFailedEvent != null)
+                if (_failedEventHandler != null)
                 {
-                    _publishFailedEvent(new ConnectionFailedEvent(_connectionId, wrappedException));
+                    _failedEventHandler(new ConnectionFailedEvent(_connectionId, wrappedException));
                 }
 
                 throw wrappedException;
@@ -330,9 +329,9 @@ namespace MongoDB.Driver.Core.Connections
 
             try
             {
-                if (_publishBeforeReceivingMessageEvent != null)
+                if (_beforeReceivingMessageEventHandler != null)
                 {
-                    _publishBeforeReceivingMessageEvent(new ConnectionBeforeReceivingMessageEvent(_connectionId, responseTo));
+                    _beforeReceivingMessageEventHandler(new ConnectionBeforeReceivingMessageEvent(_connectionId, responseTo));
                 }
 
                 var stopwatch = Stopwatch.StartNew();
@@ -351,18 +350,18 @@ namespace MongoDB.Driver.Core.Connections
                 }
                 stopwatch.Stop();
 
-                if (_publishAfterReceivingMessageEvent != null)
+                if (_afterReceivingMessageEventHandler != null)
                 {
-                    _publishAfterReceivingMessageEvent(new ConnectionAfterReceivingMessageEvent(_connectionId, reply, length, stopwatch.Elapsed));
+                    _afterReceivingMessageEventHandler(new ConnectionAfterReceivingMessageEvent(_connectionId, reply, length, stopwatch.Elapsed));
                 }
 
                 return reply;
             }
             catch (Exception ex)
             {
-                if (_publishErrorReceivingMessageEvent != null)
+                if (_errorReceivingMessageEventHandler != null)
                 {
-                    _publishErrorReceivingMessageEvent(new ConnectionErrorReceivingMessageEvent(_connectionId, responseTo, ex));
+                    _errorReceivingMessageEventHandler(new ConnectionErrorReceivingMessageEvent(_connectionId, responseTo, ex));
                 }
 
                 throw;
@@ -407,9 +406,9 @@ namespace MongoDB.Driver.Core.Connections
 
             try
             {
-                if (_publishBeforeSendingMessagesEvent != null)
+                if (_beforeSendingMessagesEventHandler != null)
                 {
-                    _publishBeforeSendingMessagesEvent(new ConnectionBeforeSendingMessagesEvent(_connectionId, messagesToSend));
+                    _beforeSendingMessagesEventHandler(new ConnectionBeforeSendingMessagesEvent(_connectionId, messagesToSend));
                 }
 
                 cancellationToken.ThrowIfCancellationRequested();
@@ -440,17 +439,17 @@ namespace MongoDB.Driver.Core.Connections
                     await SendBufferAsync(buffer, cancellationToken).ConfigureAwait(false);
                     stopwatch.Stop();
 
-                    if (_publishAfterSendingMessagesEvent != null)
+                    if (_afterSendingMessagesEventHandler != null)
                     {
-                        _publishAfterSendingMessagesEvent(new ConnectionAfterSendingMessagesEvent(_connectionId, messagesToSend, buffer.Length, stopwatch.Elapsed));
+                        _afterSendingMessagesEventHandler(new ConnectionAfterSendingMessagesEvent(_connectionId, messagesToSend, buffer.Length, stopwatch.Elapsed));
                     }
                 }
             }
             catch (Exception ex)
             {
-                if (_publishErrorSendingMessagesEvent != null)
+                if (_errorSendingMessagesEventHandler != null)
                 {
-                    _publishErrorSendingMessagesEvent(new ConnectionErrorSendingMessagesEvent(_connectionId, messagesToSend, ex));
+                    _errorSendingMessagesEventHandler(new ConnectionErrorSendingMessagesEvent(_connectionId, messagesToSend, ex));
                 }
 
                 throw;

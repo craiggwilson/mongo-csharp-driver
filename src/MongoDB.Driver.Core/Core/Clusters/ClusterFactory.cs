@@ -13,7 +13,6 @@
 * limitations under the License.
 */
 
-using System;
 using MongoDB.Driver.Core.Configuration;
 using MongoDB.Driver.Core.Events;
 using MongoDB.Driver.Core.Misc;
@@ -24,16 +23,16 @@ namespace MongoDB.Driver.Core.Clusters
     internal class ClusterFactory : IClusterFactory
     {
         // fields
-        private readonly IEventPublisherProvider _eventPublisherProvider;
+        private readonly IEventSubscriber _eventSubscriber;
         private readonly IClusterableServerFactory _serverFactory;
         private readonly ClusterSettings _settings;
 
         // constructors
-        public ClusterFactory(ClusterSettings settings, IClusterableServerFactory serverFactory, IEventPublisherProvider eventPublisherProvider)
+        public ClusterFactory(ClusterSettings settings, IClusterableServerFactory serverFactory, IEventSubscriber eventSubscriber)
         {
             _settings = Ensure.IsNotNull(settings, "settings");
             _serverFactory = Ensure.IsNotNull(serverFactory, "serverFactory");
-            _eventPublisherProvider = Ensure.IsNotNull(eventPublisherProvider, "eventPublisherProvider");
+            _eventSubscriber = Ensure.IsNotNull(eventSubscriber, "eventSubscriber");
         }
 
         // methods
@@ -68,14 +67,14 @@ namespace MongoDB.Driver.Core.Clusters
 
         private MultiServerCluster CreateMultiServerCluster(ClusterSettings settings)
         {
-            var shardedCluster = new MultiServerCluster(settings, _serverFactory, _eventPublisherProvider);
+            var shardedCluster = new MultiServerCluster(settings, _serverFactory, _eventSubscriber);
             shardedCluster.Initialize();
             return shardedCluster;
         }
 
         private SingleServerCluster CreateSingleServerCluster(ClusterSettings settings)
         {
-            var standaloneCluster = new SingleServerCluster(settings, _serverFactory, _eventPublisherProvider);
+            var standaloneCluster = new SingleServerCluster(settings, _serverFactory, _eventSubscriber);
             standaloneCluster.Initialize();
             return standaloneCluster;
         }

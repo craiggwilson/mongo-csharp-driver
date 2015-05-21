@@ -34,7 +34,7 @@ namespace MongoDB.Driver.Core.Clusters
     [TestFixture]
     public class MultiServerClusterTests
     {
-        private IEventPublisherProvider _eventPublisherProvider;
+        private IEventSubscriber _eventSubscriber;
         private MockClusterableServerFactory _serverFactory;
         private ClusterSettings _settings;
         private EndPoint _firstEndPoint = new DnsEndPoint("localhost", 27017);
@@ -46,14 +46,14 @@ namespace MongoDB.Driver.Core.Clusters
         {
             _settings = new ClusterSettings();
             _serverFactory = new MockClusterableServerFactory();
-            _eventPublisherProvider = Substitute.For<IEventPublisherProvider>();
+            _eventSubscriber = Substitute.For<IEventSubscriber>();
         }
 
         [Test]
         public void Constructor_should_throw_if_no_endpoints_are_specified()
         {
             var settings = new ClusterSettings(endPoints: new EndPoint[0]);
-            Action act = () => new MultiServerCluster(settings, _serverFactory, _eventPublisherProvider);
+            Action act = () => new MultiServerCluster(settings, _serverFactory, _eventSubscriber);
 
             act.ShouldThrow<ArgumentOutOfRangeException>();
         }
@@ -66,7 +66,7 @@ namespace MongoDB.Driver.Core.Clusters
             var settings = new ClusterSettings(
                 endPoints: new[] { new DnsEndPoint("localhost", 27017) },
                 connectionMode: mode);
-            Action act = () => new MultiServerCluster(settings, _serverFactory, _eventPublisherProvider);
+            Action act = () => new MultiServerCluster(settings, _serverFactory, _eventSubscriber);
 
             act.ShouldThrow<ArgumentException>();
         }
@@ -446,7 +446,7 @@ namespace MongoDB.Driver.Core.Clusters
 
         private MultiServerCluster CreateSubject()
         {
-            return new MultiServerCluster(_settings, _serverFactory, _eventPublisherProvider);
+            return new MultiServerCluster(_settings, _serverFactory, _eventSubscriber);
         }
 
         private IEnumerable<ServerDescription> GetDescriptions(params EndPoint[] endPoints)

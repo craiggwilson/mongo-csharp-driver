@@ -53,14 +53,14 @@ namespace MongoDB.Driver.Core.Clusters
         private readonly ClusterSettings _settings;
         private readonly InterlockedInt32 _state;
 
-        private readonly Action<ClusterAfterDescriptionChangedEvent> _publishAfterDescriptionChangedEvent;
+        private readonly Action<ClusterAfterDescriptionChangedEvent> _afterDescriptionChangedEventHandler;
 
         // constructors
-        protected Cluster(ClusterSettings settings, IClusterableServerFactory serverFactory, IEventPublisherProvider eventPublisherProvider)
+        protected Cluster(ClusterSettings settings, IClusterableServerFactory serverFactory, IEventSubscriber eventSubscriber)
         {
             _settings = Ensure.IsNotNull(settings, "settings");
             _serverFactory = Ensure.IsNotNull(serverFactory, "serverFactory");
-            Ensure.IsNotNull(eventPublisherProvider, "eventPublisherProvider");
+            Ensure.IsNotNull(eventSubscriber, "eventSubscriber");
             _state = new InterlockedInt32(State.Initial);
 
             _clusterId = new ClusterId();
@@ -69,7 +69,7 @@ namespace MongoDB.Driver.Core.Clusters
 
             _rapidHeartbeatTimer = new Timer(RapidHeartbeatTimerCallback, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
 
-            eventPublisherProvider.TryGetPublisher(out _publishAfterDescriptionChangedEvent);
+            eventSubscriber.TryGetEventHandler(out _afterDescriptionChangedEventHandler);
         }
 
         // events
@@ -175,9 +175,9 @@ namespace MongoDB.Driver.Core.Clusters
 
         protected void OnDescriptionChanged(ClusterDescription oldDescription, ClusterDescription newDescription)
         {
-            if (_publishAfterDescriptionChangedEvent != null)
+            if (_afterDescriptionChangedEventHandler != null)
             {
-                _publishAfterDescriptionChangedEvent(new ClusterAfterDescriptionChangedEvent(oldDescription, newDescription));
+                _afterDescriptionChangedEventHandler(new ClusterAfterDescriptionChangedEvent(oldDescription, newDescription));
             }
 
             var handler = DescriptionChanged;

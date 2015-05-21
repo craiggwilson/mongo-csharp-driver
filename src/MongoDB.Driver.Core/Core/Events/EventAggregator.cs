@@ -19,7 +19,7 @@ using MongoDB.Driver.Core.Misc;
 
 namespace MongoDB.Driver.Core.Events
 {
-    internal class EventAggregator : IEventPublisherProvider
+    internal class EventAggregator : IEventSubscriber
     {
         private readonly Dictionary<Type, Delegate> _handlers;
 
@@ -33,17 +33,17 @@ namespace MongoDB.Driver.Core.Events
             Ensure.IsNotNull(type, "type");
             Ensure.IsNotNull(handler, "handler");
 
-            Delegate chain;
-            if (_handlers.TryGetValue(type, out chain))
+            Delegate @delegate;
+            if (_handlers.TryGetValue(type, out @delegate))
             {
-                chain = Delegate.Combine(chain, handler);
+                @delegate = Delegate.Combine(@delegate, handler);
             }
             else
             {
-                chain = handler;
+                @delegate = handler;
             }
 
-            _handlers[type] = chain;
+            _handlers[type] = @delegate;
         }
 
         public void Subscribe<TEvent>(Action<TEvent> handler)
@@ -51,16 +51,16 @@ namespace MongoDB.Driver.Core.Events
             Subscribe(typeof(TEvent), handler);
         }
 
-        public bool TryGetPublisher<TEvent>(out Action<TEvent> publisher)
+        public bool TryGetEventHandler<TEvent>(out Action<TEvent> handler)
         {
-            Delegate handler;
-            if (_handlers.TryGetValue(typeof(TEvent), out handler))
+            Delegate @delegate;
+            if (_handlers.TryGetValue(typeof(TEvent), out @delegate))
             {
-                publisher = (Action<TEvent>)handler;
+                handler = (Action<TEvent>)@delegate;
                 return true;
             }
 
-            publisher = null;
+            handler = null;
             return false;
         }
     }

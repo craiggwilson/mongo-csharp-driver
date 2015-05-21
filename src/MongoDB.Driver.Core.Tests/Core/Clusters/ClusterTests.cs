@@ -35,7 +35,7 @@ namespace MongoDB.Driver.Core.Clusters
     [TestFixture]
     public class ClusterTests
     {
-        private IEventPublisherProvider _eventPublisherProvider;
+        private IEventSubscriber _eventSubscriber;
         private IClusterableServerFactory _serverFactory;
         private ClusterSettings _settings;
 
@@ -45,13 +45,13 @@ namespace MongoDB.Driver.Core.Clusters
             _settings = new ClusterSettings(serverSelectionTimeout: TimeSpan.FromSeconds(2),
                 postServerSelector: new LatencyLimitingServerSelector(TimeSpan.FromMinutes(2)));
             _serverFactory = Substitute.For<IClusterableServerFactory>();
-            _eventPublisherProvider = Substitute.For<IEventPublisherProvider>();
+            _eventSubscriber = Substitute.For<IEventSubscriber>();
         }
 
         [Test]
         public void Constructor_should_throw_if_settings_is_null()
         {
-            Action act = () => new StubCluster(null, _serverFactory, _eventPublisherProvider);
+            Action act = () => new StubCluster(null, _serverFactory, _eventSubscriber);
 
             act.ShouldThrow<ArgumentNullException>();
         }
@@ -59,13 +59,13 @@ namespace MongoDB.Driver.Core.Clusters
         [Test]
         public void Constructor_should_throw_if_serverFactory_is_null()
         {
-            Action act = () => new StubCluster(_settings, null, _eventPublisherProvider);
+            Action act = () => new StubCluster(_settings, null, _eventSubscriber);
 
             act.ShouldThrow<ArgumentNullException>();
         }
 
         [Test]
-        public void Constructor_should_throw_if_eventPublisherProvider_is_null()
+        public void Constructor_should_throw_if_eventSubscriber_is_null()
         {
             Action act = () => new StubCluster(_settings, _serverFactory, null);
 
@@ -267,7 +267,7 @@ namespace MongoDB.Driver.Core.Clusters
                 preServerSelector: preSelector,
                 postServerSelector: postSelector);
 
-            var subject = new StubCluster(settings, _serverFactory, _eventPublisherProvider);
+            var subject = new StubCluster(settings, _serverFactory, _eventSubscriber);
             subject.Initialize();
 
             subject.SetServerDescriptions(
@@ -284,13 +284,13 @@ namespace MongoDB.Driver.Core.Clusters
         {
             _settings = _settings.With(connectionMode: connectionMode);
 
-            return new StubCluster(_settings, _serverFactory, _eventPublisherProvider);
+            return new StubCluster(_settings, _serverFactory, _eventSubscriber);
         }
 
         private class StubCluster : Cluster
         {
-            public StubCluster(ClusterSettings settings, IClusterableServerFactory serverFactory, IEventPublisherProvider eventPublisherProvider)
-                : base(settings, serverFactory, eventPublisherProvider)
+            public StubCluster(ClusterSettings settings, IClusterableServerFactory serverFactory, IEventSubscriber eventSubscriber)
+                : base(settings, serverFactory, eventSubscriber)
             {
 
 

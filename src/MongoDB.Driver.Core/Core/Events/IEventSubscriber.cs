@@ -17,8 +17,8 @@ using System;
 
 namespace MongoDB.Driver.Core.Events
 {
-    internal interface IEventPublisherProvider
+    internal interface IEventSubscriber
     {
-        bool TryGetPublisher<TEvent>(out Action<TEvent> publisher);
+        bool TryGetEventHandler<TEvent>(out Action<TEvent> handler);
     }
 }

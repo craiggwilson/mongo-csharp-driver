@@ -26,7 +26,7 @@ namespace MongoDB.Driver.Core.ConnectionPools
     {
         // fields
         private readonly IConnectionFactory _connectionFactory;
-        private readonly IEventPublisherProvider _eventPublisherProvider;
+        private readonly IEventSubscriber _eventSubscriber;
         private readonly ConnectionPoolSettings _settings;
 
         public ExclusiveConnectionPoolFactory()
@@ -34,11 +34,11 @@ namespace MongoDB.Driver.Core.ConnectionPools
         {
         }
 
-        public ExclusiveConnectionPoolFactory(ConnectionPoolSettings settings, IConnectionFactory connectionFactory, IEventPublisherProvider eventPublisherProvider)
+        public ExclusiveConnectionPoolFactory(ConnectionPoolSettings settings, IConnectionFactory connectionFactory, IEventSubscriber eventSubscriber)
         {
             _settings = Ensure.IsNotNull(settings, "settings");
             _connectionFactory = Ensure.IsNotNull(connectionFactory, "connectionFactory");
-            _eventPublisherProvider = Ensure.IsNotNull(eventPublisherProvider, "eventPublisherProvider");
+            _eventSubscriber = Ensure.IsNotNull(eventSubscriber, "eventSubscriber");
         }
 
         public IConnectionPool CreateConnectionPool(ServerId serverId, EndPoint endPoint)
@@ -46,7 +46,7 @@ namespace MongoDB.Driver.Core.ConnectionPools
             Ensure.IsNotNull(serverId, "serverId");
             Ensure.IsNotNull(endPoint, "endPoint");
 
-            return new ExclusiveConnectionPool(serverId, endPoint, _settings, _connectionFactory, _eventPublisherProvider);
+            return new ExclusiveConnectionPool(serverId, endPoint, _settings, _connectionFactory, _eventSubscriber);
         }
     }
 }

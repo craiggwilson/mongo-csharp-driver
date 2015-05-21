@@ -29,24 +29,24 @@ namespace MongoDB.Driver.Core.Servers
         private readonly ClusterConnectionMode _clusterConnectionMode;
         private readonly IConnectionPoolFactory _connectionPoolFactory;
         private readonly IConnectionFactory _heartbeatConnectionFactory;
-        private readonly IEventPublisherProvider _eventPublisherProvider;
+        private readonly IEventSubscriber _eventSubscriber;
         private readonly ServerSettings _settings;
 
         // constructors
-        public ServerFactory(ClusterConnectionMode clusterConnectionMode, ServerSettings settings, IConnectionPoolFactory connectionPoolFactory, IConnectionFactory heartbeatConnectionFactory, IEventPublisherProvider eventPublisherProvider)
+        public ServerFactory(ClusterConnectionMode clusterConnectionMode, ServerSettings settings, IConnectionPoolFactory connectionPoolFactory, IConnectionFactory heartbeatConnectionFactory, IEventSubscriber eventSubscriber)
         {
             _clusterConnectionMode = clusterConnectionMode;
             _settings = Ensure.IsNotNull(settings, "settings");
             _connectionPoolFactory = Ensure.IsNotNull(connectionPoolFactory, "connectionPoolFactory");
             _heartbeatConnectionFactory = Ensure.IsNotNull(heartbeatConnectionFactory, "heartbeatConnectionFactory");
-            _eventPublisherProvider = Ensure.IsNotNull(eventPublisherProvider, "eventPublisherProvider");
+            _eventSubscriber = Ensure.IsNotNull(eventSubscriber, "eventSubscriber");
         }
 
         // methods
         /// <inheritdoc/>
         public IClusterableServer CreateServer(ClusterId clusterId, EndPoint endPoint)
         {
-            return new ClusterableServer(clusterId, _clusterConnectionMode, _settings, endPoint, _connectionPoolFactory, _heartbeatConnectionFactory, _eventPublisherProvider);
+            return new ClusterableServer(clusterId, _clusterConnectionMode, _settings, endPoint, _connectionPoolFactory, _heartbeatConnectionFactory, _eventSubscriber);
         }
     }
 }

@@ -14,12 +14,8 @@
 */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using NUnit.Framework;
 using FluentAssertions;
+using NUnit.Framework;
 
 namespace MongoDB.Driver.Core.Events
 {
@@ -28,40 +24,40 @@ namespace MongoDB.Driver.Core.Events
     {
 
         [Test]
-        public void TryGetPublisher_should_return_false_when_no_subscribers_exist()
+        public void TryGetEventHandler_should_return_false_when_no_subscribers_exist()
         {
             var subject = new EventAggregator();
 
-            Action<int> publisher;
-            subject.TryGetPublisher(out publisher).Should().BeFalse();
+            Action<int> handler;
+            subject.TryGetEventHandler(out handler).Should().BeFalse();
         }
 
         [Test]
-        public void TryGetPublisher_should_return_true_when_one_subscriber_exists()
+        public void TryGetEventHandler_should_return_true_when_one_subscriber_exists()
         {
             var subject = new EventAggregator();
             subject.Subscribe<int>(x => { });
 
-            Action<int> publisher;
-            subject.TryGetPublisher(out publisher).Should().BeTrue();
+            Action<int> handler;
+            subject.TryGetEventHandler(out handler).Should().BeTrue();
         }
 
         [Test]
-        public void Publisher_should_invoke_a_single_subscriber()
+        public void Handler_should_invoke_a_single_subscriber()
         {
             var subject = new EventAggregator();
             bool called = false;
             subject.Subscribe<int>(x => called = true);
 
-            Action<int> publisher;
-            subject.TryGetPublisher(out publisher);
-            publisher(42);
+            Action<int> handler;
+            subject.TryGetEventHandler(out handler);
+            handler(42);
 
             called.Should().BeTrue();
         }
 
         [Test]
-        public void Publisher_should_invoke_multiple_subscribers()
+        public void Handler_should_invoke_multiple_subscribers()
         {
             var subject = new EventAggregator();
             bool called1 = false;
@@ -71,9 +67,9 @@ namespace MongoDB.Driver.Core.Events
             subject.Subscribe<int>(x => called2 = true);
             subject.Subscribe<int>(x => called3 = true);
 
-            Action<int> publisher;
-            subject.TryGetPublisher(out publisher);
-            publisher(42);
+            Action<int> handler;
+            subject.TryGetEventHandler(out handler);
+            handler(42);
 
             called1.Should().BeTrue();
             called2.Should().BeTrue();

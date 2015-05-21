@@ -15,7 +15,6 @@
 
 using System;
 using System.Linq;
-using System.Linq.Expressions;
 using System.Reflection;
 using MongoDB.Driver.Core.Clusters;
 using MongoDB.Driver.Core.ConnectionPools;
@@ -192,12 +191,12 @@ namespace MongoDB.Driver.Core.Configuration
         public ClusterBuilder Subscribe<TEvent>(Action<TEvent> handler)
         {
             Ensure.IsNotNull(handler, "handler");
-            _eventAggregator.Subscribe(typeof(TEvent), handler);
+            _eventAggregator.Subscribe(handler);
             return this;
         }
 
         /// <summary>
-        /// Subscribes all public methods (instance or static) named "Handle" with a single argument
+        /// Subscribes all public instance methods named "Handle" with a single argument
         /// to events of that single argument's type.
         /// </summary>
         /// <param name="handler">The handler.</param>

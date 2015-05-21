@@ -22,7 +22,7 @@ using MongoDB.Driver.Core.Events;
 
 namespace MongoDB.Driver.Core.Helpers
 {
-    internal class EventCapturer : IEventPublisherProvider
+    internal class EventCapturer : IEventSubscriber
     {
         private readonly Queue<object> _capturedEvents;
 
@@ -46,9 +46,9 @@ namespace MongoDB.Driver.Core.Helpers
             return _capturedEvents.Dequeue();
         }
 
-        public bool TryGetPublisher<TEvent>(out Action<TEvent> publisher)
+        public bool TryGetEventHandler<TEvent>(out Action<TEvent> handler)
         {
-            publisher = e => Capture(e);
+            handler = e => Capture(e);
             return true;
         }
 

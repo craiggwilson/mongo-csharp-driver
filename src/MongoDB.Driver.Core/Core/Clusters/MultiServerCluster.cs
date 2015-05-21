@@ -43,18 +43,18 @@ namespace MongoDB.Driver.Core.Clusters
         private readonly object _serversLock = new object();
         private readonly InterlockedInt32 _state;
 
-        private readonly Action<ClusterBeforeClosingEvent> _publishBeforeClosingEvent;
-        private readonly Action<ClusterAfterClosingEvent> _publishAfterClosingEvent;
-        private readonly Action<ClusterBeforeOpeningEvent> _publishBeforeOpeningEvent;
-        private readonly Action<ClusterAfterOpeningEvent> _publishAfterOpeningEvent;
-        private readonly Action<ClusterBeforeAddingServerEvent> _publishBeforeAddingServerEvent;
-        private readonly Action<ClusterAfterAddingServerEvent> _publishAfterAddingServerEvent;
-        private readonly Action<ClusterBeforeRemovingServerEvent> _publishBeforeRemovingServerEvent;
-        private readonly Action<ClusterAfterRemovingServerEvent> _publishAfterRemovingServerEvent;
+        private readonly Action<ClusterBeforeClosingEvent> _beforeClosingEventHandler;
+        private readonly Action<ClusterAfterClosingEvent> _afterClosingEventHandler;
+        private readonly Action<ClusterBeforeOpeningEvent> _beforeOpeningEventHandler;
+        private readonly Action<ClusterAfterOpeningEvent> _afterOpeningEventHandler;
+        private readonly Action<ClusterBeforeAddingServerEvent> _beforeAddingServerEventHandler;
+        private readonly Action<ClusterAfterAddingServerEvent> _afterAddingServerEventHandler;
+        private readonly Action<ClusterBeforeRemovingServerEvent> _beforeRemovingServerEventHandler;
+        private readonly Action<ClusterAfterRemovingServerEvent> _afterRemovingServerEventHandler;
 
         // constructors
-        public MultiServerCluster(ClusterSettings settings, IClusterableServerFactory serverFactory, IEventPublisherProvider eventPublisherProvider)
-            : base(settings, serverFactory, eventPublisherProvider)
+        public MultiServerCluster(ClusterSettings settings, IClusterableServerFactory serverFactory, IEventSubscriber eventSubscriber)
+            : base(settings, serverFactory, eventSubscriber)
         {
             Ensure.IsGreaterThanZero(settings.EndPoints.Count, "settings.EndPoints.Count");
             if (settings.ConnectionMode == ClusterConnectionMode.Standalone)
@@ -72,14 +72,14 @@ namespace MongoDB.Driver.Core.Clusters
             _state = new InterlockedInt32(State.Initial);
             _replicaSetName = settings.ReplicaSetName;
 
-            eventPublisherProvider.TryGetPublisher(out _publishBeforeClosingEvent);
-            eventPublisherProvider.TryGetPublisher(out _publishAfterClosingEvent);
-            eventPublisherProvider.TryGetPublisher(out _publishBeforeOpeningEvent);
-            eventPublisherProvider.TryGetPublisher(out _publishAfterOpeningEvent);
-            eventPublisherProvider.TryGetPublisher(out _publishBeforeAddingServerEvent);
-            eventPublisherProvider.TryGetPublisher(out _publishAfterAddingServerEvent);
-            eventPublisherProvider.TryGetPublisher(out _publishBeforeRemovingServerEvent);
-            eventPublisherProvider.TryGetPublisher(out _publishAfterRemovingServerEvent);
+            eventSubscriber.TryGetEventHandler(out _beforeClosingEventHandler);
+            eventSubscriber.TryGetEventHandler(out _afterClosingEventHandler);
+            eventSubscriber.TryGetEventHandler(out _beforeOpeningEventHandler);
+            eventSubscriber.TryGetEventHandler(out _afterOpeningEventHandler);
+            eventSubscriber.TryGetEventHandler(out _beforeAddingServerEventHandler);
+            eventSubscriber.TryGetEventHandler(out _afterAddingServerEventHandler);
+            eventSubscriber.TryGetEventHandler(out _beforeRemovingServerEventHandler);
+            eventSubscriber.TryGetEventHandler(out _afterRemovingServerEventHandler);
         }
 
         // methods
@@ -89,9 +89,9 @@ namespace MongoDB.Driver.Core.Clusters
             {
                 if (disposing)
                 {
-                    if (_publishBeforeClosingEvent != null)
+                    if (_beforeClosingEventHandler != null)
                     {
-                        _publishBeforeClosingEvent(new ClusterBeforeClosingEvent(ClusterId));
+                        _beforeClosingEventHandler(new ClusterBeforeClosingEvent(ClusterId));
                     }
 
                     var stopwatch = Stopwatch.StartNew();
@@ -108,9 +108,9 @@ namespace MongoDB.Driver.Core.Clusters
                     UpdateClusterDescription(clusterDescription);
                     stopwatch.Stop();
 
-                    if (_publishAfterClosingEvent != null)
+                    if (_afterClosingEventHandler != null)
                     {
-                        _publishAfterClosingEvent(new ClusterAfterClosingEvent(ClusterId, stopwatch.Elapsed));
+                        _afterClosingEventHandler(new ClusterAfterClosingEvent(ClusterId, stopwatch.Elapsed));
                     }
                 }
             }
@@ -122,9 +122,9 @@ namespace MongoDB.Driver.Core.Clusters
             base.Initialize();
             if (_state.TryChange(State.Initial, State.Open))
             {
-                if (_publishBeforeOpeningEvent != null)
+                if (_beforeOpeningEventHandler != null)
                 {
-                    _publishBeforeOpeningEvent(new ClusterBeforeOpeningEvent(ClusterId, Settings));
+                    _beforeOpeningEventHandler(new ClusterBeforeOpeningEvent(ClusterId, Settings));
                 }
 
                 var stopwatch = Stopwatch.StartNew();
@@ -145,9 +145,9 @@ namespace MongoDB.Driver.Core.Clusters
                 UpdateClusterDescription(clusterDescription);
                 stopwatch.Stop();
 
-                if (_publishAfterOpeningEvent != null)
+                if (_afterOpeningEventHandler != null)
                 {
-                    _publishAfterOpeningEvent(new ClusterAfterOpeningEvent(ClusterId, Settings, stopwatch.Elapsed));
+                    _afterOpeningEventHandler(new ClusterAfterOpeningEvent(ClusterId, Settings, stopwatch.Elapsed));
                 }
             }
         }
@@ -376,9 +376,9 @@ namespace MongoDB.Driver.Core.Clusters
                     return clusterDescription;
                 }
 
-                if (_publishBeforeAddingServerEvent != null)
+                if (_beforeAddingServerEventHandler != null)
                 {
-                    _publishBeforeAddingServerEvent(new ClusterBeforeAddingServerEvent(ClusterId, endPoint));
+                    _beforeAddingServerEventHandler(new ClusterBeforeAddingServerEvent(ClusterId, endPoint));
                 }
 
                 stopwatch.Start();
@@ -391,9 +391,9 @@ namespace MongoDB.Driver.Core.Clusters
             server.Initialize();
             stopwatch.Stop();
 
-            if (_publishAfterAddingServerEvent != null)
+            if (_afterAddingServerEventHandler != null)
             {
-                _publishAfterAddingServerEvent(new ClusterAfterAddingServerEvent(server.ServerId, stopwatch.Elapsed));
+                _afterAddingServerEventHandler(new ClusterAfterAddingServerEvent(server.ServerId, stopwatch.Elapsed));
             }
 
             return clusterDescription;
@@ -434,9 +434,9 @@ namespace MongoDB.Driver.Core.Clusters
                     return clusterDescription;
                 }
 
-                if (_publishBeforeRemovingServerEvent != null)
+                if (_beforeRemovingServerEventHandler != null)
                 {
-                    _publishBeforeRemovingServerEvent(new ClusterBeforeRemovingServerEvent(server.ServerId, reason));
+                    _beforeRemovingServerEventHandler(new ClusterBeforeRemovingServerEvent(server.ServerId, reason));
                 }
 
                 _servers.Remove(server);
@@ -447,9 +447,9 @@ namespace MongoDB.Driver.Core.Clusters
             server.Dispose();
             stopwatch.Stop();
 
-            if (_publishAfterRemovingServerEvent != null)
+            if (_afterRemovingServerEventHandler != null)
             {
-                _publishAfterRemovingServerEvent(new ClusterAfterRemovingServerEvent(server.ServerId, reason, stopwatch.Elapsed));
+                _afterRemovingServerEventHandler(new ClusterAfterRemovingServerEvent(server.ServerId, reason, stopwatch.Elapsed));
             }
 
             return clusterDescription.WithoutServerDescription(endPoint);
