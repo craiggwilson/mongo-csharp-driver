@@ -75,8 +75,8 @@ namespace MongoDB.Driver.Core.Connections
         {
             _subject.Dispose();
 
-            _capturedEvents.Next().Should().BeOfType<ConnectionBeforeClosingEvent>();
-            _capturedEvents.Next().Should().BeOfType<ConnectionAfterClosingEvent>();
+            _capturedEvents.Next().Should().BeOfType<ConnectionClosingEvent>();
+            _capturedEvents.Next().Should().BeOfType<ConnectionClosedEvent>();
         }
 
         [Test]
@@ -103,8 +103,8 @@ namespace MongoDB.Driver.Core.Connections
                 .WithInnerException<SocketException>()
                 .And.ConnectionId.Should().Be(_subject.ConnectionId);
 
-            _capturedEvents.Next().Should().BeOfType<ConnectionBeforeOpeningEvent>();
-            _capturedEvents.Next().Should().BeOfType<ConnectionErrorOpeningEvent>();
+            _capturedEvents.Next().Should().BeOfType<ConnectionOpeningEvent>();
+            _capturedEvents.Next().Should().BeOfType<ConnectionOpeningFailedEvent>();
             _capturedEvents.Next().Should().BeOfType<ConnectionFailedEvent>();
         }
 
@@ -121,8 +121,8 @@ namespace MongoDB.Driver.Core.Connections
         {
             _subject.OpenAsync(CancellationToken.None).Wait();
 
-            _capturedEvents.Next().Should().BeOfType<ConnectionBeforeOpeningEvent>();
-            _capturedEvents.Next().Should().BeOfType<ConnectionAfterOpeningEvent>();
+            _capturedEvents.Next().Should().BeOfType<ConnectionOpeningEvent>();
+            _capturedEvents.Next().Should().BeOfType<ConnectionOpenedEvent>();
         }
 
         [Test]
@@ -198,8 +198,8 @@ namespace MongoDB.Driver.Core.Connections
 
                 actual.Should().BeEquivalentTo(expected);
 
-                _capturedEvents.Next().Should().BeOfType<ConnectionBeforeReceivingMessageEvent>();
-                _capturedEvents.Next().Should().BeOfType<ConnectionAfterReceivingMessageEvent>();
+                _capturedEvents.Next().Should().BeOfType<ConnectionReceivingMessageEvent>();
+                _capturedEvents.Next().Should().BeOfType<ConnectionReceivedMessageEvent>();
             }
         }
 
@@ -293,11 +293,11 @@ namespace MongoDB.Driver.Core.Connections
                     .WithInnerException<SocketException>()
                     .And.ConnectionId.Should().Be(_subject.ConnectionId);
 
-                _capturedEvents.Next().Should().BeOfType<ConnectionBeforeReceivingMessageEvent>();
-                _capturedEvents.Next().Should().BeOfType<ConnectionBeforeReceivingMessageEvent>();
+                _capturedEvents.Next().Should().BeOfType<ConnectionReceivingMessageEvent>();
+                _capturedEvents.Next().Should().BeOfType<ConnectionReceivingMessageEvent>();
                 _capturedEvents.Next().Should().BeOfType<ConnectionFailedEvent>();
-                _capturedEvents.Next().Should().BeOfType<ConnectionErrorReceivingMessageEvent>();
-                _capturedEvents.Next().Should().BeOfType<ConnectionErrorReceivingMessageEvent>();
+                _capturedEvents.Next().Should().BeOfType<ConnectionReceivingMessageFailedEvent>();
+                _capturedEvents.Next().Should().BeOfType<ConnectionReceivingMessageFailedEvent>();
             }
         }
 
@@ -336,9 +336,9 @@ namespace MongoDB.Driver.Core.Connections
                 act2.ShouldThrow<MongoConnectionClosedException>()
                     .And.ConnectionId.Should().Be(_subject.ConnectionId);
 
-                _capturedEvents.Next().Should().BeOfType<ConnectionBeforeReceivingMessageEvent>();
+                _capturedEvents.Next().Should().BeOfType<ConnectionReceivingMessageEvent>();
                 _capturedEvents.Next().Should().BeOfType<ConnectionFailedEvent>();
-                _capturedEvents.Next().Should().BeOfType<ConnectionErrorReceivingMessageEvent>();
+                _capturedEvents.Next().Should().BeOfType<ConnectionReceivingMessageFailedEvent>();
             }
         }
 
@@ -391,8 +391,8 @@ namespace MongoDB.Driver.Core.Connections
                 var sentRequests = MessageHelper.TranslateMessagesToBsonDocuments(stream.ToArray());
 
                 sentRequests.Should().BeEquivalentTo(expectedRequests);
-                _capturedEvents.Next().Should().BeOfType<ConnectionBeforeSendingMessagesEvent>();
-                _capturedEvents.Next().Should().BeOfType<ConnectionAfterSendingMessagesEvent>();
+                _capturedEvents.Next().Should().BeOfType<ConnectionSendingMessagesEvent>();
+                _capturedEvents.Next().Should().BeOfType<ConnectionSentMessagesEvent>();
             }
         }
 
@@ -431,11 +431,11 @@ namespace MongoDB.Driver.Core.Connections
                 Func<Task> act2 = () => task2;
                 act2.ShouldThrow<MongoConnectionClosedException>();
 
-                _capturedEvents.Next().Should().BeOfType<ConnectionBeforeSendingMessagesEvent>();
-                _capturedEvents.Next().Should().BeOfType<ConnectionBeforeSendingMessagesEvent>();
+                _capturedEvents.Next().Should().BeOfType<ConnectionSendingMessagesEvent>();
+                _capturedEvents.Next().Should().BeOfType<ConnectionSendingMessagesEvent>();
                 _capturedEvents.Next().Should().BeOfType<ConnectionFailedEvent>();
-                _capturedEvents.Next().Should().BeOfType<ConnectionErrorSendingMessagesEvent>();
-                _capturedEvents.Next().Should().BeOfType<ConnectionErrorSendingMessagesEvent>();
+                _capturedEvents.Next().Should().BeOfType<ConnectionSendingMessagesFailedEvent>();
+                _capturedEvents.Next().Should().BeOfType<ConnectionSendingMessagesFailedEvent>();
             }
         }
     }

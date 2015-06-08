@@ -19,7 +19,7 @@ using MongoDB.Driver.Core.Misc;
 
 namespace MongoDB.Driver.Core.Events
 {
-    internal class EventAggregator : IEventSubscriber
+    internal class EventAggregator : IEventAggregator, IEventSubscriber
     {
         private readonly Dictionary<Type, Delegate> _handlers;
 
@@ -44,11 +44,6 @@ namespace MongoDB.Driver.Core.Events
             }
 
             _handlers[type] = @delegate;
-        }
-
-        public void Subscribe<TEvent>(Action<TEvent> handler)
-        {
-            Subscribe(typeof(TEvent), handler);
         }
 
         public bool TryGetEventHandler<TEvent>(out Action<TEvent> handler)

@@ -43,14 +43,14 @@ namespace MongoDB.Driver.Core.Clusters
         private readonly object _serversLock = new object();
         private readonly InterlockedInt32 _state;
 
-        private readonly Action<ClusterBeforeClosingEvent> _beforeClosingEventHandler;
-        private readonly Action<ClusterAfterClosingEvent> _afterClosingEventHandler;
-        private readonly Action<ClusterBeforeOpeningEvent> _beforeOpeningEventHandler;
-        private readonly Action<ClusterAfterOpeningEvent> _afterOpeningEventHandler;
-        private readonly Action<ClusterBeforeAddingServerEvent> _beforeAddingServerEventHandler;
-        private readonly Action<ClusterAfterAddingServerEvent> _afterAddingServerEventHandler;
-        private readonly Action<ClusterBeforeRemovingServerEvent> _beforeRemovingServerEventHandler;
-        private readonly Action<ClusterAfterRemovingServerEvent> _afterRemovingServerEventHandler;
+        private readonly Action<ClusterClosingEvent> _closingEventHandler;
+        private readonly Action<ClusterClosedEvent> _closedEventHandler;
+        private readonly Action<ClusterOpeningEvent> _openingEventHandler;
+        private readonly Action<ClusterOpenedEvent> _openedEventHandler;
+        private readonly Action<ClusterAddingServerEvent> _addingServerEventHandler;
+        private readonly Action<ClusterAddedServerEvent> _addedServerEventHandler;
+        private readonly Action<ClusterRemovingServerEvent> _removingServerEventHandler;
+        private readonly Action<ClusterRemovedServerEvent> _removedServerEventHandler;
 
         // constructors
         public MultiServerCluster(ClusterSettings settings, IClusterableServerFactory serverFactory, IEventSubscriber eventSubscriber)
@@ -72,14 +72,14 @@ namespace MongoDB.Driver.Core.Clusters
             _state = new InterlockedInt32(State.Initial);
             _replicaSetName = settings.ReplicaSetName;
 
-            eventSubscriber.TryGetEventHandler(out _beforeClosingEventHandler);
-            eventSubscriber.TryGetEventHandler(out _afterClosingEventHandler);
-            eventSubscriber.TryGetEventHandler(out _beforeOpeningEventHandler);
-            eventSubscriber.TryGetEventHandler(out _afterOpeningEventHandler);
-            eventSubscriber.TryGetEventHandler(out _beforeAddingServerEventHandler);
-            eventSubscriber.TryGetEventHandler(out _afterAddingServerEventHandler);
-            eventSubscriber.TryGetEventHandler(out _beforeRemovingServerEventHandler);
-            eventSubscriber.TryGetEventHandler(out _afterRemovingServerEventHandler);
+            eventSubscriber.TryGetEventHandler(out _closingEventHandler);
+            eventSubscriber.TryGetEventHandler(out _closedEventHandler);
+            eventSubscriber.TryGetEventHandler(out _openingEventHandler);
+            eventSubscriber.TryGetEventHandler(out _openedEventHandler);
+            eventSubscriber.TryGetEventHandler(out _addingServerEventHandler);
+            eventSubscriber.TryGetEventHandler(out _addedServerEventHandler);
+            eventSubscriber.TryGetEventHandler(out _removingServerEventHandler);
+            eventSubscriber.TryGetEventHandler(out _removedServerEventHandler);
         }
 
         // methods
@@ -89,9 +89,9 @@ namespace MongoDB.Driver.Core.Clusters
             {
                 if (disposing)
                 {
-                    if (_beforeClosingEventHandler != null)
+                    if (_closingEventHandler != null)
                     {
-                        _beforeClosingEventHandler(new ClusterBeforeClosingEvent(ClusterId));
+                        _closingEventHandler(new ClusterClosingEvent(ClusterId));
                     }
 
                     var stopwatch = Stopwatch.StartNew();
@@ -108,9 +108,9 @@ namespace MongoDB.Driver.Core.Clusters
                     UpdateClusterDescription(clusterDescription);
                     stopwatch.Stop();
 
-                    if (_afterClosingEventHandler != null)
+                    if (_closedEventHandler != null)
                     {
-                        _afterClosingEventHandler(new ClusterAfterClosingEvent(ClusterId, stopwatch.Elapsed));
+                        _closedEventHandler(new ClusterClosedEvent(ClusterId, stopwatch.Elapsed));
                     }
                 }
             }
@@ -122,9 +122,9 @@ namespace MongoDB.Driver.Core.Clusters
             base.Initialize();
             if (_state.TryChange(State.Initial, State.Open))
             {
-                if (_beforeOpeningEventHandler != null)
+                if (_openingEventHandler != null)
                 {
-                    _beforeOpeningEventHandler(new ClusterBeforeOpeningEvent(ClusterId, Settings));
+                    _openingEventHandler(new ClusterOpeningEvent(ClusterId, Settings));
                 }
 
                 var stopwatch = Stopwatch.StartNew();
@@ -145,9 +145,9 @@ namespace MongoDB.Driver.Core.Clusters
                 UpdateClusterDescription(clusterDescription);
                 stopwatch.Stop();
 
-                if (_afterOpeningEventHandler != null)
+                if (_openedEventHandler != null)
                 {
-                    _afterOpeningEventHandler(new ClusterAfterOpeningEvent(ClusterId, Settings, stopwatch.Elapsed));
+                    _openedEventHandler(new ClusterOpenedEvent(ClusterId, Settings, stopwatch.Elapsed));
                 }
             }
         }
@@ -376,9 +376,9 @@ namespace MongoDB.Driver.Core.Clusters
                     return clusterDescription;
                 }
 
-                if (_beforeAddingServerEventHandler != null)
+                if (_addingServerEventHandler != null)
                 {
-                    _beforeAddingServerEventHandler(new ClusterBeforeAddingServerEvent(ClusterId, endPoint));
+                    _addingServerEventHandler(new ClusterAddingServerEvent(ClusterId, endPoint));
                 }
 
                 stopwatch.Start();
@@ -391,9 +391,9 @@ namespace MongoDB.Driver.Core.Clusters
             server.Initialize();
             stopwatch.Stop();
 
-            if (_afterAddingServerEventHandler != null)
+            if (_addedServerEventHandler != null)
             {
-                _afterAddingServerEventHandler(new ClusterAfterAddingServerEvent(server.ServerId, stopwatch.Elapsed));
+                _addedServerEventHandler(new ClusterAddedServerEvent(server.ServerId, stopwatch.Elapsed));
             }
 
             return clusterDescription;
@@ -426,6 +426,7 @@ namespace MongoDB.Driver.Core.Clusters
         private ClusterDescription RemoveServer(ClusterDescription clusterDescription, EndPoint endPoint, string reason)
         {
             IClusterableServer server;
+            var stopwatch = new Stopwatch();
             lock (_serversLock)
             {
                 server = _servers.SingleOrDefault(x => EndPointHelper.Equals(x.EndPoint, endPoint));
@@ -434,22 +435,22 @@ namespace MongoDB.Driver.Core.Clusters
                     return clusterDescription;
                 }
 
-                if (_beforeRemovingServerEventHandler != null)
+                if (_removingServerEventHandler != null)
                 {
-                    _beforeRemovingServerEventHandler(new ClusterBeforeRemovingServerEvent(server.ServerId, reason));
+                    _removingServerEventHandler(new ClusterRemovingServerEvent(server.ServerId, reason));
                 }
 
+                stopwatch.Start();
                 _servers.Remove(server);
             }
 
-            var stopwatch = new Stopwatch();
             server.DescriptionChanged -= ServerDescriptionChangedHandler;
             server.Dispose();
             stopwatch.Stop();
 
-            if (_afterRemovingServerEventHandler != null)
+            if (_removedServerEventHandler != null)
             {
-                _afterRemovingServerEventHandler(new ClusterAfterRemovingServerEvent(server.ServerId, reason, stopwatch.Elapsed));
+                _removedServerEventHandler(new ClusterRemovedServerEvent(server.ServerId, reason, stopwatch.Elapsed));
             }
 
             return clusterDescription.WithoutServerDescription(endPoint);

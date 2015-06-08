@@ -53,7 +53,7 @@ namespace MongoDB.Driver.Core.Clusters
         private readonly ClusterSettings _settings;
         private readonly InterlockedInt32 _state;
 
-        private readonly Action<ClusterAfterDescriptionChangedEvent> _afterDescriptionChangedEventHandler;
+        private readonly Action<ClusterDescriptionChangedEvent> _descriptionChangedEventHandler;
 
         // constructors
         protected Cluster(ClusterSettings settings, IClusterableServerFactory serverFactory, IEventSubscriber eventSubscriber)
@@ -69,7 +69,7 @@ namespace MongoDB.Driver.Core.Clusters
 
             _rapidHeartbeatTimer = new Timer(RapidHeartbeatTimerCallback, null, Timeout.InfiniteTimeSpan, Timeout.InfiniteTimeSpan);
 
-            eventSubscriber.TryGetEventHandler(out _afterDescriptionChangedEventHandler);
+            eventSubscriber.TryGetEventHandler(out _descriptionChangedEventHandler);
         }
 
         // events
@@ -175,9 +175,9 @@ namespace MongoDB.Driver.Core.Clusters
 
         protected void OnDescriptionChanged(ClusterDescription oldDescription, ClusterDescription newDescription)
         {
-            if (_afterDescriptionChangedEventHandler != null)
+            if (_descriptionChangedEventHandler != null)
             {
-                _afterDescriptionChangedEventHandler(new ClusterAfterDescriptionChangedEvent(oldDescription, newDescription));
+                _descriptionChangedEventHandler(new ClusterDescriptionChangedEvent(oldDescription, newDescription));
             }
 
             var handler = DescriptionChanged;

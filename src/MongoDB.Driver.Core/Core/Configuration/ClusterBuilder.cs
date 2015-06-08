@@ -196,26 +196,15 @@ namespace MongoDB.Driver.Core.Configuration
         }
 
         /// <summary>
-        /// Subscribes all public instance methods named "Handle" with a single argument
-        /// to events of that single argument's type.
+        /// Subscribes the specified registrar.
         /// </summary>
-        /// <param name="handler">The handler.</param>
-        /// <returns>A reconfigured cluster builder.</returns>
-        public ClusterBuilder Subscribe(object handler)
+        /// <param name="registrar">The registrar.</param>
+        /// <returns></returns>
+        public ClusterBuilder Subscribe(IEventRegistrar registrar)
         {
-            Ensure.IsNotNull(handler, "handler");
+            Ensure.IsNotNull(registrar, "registrar");
 
-            var methods = handler.GetType().GetMethods(BindingFlags.Instance | BindingFlags.Public)
-                .Where(x => x.Name == "Handle" && x.GetParameters().Length == 1);
-
-            foreach (var method in methods)
-            {
-                var eventType = method.GetParameters()[0].ParameterType;
-                var delegateType = typeof(Action<>).MakeGenericType(eventType);
-                var @delegate = method.CreateDelegate(delegateType, handler);
-                _eventAggregator.Subscribe(eventType, @delegate);
-            }
-
+            registrar.Register(_eventAggregator);
             return this;
         }
     }

@@ -22,6 +22,7 @@ using System.Net.Sockets;
 using System.Security.Cryptography.X509Certificates;
 using MongoDB.Driver.Core.Authentication;
 using MongoDB.Driver.Core.Clusters;
+using MongoDB.Driver.Core.Events;
 using MongoDB.Driver.Core.Events.Diagnostics;
 using MongoDB.Driver.Core.Misc;
 
@@ -232,7 +233,8 @@ namespace MongoDB.Driver.Core.Configuration
                 PerformanceCounterListener.InstallPerformanceCounters();
             }
 
-            return builder.Subscribe(new PerformanceCounterListener(applicationName));
+            var registrar = new ReflectionEventRegistrar(new PerformanceCounterListener(applicationName));
+            return builder.Subscribe(registrar);
         }
     }
 }
