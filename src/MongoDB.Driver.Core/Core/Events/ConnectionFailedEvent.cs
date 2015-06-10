@@ -20,7 +20,7 @@ namespace MongoDB.Driver.Core.Events
 {
     /// <preliminary/>
     /// <summary>
-    /// Represents information about a ConnectionFailed event.
+    /// Occurs when a connection fails.
     /// </summary>
     public struct ConnectionFailedEvent
     {
