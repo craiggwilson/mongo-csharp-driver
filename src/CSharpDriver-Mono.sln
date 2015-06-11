@@ -39,6 +39,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Legacy", "Legacy", "{C0AC2F
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Misc", "Misc", "{391D831D-5AC7-43F8-8BCB-6AE81B027658}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integrations", "Integrations", "{832920A3-58AE-4073-AE6C-72FEF909CF6B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongoDB.Driver.Integrations.Common.Logging", "MongoDB.Driver.Integrations.Common.Logging\MongoDB.Driver.Integrations.Common.Logging.csproj", "{D8BCF524-90E5-430A-8EC8-478CE0B16EF8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

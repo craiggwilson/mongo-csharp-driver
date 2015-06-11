@@ -49,6 +49,14 @@
     <UseVSHostingProcess>false</UseVSHostingProcess>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Common.Logging, Version=3.1.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Common.Logging.3.1.0\lib\net40\Common.Logging.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="Common.Logging.Core, Version=3.1.0.0, Culture=neutral, PublicKeyToken=af08829b84f0328e, processorArchitecture=MSIL">
+      <HintPath>..\packages\Common.Logging.Core.3.1.0\lib\net40\Common.Logging.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -67,11 +75,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\MongoDB.Bson\MongoDB.Bson.csproj">
       <Project>{0e9a3a2a-49cd-4f6c-847c-dc79b4b65ce6}</Project>
       <Name>MongoDB.Bson</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\MongoDB.Driver.Integrations.Common.Logging\MongoDB.Driver.Integrations.Common.Logging.csproj">
+      <Project>{d8bcf524-90e5-430a-8ec8-478ce0b16ef8}</Project>
+      <Name>MongoDB.Driver.Integrations.Common.Logging</Name>
     </ProjectReference>
     <ProjectReference Include="..\MongoDB.Driver.Core\MongoDB.Driver.Core.csproj">
       <Project>{da56482a-5d8f-41e0-85e6-1f22b310f91b}</Project>
