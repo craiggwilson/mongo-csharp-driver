@@ -16,6 +16,7 @@
 using System;
 using System.IO;
 using MongoDB.Driver.Core.Configuration;
+using MongoDB.Driver.Common.Logging;
 using MongoDB.Driver.Core.Events.Diagnostics;
 
 namespace MongoDB.Driver.TestConsoleApplication
@@ -35,6 +36,7 @@ namespace MongoDB.Driver.TestConsoleApplication
 
         private static void ConfigureCluster(ClusterBuilder cb)
         {
+            cb.UseCommonLogging();
             cb.UsePerformanceCounters("test", true);
         }
     }
