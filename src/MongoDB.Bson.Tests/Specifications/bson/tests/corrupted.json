@@ -106,8 +106,32 @@
             "error": "One object, missing the EOO at the end"
         },
         {
+            "encoded": "0500000001",
+            "error": "One object, sized correctly, with a spot for an EOO, but the EOO is 0x01"
+        },
+        {
             "encoded": "05000000ff",
-            "error": " One object, sized correctly, with a spot for an EOO, but the EOO isn't 0x00"
+            "error": "One object, sized correctly, with a spot for an EOO, but the EOO is 0xff"
+        },
+        {
+            "encoded": "0500000070",
+            "error": "One object, sized correctly, with a spot for an EOO, but the EOO is 0x70"
+        },
+        {
+            "encoded": "07000000000000",
+            "error": "Invalid BSON type low range"
+        },
+        {
+            "encoded": "07000000800000",
+            "error": "Invalid BSON type high range"
+        },
+        {
+            "encoded": "090000000862000200",
+            "error": "Invalid boolean value of 2"
+        },
+        {
+            "encoded": "09000000086200ff00",
+            "error": "Invalid boolean value of -1"
         }
     ]
 }
