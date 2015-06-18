@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.22823.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongoDB.Bson", "MongoDB.Bson\MongoDB.Bson.csproj", "{0E9A3A2A-49CD-4F6C-847C-DC79B4B65CE6}"
 EndProject
@@ -51,6 +51,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Integrations", "Integrations", "{832920A3-58AE-4073-AE6C-72FEF909CF6B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongoDB.Driver.Common.Logging", "MongoDB.Driver.Common.Logging\MongoDB.Driver.Common.Logging.csproj", "{D8BCF524-90E5-430A-8EC8-478CE0B16EF8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongoDB.Driver.Integrations.Glimpse", "MongoDB.Driver.Integrations.Glimpse\MongoDB.Driver.Integrations.Glimpse.csproj", "{DD5B05A5-066B-4553-9702-45CDA5AEE02F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -122,6 +124,10 @@ Global
 		{D8BCF524-90E5-430A-8EC8-478CE0B16EF8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8BCF524-90E5-430A-8EC8-478CE0B16EF8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D8BCF524-90E5-430A-8EC8-478CE0B16EF8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DD5B05A5-066B-4553-9702-45CDA5AEE02F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DD5B05A5-066B-4553-9702-45CDA5AEE02F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DD5B05A5-066B-4553-9702-45CDA5AEE02F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DD5B05A5-066B-4553-9702-45CDA5AEE02F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -143,5 +149,6 @@ Global
 		{02AB2E44-785A-4D39-99C0-29F93A02EF84} = {C0AC2FCF-37FB-4A64-ACC6-8490DC15091D}
 		{0B7600F4-A343-4007-8977-933DBEFC0CC7} = {391D831D-5AC7-43F8-8BCB-6AE81B027658}
 		{D8BCF524-90E5-430A-8EC8-478CE0B16EF8} = {832920A3-58AE-4073-AE6C-72FEF909CF6B}
+		{DD5B05A5-066B-4553-9702-45CDA5AEE02F} = {832920A3-58AE-4073-AE6C-72FEF909CF6B}
 	EndGlobalSection
 EndGlobal
