@@ -478,60 +478,60 @@ namespace MongoDB.Driver.Linq.Translators
         private bool TryBuildMap(MethodCallExpression node, out BsonValue result)
         {
             result = null;
-            var sourceSerializationExpression = node.Arguments[0] as ISerializationExpression;
-            if (sourceSerializationExpression != null)
+            ISerializationExpression sourceSerializationExpression;
+            if (!TryFindSerializationExpression(node, out sourceSerializationExpression))
             {
-                var lambda = ExtensionExpressionVisitor.GetLambda(node.Arguments[1]);
-                if (lambda.Body is ISerializationExpression)
-                {
-                    result = BuildValue(lambda.Body);
-                    return true;
-                }
+                return false;
+            }
 
-                var inputValue = BuildValue(node.Arguments[0]);
-                var asValue = lambda.Parameters[0].Name;
-
-                // HACK: need to add a leading $ sign to the replacement because of how we resolve values.
-                var body = FieldNameReplacer.Replace(lambda.Body, sourceSerializationExpression.SerializationInfo.ElementName, "$" + asValue);
-                var inValue = BuildValue(body);
-
-                result = new BsonDocument("$map", new BsonDocument
-                            {
-                                { "input", inputValue },
-                                { "as", asValue },
-                                { "in", inValue }
-                            });
+            var lambda = ExtensionExpressionVisitor.GetLambda(node.Arguments[1]);
+            if (node.Arguments[0] is ISerializationExpression && lambda.Body is ISerializationExpression)
+            {
+                result = BuildValue(lambda.Body);
                 return true;
             }
 
-            return false;
+            var asValue = lambda.Parameters[0].Name;
+
+            var inputValue = BuildValue(node.Arguments[0]);
+
+            var body = FieldNameReplacer.Replace(lambda.Body, sourceSerializationExpression.SerializationInfo.ElementName, "$" + asValue);
+            var inValue = BuildValue(body);
+
+            result = new BsonDocument("$map", new BsonDocument
+            {
+                { "input", inputValue },
+                { "as", asValue },
+                { "in", inValue }
+            });
+
+            return true;
         }
 
         private bool TryBuildFilter(MethodCallExpression node, out BsonValue result)
         {
             result = null;
-            var sourceSerializationExpression = node.Arguments[0] as ISerializationExpression;
-            if (sourceSerializationExpression != null)
+            ISerializationExpression sourceSerializationExpression;
+            if (!TryFindSerializationExpression(node, out sourceSerializationExpression))
             {
-                var lambda = ExtensionExpressionVisitor.GetLambda(node.Arguments[1]);
-
-                var inputValue = BuildValue(node.Arguments[0]);
-                var asValue = lambda.Parameters[0].Name;
-
-                // HACK: need to add a leading $ sign to the replacement because of how we resolve values.
-                var body = FieldNameReplacer.Replace(lambda.Body, sourceSerializationExpression.SerializationInfo.ElementName, "$" + asValue);
-                var conditionValue = BuildValue(body);
-
-                result = new BsonDocument("$filter", new BsonDocument
-                            {
-                                { "input", inputValue },
-                                { "as", asValue },
-                                { "cond", conditionValue }
-                            });
-                return true;
+                return false;
             }
 
-            return false;
+            var inputValue = BuildValue(node.Arguments[0]);
+            var lambda = ExtensionExpressionVisitor.GetLambda(node.Arguments[1]);
+            var asValue = lambda.Parameters[0].Name;
+
+            var body = FieldNameReplacer.Replace(lambda.Body, sourceSerializationExpression.SerializationInfo.ElementName, "$" + asValue);
+            var inValue = BuildValue(body);
+
+            result = new BsonDocument("$filter", new BsonDocument
+            {
+                { "input", inputValue },
+                { "as", asValue },
+                { "cond", inValue }
+            });
+
+            return true;
         }
 
         private bool TryBuildStaticStringMethodCall(MethodCallExpression node, out BsonValue result)
@@ -612,6 +612,21 @@ namespace MongoDB.Driver.Linq.Translators
             }
 
             return false;
+        }
+
+        private static bool TryFindSerializationExpression(MethodCallExpression node, out ISerializationExpression serializationExpression)
+        {
+            var current = node.Arguments[0];
+            serializationExpression = current as ISerializationExpression;
+            if (serializationExpression == null &&
+                current.NodeType == ExpressionType.Call &&
+                ExtensionExpressionVisitor.IsLinqMethod((MethodCallExpression)current))
+            {
+                current = ((MethodCallExpression)current).Arguments[0];
+                serializationExpression = current as ISerializationExpression;
+            }
+
+            return serializationExpression != null;
         }
 
         private class FieldNameReplacer : ExtensionExpressionVisitor

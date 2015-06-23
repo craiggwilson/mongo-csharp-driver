@@ -139,13 +139,13 @@ namespace MongoDB.Driver.Linq.Processors
                 case "LongCount":
                 case "Max":
                 case "Min":
-                case "Where":
+                case "Sum":
                 case "Select":
                 case "SelectMany":
-                case "Sum":
+                case "Where":
                     if (IsLinqMethod(node) && node.Arguments.Count == 2)
                     {
-                        return BindTwoArgumentLinqMethodWithSelector(node);
+                        return BindGeneralTwoArgumentLinqMethod(node);
                     }
                     break;
             }
@@ -303,16 +303,16 @@ namespace MongoDB.Driver.Linq.Processors
             return node; // return the original node because we can't translate this expression.
         }
 
-        private Expression BindTwoArgumentLinqMethodWithSelector(MethodCallExpression node)
+        private Expression BindGeneralTwoArgumentLinqMethod(MethodCallExpression node)
         {
             List<Expression> arguments = new List<Expression>();
             arguments.Add(Visit(node.Arguments[0]));
 
-            // we need to make sure that the serialization info for the parameter
-            // is the item serialization from the parent IBsonArraySerializer
-            var serializationExpression = arguments[0] as ISerializationExpression;
-            if (serializationExpression != null)
+            ISerializationExpression serializationExpression;
+            if (TryFindSerializationExpression(arguments[0], out serializationExpression))
             {
+                // we need to make sure that the serialization info for the parameter
+                // is the item serialization from the parent IBsonArraySerializer
                 var arraySerializer = serializationExpression.SerializationInfo.Serializer as IBsonArraySerializer;
                 BsonSerializationInfo itemSerializationInfo;
                 if (arraySerializer != null && arraySerializer.TryGetItemSerializationInfo(out itemSerializationInfo))
@@ -348,6 +348,21 @@ namespace MongoDB.Driver.Linq.Processors
             }
 
             return node;
+        }
+
+        private static bool TryFindSerializationExpression(Expression node, out ISerializationExpression serializationExpression)
+        {
+            var current = node;
+            serializationExpression = current as ISerializationExpression;
+            if (serializationExpression == null &&
+                current.NodeType == ExpressionType.Call &&
+                ExtensionExpressionVisitor.IsLinqMethod((MethodCallExpression)current))
+            {
+                current = ((MethodCallExpression)current).Arguments[0];
+                serializationExpression = current as ISerializationExpression;
+            }
+
+            return serializationExpression != null;
         }
     }
 }
