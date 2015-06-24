@@ -636,6 +636,30 @@ namespace MongoDB.Driver.Tests.Linq.Translators
         }
 
         [Test]
+        [RequiresServer(MinimumVersion = "3.1.3")]
+        public async Task Should_translate_select_then_where_to_map_then_filter()
+        {
+            var result = await Project(x => new { Result = x.G.Select(c => c.D).Where(c => c == "Don't") });
+
+            result.Projection.Should().Be("{ Result: { \"$filter\": { \"input\": \"$G.D\", \"as\": \"c\", \"cond\": { \"$eq\": [\"$$c\", \"Don't\"] } } }, _id: 0 }");
+
+            result.Value.Result.Should().HaveCount(1);
+            result.Value.Result.Single().Should().Be("Don't");
+        }
+
+        [Test]
+        [RequiresServer(MinimumVersion = "3.1.3")]
+        public async Task Should_translate_select_with_an_anonymous_type_then_where_to_map_then_filter()
+        {
+            var result = await Project(x => new { Result = x.G.Select(c => new { c.D, c.E.F }).Where(c => c.F == 33) });
+
+            result.Projection.Should().Be("{ Result: { \"$filter\": { \"input\": { \"$map\" : { \"input\": \"$G\", \"as\": \"c\", \"in\": { \"D\": \"$$c.D\", \"F\": \"$$c.E.F\" } } }, \"as\": \"c\", \"cond\": { \"$eq\": [\"$$c.F\", 33] } } }, _id: 0 }");
+
+            result.Value.Result.Should().HaveCount(1);
+            result.Value.Result.Single().Should().Be("Don't");
+        }
+
+        [Test]
         public async Task Should_translate_string_equals()
         {
             var result = await Project(x => new { Result = x.B.Equals("Balloon") });

@@ -19,6 +19,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
 using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver.Linq.Expressions;
 using MongoDB.Driver.Support;
 
@@ -27,6 +28,7 @@ namespace MongoDB.Driver.Linq.Processors
     internal class SerializationInfoBinder : ExtensionExpressionVisitor
     {
         // private fields
+        private readonly Dictionary<Expression, ISerializationExpression> _projectedSerializationExpression;
         private readonly Dictionary<MemberInfo, Expression> _memberMap;
         private readonly Dictionary<ParameterExpression, Expression> _parameterMap;
         protected readonly IBsonSerializerRegistry _serializerRegistry;
@@ -35,6 +37,7 @@ namespace MongoDB.Driver.Linq.Processors
         public SerializationInfoBinder(IBsonSerializerRegistry serializerRegistry)
         {
             _serializerRegistry = serializerRegistry;
+            _projectedSerializationExpression = new Dictionary<Expression, ISerializationExpression>();
             _memberMap = new Dictionary<MemberInfo, Expression>();
             _parameterMap = new Dictionary<ParameterExpression, Expression>();
         }
@@ -43,6 +46,11 @@ namespace MongoDB.Driver.Linq.Processors
         public Expression Bind(Expression node)
         {
             return Visit(node);
+        }
+
+        public void RegisterProjectedSerializationExpression(Expression node, ISerializationExpression replacement)
+        {
+            _projectedSerializationExpression[node] = replacement;
         }
 
         public void RegisterMemberReplacement(MemberInfo member, Expression replacement)
@@ -140,12 +148,17 @@ namespace MongoDB.Driver.Linq.Processors
                 case "Max":
                 case "Min":
                 case "Sum":
-                case "Select":
                 case "SelectMany":
                 case "Where":
                     if (IsLinqMethod(node) && node.Arguments.Count == 2)
                     {
                         return BindGeneralTwoArgumentLinqMethod(node);
+                    }
+                    break;
+                case "Select":
+                    if (IsLinqMethod(node) && node.Arguments.Count == 2)
+                    {
+                        return BindSelectLinqMethod(node);
                     }
                     break;
             }
@@ -336,6 +349,102 @@ namespace MongoDB.Driver.Linq.Processors
             return node;
         }
 
+        private Expression BindSelectLinqMethod(MethodCallExpression node)
+        {
+            List<Expression> arguments = new List<Expression>();
+            arguments.Add(Visit(node.Arguments[0]));
+
+
+            ISerializationExpression serializationExpression;
+            if (TryFindSerializationExpression(arguments[0], out serializationExpression))
+            {
+                // we need to make sure that the serialization info for the parameter
+                // is the item serialization from the parent IBsonArraySerializer
+                var arraySerializer = serializationExpression.SerializationInfo.Serializer as IBsonArraySerializer;
+                BsonSerializationInfo itemSerializationInfo;
+                if (arraySerializer != null && arraySerializer.TryGetItemSerializationInfo(out itemSerializationInfo))
+                {
+                    var lambda = (LambdaExpression)node.Arguments[1];
+                    RegisterParameterReplacement(
+                        lambda.Parameters[0],
+                        new SerializationExpression(
+                            lambda.Parameters[0],
+                            itemSerializationInfo.WithNewName(serializationExpression.SerializationInfo.ElementName)));
+                }
+            }
+
+            arguments.Add(Visit(node.Arguments[1]));
+
+            //if (serializationExpression != null)
+            //{
+            //    var fieldPrefixName = serializationExpression.SerializationInfo.ElementName;
+            //    // for projections, like Select, we need to now register member replacements for
+            //    // the projected members
+            //    var visitedLambda = (LambdaExpression)arguments[1];
+            //    serializationExpression = visitedLambda.Body as ISerializationExpression;
+            //    if (serializationExpression != null)
+            //    {
+            //        // TODO: figure out how to handle this...
+            //        throw new NotSupportedException("Can only project a new type.");
+            //    }
+            //    else if (ProjectionMapper.CanMap(visitedLambda.Body))
+            //    {
+            //        var serializer = SerializerBuilder.Build(node, _serializerRegistry);
+
+            //        var serializationExpression = 
+            //    }
+            //}
+
+            if (node.Arguments[0] != arguments[0] || node.Arguments[1] != arguments[1])
+            {
+                node = Expression.Call(node.Method, arguments.ToArray());
+            }
+
+            if (serializationExpression != null)
+            {
+                var lambda = (LambdaExpression)node.Arguments[1];
+                var serializer = (IBsonSerializer)Activator.CreateInstance(
+                    typeof(EnumerableInterfaceImplementerSerializer<,>).MakeGenericType(node.Type, lambda.Body.Type),
+                    SerializerBuilder.Build(lambda.Body, _serializerRegistry));
+
+                var newSerializationInfo = new BsonSerializationInfo(
+                    serializationExpression.SerializationInfo.ElementName,
+                    serializer,
+                    serializer.ValueType);
+                var newSerializationExpression = new SerializationExpression(
+                    node,
+                    newSerializationInfo);
+
+                RegisterProjectedSerializationExpression(node, newSerializationExpression);
+            }
+
+            return node;
+        }
+
+        //private void RegisterMemberReplacements(string oldPrefixName, Expression node)
+        //{
+        //    var mapping = ProjectionMapper.Map(node);
+        //    foreach (var memberMapping in mapping.Members)
+        //    {
+        //        var serializationExpression = memberMapping.Expression as ISerializationExpression;
+        //        if (serializationExpression != null)
+        //        {
+        //            RegisterMemberReplacement(
+        //                memberMapping.Member,
+        //                new SerializationExpression(
+        //                    memberMapping.Expression,
+        //                    new BsonSerializationInfo(
+        //                        oldPrefixName + "." + memberMapping.Member.Name,
+        //                        serializer,
+        //                        serializer.ValueType)));
+        //        }
+        //        else
+        //        {
+        //            throw new NotSupportedException("Haven't done this yet.");
+        //        }
+        //    }
+        //}
+
         protected override Expression VisitLambda<T>(Expression<T> node)
         {
             // Don't visit the parameters. We cannot replace a parameter expression
@@ -350,8 +459,13 @@ namespace MongoDB.Driver.Linq.Processors
             return node;
         }
 
-        private static bool TryFindSerializationExpression(Expression node, out ISerializationExpression serializationExpression)
+        private bool TryFindSerializationExpression(Expression node, out ISerializationExpression serializationExpression)
         {
+            if (_projectedSerializationExpression.TryGetValue(node, out serializationExpression))
+            {
+                return true;
+            }
+
             var current = node;
             serializationExpression = current as ISerializationExpression;
             if (serializationExpression == null &&
@@ -359,7 +473,10 @@ namespace MongoDB.Driver.Linq.Processors
                 ExtensionExpressionVisitor.IsLinqMethod((MethodCallExpression)current))
             {
                 current = ((MethodCallExpression)current).Arguments[0];
-                serializationExpression = current as ISerializationExpression;
+                if (!_projectedSerializationExpression.TryGetValue(current, out serializationExpression))
+                {
+                    serializationExpression = current as ISerializationExpression;
+                }
             }
 
             return serializationExpression != null;

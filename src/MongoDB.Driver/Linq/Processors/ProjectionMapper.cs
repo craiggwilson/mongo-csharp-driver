@@ -48,6 +48,12 @@ namespace MongoDB.Driver.Linq.Processors
             };
         }
 
+        public static bool CanMap(Expression node)
+        {
+            return node.NodeType == ExpressionType.MemberInit ||
+                node.NodeType == ExpressionType.New;
+        }
+
         private ConstructorInfo _constructor;
         private List<ProjectionMemberMapping> _mappings;
 
