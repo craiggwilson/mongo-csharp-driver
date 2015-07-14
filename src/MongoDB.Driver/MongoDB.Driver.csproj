@@ -67,6 +67,10 @@
     <AssemblyOriginatorKeyFile>..\Keys\TemporaryKeyPair.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Remotion.Linq, Version=2.0.0.0, Culture=neutral, PublicKeyToken=fee00910d6e5f53b, processorArchitecture=MSIL">
+      <HintPath>..\packages\Remotion.Linq.2.0.0-beta-002\lib\net45\Remotion.Linq.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
   </ItemGroup>
@@ -149,6 +153,42 @@
     <Compile Include="Linq\Processors\Transformers\VBInformationIsNothingTransformer.cs" />
     <Compile Include="Linq\Processors\Transformers\VBStringIndexComparisonTransformer.cs" />
     <Compile Include="Linq\QueryableExecutionBuilder.cs" />
+    <Compile Include="Relinq\Language\FieldNamePrefixingExpressionVisitor.cs" />
+    <Compile Include="Relinq\Preparation\Embedded\EmbeddedPipelineBuilder.cs" />
+    <Compile Include="Relinq\Preparation\Embedded\EmbeddedPipelinePreparationContext.cs" />
+    <Compile Include="Relinq\Preparation\Embedded\IEmbeddedPipelineResultOperatorHandler.cs" />
+    <Compile Include="Relinq\Preparation\Embedded\EmbeddedPipelineResultOperatorHandlerRegistry.cs" />
+    <Compile Include="Relinq\Preparation\Embedded\ResultOperatorHandlers\AnyResultOperatorHandler.cs" />
+    <Compile Include="Relinq\Preparation\ExpressionMapping.cs" />
+    <Compile Include="Relinq\Preparation\IPipelinePreparationContext.cs" />
+    <Compile Include="Relinq\Preparation\Pipeline\PipelineBuildingQueryModelVisitor.cs" />
+    <Compile Include="Relinq\Structure\Expressions\AnyElementTrueExpression.cs" />
+    <Compile Include="Relinq\Structure\Expressions\ArrayItemExpression.cs" />
+    <Compile Include="Relinq\Structure\Expressions\FilterExpression.cs" />
+    <Compile Include="Relinq\Structure\Expressions\DocumentExpression.cs" />
+    <Compile Include="Relinq\Structure\Expressions\MongoExpression.cs" />
+    <Compile Include="Relinq\Structure\Expressions\FieldExpression.cs" />
+    <Compile Include="Relinq\Structure\Expressions\IFieldExpression.cs" />
+    <Compile Include="Relinq\Structure\Expressions\SerializationExpression.cs" />
+    <Compile Include="Relinq\Structure\Expressions\MongoExpressionType.cs" />
+    <Compile Include="Relinq\Structure\Expressions\MongoExpressionVisitor.cs" />
+    <Compile Include="Relinq\Structure\Expressions\DocumentWrappedFieldExpression.cs" />
+    <Compile Include="Relinq\Language\AggregateLanguageBuildingExpressionVisitor.cs" />
+    <Compile Include="Relinq\Language\MatchBuildingExpressionVisitor.cs" />
+    <Compile Include="Relinq\Preparation\Pipeline\IPipelineResultOperatorHandler.cs" />
+    <Compile Include="Relinq\Preparation\Pipeline\PipelinePreparationContext.cs" />
+    <Compile Include="Relinq\Preparation\Pipeline\PipelineResultOperatorHandlerRegistry.cs" />
+    <Compile Include="Relinq\Preparation\Pipeline\ResultOperatorHandlers\DistinctResultOperatorHandler.cs" />
+    <Compile Include="Relinq\Structure\Stages\MatchStage.cs" />
+    <Compile Include="Relinq\Preparation\Pipeline\PipelineBuilder.cs" />
+    <Compile Include="Relinq\Structure\PipelineModel.cs" />
+    <Compile Include="Relinq\Structure\PipelineStage.cs" />
+    <Compile Include="Relinq\Preparation\ComplexSelectClauseSubQueryCreatingQueryModelVisitor.cs" />
+    <Compile Include="Relinq\Preparation\PreparingExpressionVisitor.cs" />
+    <Compile Include="Relinq\Preparation\Embedded\EmbeddedPipelineBuildingQueryModelVisitor.cs" />
+    <Compile Include="Relinq\Preparation\ProjectionMapper.cs" />
+    <Compile Include="Relinq\Preparation\SerializerBuilder.cs" />
+    <Compile Include="Relinq\RelinqQueryable.cs" />
     <Compile Include="Linq\Translators\AggregateLanguageTranslator.cs" />
     <Compile Include="Linq\QueryableExecutionModelBuilder.cs" />
     <Compile Include="Linq\Translators\PredicateTranslator.cs" />
@@ -160,6 +200,11 @@
     <Compile Include="AggregateFluentBase.cs" />
     <Compile Include="ProjectionDefinitionBuilder.cs" />
     <Compile Include="IndexKeysDefinitionBuilder.cs" />
+    <Compile Include="Relinq\RelinqQueryExecutor.cs" />
+    <Compile Include="Relinq\Language\PipelineLanguageTranslator.cs" />
+    <Compile Include="Relinq\Structure\PipelineStageType.cs" />
+    <Compile Include="Relinq\Structure\Stages\GroupStage.cs" />
+    <Compile Include="Relinq\Structure\Stages\ProjectStage.cs" />
     <Compile Include="SortDefinitionBuilder.cs" />
     <Compile Include="FilterDefinitionBuilder.cs" />
     <Compile Include="IAggregateFluentExtensions.cs" />
@@ -349,6 +394,9 @@
       <Project>{da56482a-5d8f-41e0-85e6-1f22b310f91b}</Project>
       <Name>MongoDB.Driver.Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
