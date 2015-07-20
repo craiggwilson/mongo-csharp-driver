@@ -162,6 +162,7 @@
     <Compile Include="Relinq\Preparation\ExpressionMapping.cs" />
     <Compile Include="Relinq\Preparation\IPipelinePreparationContext.cs" />
     <Compile Include="Relinq\Preparation\Pipeline\PipelineBuildingQueryModelVisitor.cs" />
+    <Compile Include="Relinq\Preparation\Pipeline\ResultOperatorHandlers\GroupResultOperatorHandler.cs" />
     <Compile Include="Relinq\Structure\Expressions\AnyElementTrueExpression.cs" />
     <Compile Include="Relinq\Structure\Expressions\ArrayItemExpression.cs" />
     <Compile Include="Relinq\Structure\Expressions\FilterExpression.cs" />

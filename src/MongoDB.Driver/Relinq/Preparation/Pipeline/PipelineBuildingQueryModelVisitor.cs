@@ -33,6 +33,7 @@ namespace MongoDB.Driver.Relinq.Preparation.Pipeline
         {
             __resultOperatorHandlerRegistry = new PipelineResultOperatorHandlerRegistry();
             __resultOperatorHandlerRegistry.Register(new DistinctResultOperatorHandler());
+            __resultOperatorHandlerRegistry.Register(new GroupResultOperatorHandler());
         }
 
         public static PipelineModel Prepare(

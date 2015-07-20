@@ -26,6 +26,7 @@ namespace MongoDB.Driver.Relinq.Preparation.Pipeline
 {
     internal class PipelinePreparationContext : IPipelinePreparationContext
     {
+        private readonly ExpressionMapping _groupMapping;
         private readonly ExpressionMapping _mapping;
         private readonly IBsonSerializer _rootSerializer;
         private readonly IBsonSerializerRegistry _serializerRegistry;
@@ -37,6 +38,7 @@ namespace MongoDB.Driver.Relinq.Preparation.Pipeline
             _serializerRegistry = Ensure.IsNotNull(serializerRegistry, "serializerRegistry");
             _uniqueIdentifierGenerator = Ensure.IsNotNull(uniqueIdentifierGenerator, "uniqueIdentifierGenerator");
             _mapping = new ExpressionMapping();
+            _groupMapping = new ExpressionMapping();
         }
 
         public void AddExpressionMapping(Expression original, Expression replacement)
@@ -45,6 +47,13 @@ namespace MongoDB.Driver.Relinq.Preparation.Pipeline
             Ensure.IsNotNull(replacement, "replacement");
 
             _mapping.AddMapping(original, replacement);
+        }
+
+        public void PrepareGroup(Expression keySelector, Expression elementSelector)
+        {
+            _groupMapping.AddMapping(
+                PrepareExpression(elementSelector),
+                PrepareExpression(keySelector));
         }
 
         public IBsonSerializer GetSerializer(Type type)
@@ -115,7 +124,7 @@ namespace MongoDB.Driver.Relinq.Preparation.Pipeline
             return PrepareExpression(predicate);
         }
 
-        private Expression PrepareExpression(Expression expression)
+        public Expression PrepareExpression(Expression expression)
         {
             return PreparingExpressionVisitor.Prepare(expression, this);
         }

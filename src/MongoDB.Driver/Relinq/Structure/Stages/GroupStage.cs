@@ -21,15 +21,22 @@ namespace MongoDB.Driver.Relinq.Structure.Stages
     internal class GroupStage : PipelineStage
     {
         private readonly Expression _idSelector;
+        private readonly Expression _elementSelector;
 
         public GroupStage(Expression idSelector)
+            : this(idSelector, null)
         {
-            _idSelector = Ensure.IsNotNull(idSelector, "idSelector");
         }
 
-        public override PipelineStageType StageType
+        public GroupStage(Expression idSelector, Expression elementSelector)
         {
-            get { return PipelineStageType.Group; }
+            _idSelector = Ensure.IsNotNull(idSelector, "idSelector");
+            _elementSelector = elementSelector;
+        }
+
+        public Expression ElementSelector
+        {
+            get { return _elementSelector; }
         }
 
         public Expression IdSelector
@@ -37,5 +44,9 @@ namespace MongoDB.Driver.Relinq.Structure.Stages
             get { return _idSelector; }
         }
 
+        public override PipelineStageType StageType
+        {
+            get { return PipelineStageType.Group; }
+        }
     }
 }

@@ -34,6 +34,40 @@ namespace MongoDB.Driver.Tests.Relinq
     public class RelinqQueryableTests : MongoDB.Driver.Tests.Linq.IntegrationTestBase
     {
         [Test]
+        public void Group_method_with_just_id()
+        {
+            var query = CreateQuery()
+                .GroupBy(x => x.A);
+
+            Assert(query,
+                2,
+                "{ $group: { _id: '$A', __items: { $push: '$$ROOT' } } }");
+        }
+
+        [Test]
+        public void Group_method_with_element_selector()
+        {
+            var query = CreateQuery()
+                .GroupBy(x => x.A, (k, s) => new { A = k, Count = s.Count() });
+
+            Assert(query,
+                2,
+                "{ $group: { _id: '$A', Count: { $sum: 1 } } }");
+        }
+
+        [Test]
+        public void Group_method_using_select()
+        {
+            var query = CreateQuery()
+                .GroupBy(x => x.A)
+                .Select(x => new { A = x.Key, Count = x.Count() });
+
+            Assert(query,
+                2,
+                "{ $group: { _id: '$A', Count: { $sum: 1 } } }");
+        }
+
+        [Test]
         public void Select_method_computed_scalar()
         {
             var query = CreateQuery().Select(x => x.A + " " + x.B);
