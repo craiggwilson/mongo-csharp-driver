@@ -24,11 +24,11 @@ namespace MongoDB.Driver.TestConsoleApplication
     {
         static void Main(string[] args)
         {
-            //FilterMeasuring.TestAsync().GetAwaiter().GetResult();
-            int numConcurrentWorkers = 50;
+            FilterMeasuring.TestAsync().GetAwaiter().GetResult();
+            //int numConcurrentWorkers = 50;
             //new CoreApi().Run(numConcurrentWorkers, ConfigureCluster);
 
-            new Api().Run(numConcurrentWorkers, ConfigureCluster);
+            //new Api().Run(numConcurrentWorkers, ConfigureCluster);
 
             //new LegacyApi().Run(numConcurrentWorkers, ConfigureCluster);
         }

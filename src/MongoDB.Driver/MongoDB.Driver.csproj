@@ -83,6 +83,7 @@
     <Compile Include="CreateIndexModel.cs" />
     <Compile Include="IndexKeysDefinition.cs" />
     <Compile Include="Linq\AggregateQueryableExecutionModel.cs" />
+    <Compile Include="Linq\CompiledQuery.cs" />
     <Compile Include="Linq\ExecutionPlanBuilder.cs" />
     <Compile Include="Linq\ExpressionHelper.cs" />
     <Compile Include="Linq\Expressions\AccumulatorExpression.cs" />

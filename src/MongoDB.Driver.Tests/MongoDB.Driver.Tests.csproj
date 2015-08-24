@@ -94,6 +94,7 @@
     <Compile Include="BulkWriteErrorTests.cs" />
     <Compile Include="FieldDefinitionTests.cs" />
     <Compile Include="FindFluentTests.cs" />
+    <Compile Include="Linq\CompiledQueryTests.cs" />
     <Compile Include="Linq\Translators\AggregateGroupTranslatorTests.cs" />
     <Compile Include="Linq\Translators\AggregateProjectTranslatorTests.cs" />
     <Compile Include="Linq\IntegrationTestBase.cs" />
