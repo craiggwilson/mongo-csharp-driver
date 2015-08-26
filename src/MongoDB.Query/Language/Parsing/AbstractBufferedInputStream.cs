@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MongoDB.Query.Structure.Parsing
+namespace MongoDB.Query.Language.Parsing
 {
     public abstract class AbstractBufferedInputStream<T> : IInputStream<T>
     {
@@ -26,7 +26,7 @@ namespace MongoDB.Query.Structure.Parsing
 
         protected AbstractBufferedInputStream(int blockSize)
         {
-            if(blockSize <= 0)
+            if (blockSize <= 0)
                 throw new ArgumentOutOfRangeException("blockSize", "blockSize must be greater than 0");
 
             _buffer = new List<T>();

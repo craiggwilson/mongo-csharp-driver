@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MongoDB.Query.Structure.Parsing
+namespace MongoDB.Query.Language.Parsing
 {
     public class BufferedCharInputStream : AbstractBufferedInputStream<char>
     {

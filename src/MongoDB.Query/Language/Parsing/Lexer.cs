@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MongoDB.Query.Structure.Parsing
+namespace MongoDB.Query.Language.Parsing
 {
     public class Lexer : AbstractBufferedInputStream<Token>
     {
@@ -33,7 +33,7 @@ namespace MongoDB.Query.Structure.Parsing
                 }
             }
 
-            if(i != count)
+            if (i != count)
             {
                 Array.Resize(ref tokens, i + 1);
             }
@@ -46,15 +46,30 @@ namespace MongoDB.Query.Structure.Parsing
             ReadWhiteSpace();
 
             var c = _input.LA(0);
-            if(c == '\0')
+            if (c == '\0')
             {
                 return ReadEndOfFile();
             }
 
-            switch(c)
+            if (char.IsWhiteSpace(c))
+            {
+                return ReadWhiteSpace();
+            }
+
+            switch (c)
             {
                 case '{':
-                    return ReadDocument();
+                    return CreateToken(TokenKind.LBrace, _input.Consume());
+                case '}':
+                    return CreateToken(TokenKind.RBrace, _input.Consume());
+                case '[':
+                    return CreateToken(TokenKind.LBracket, _input.Consume());
+                case ']':
+                    return CreateToken(TokenKind.RBracket, _input.Consume());
+                case '.':
+                    return CreateToken(TokenKind.Dot, _input.Consume());
+                case ',':
+                    return CreateToken(TokenKind.Comma, _input.Consume());
                 default:
                     return ReadWord();
             }
@@ -65,33 +80,9 @@ namespace MongoDB.Query.Structure.Parsing
             return new Token(TokenKind.EOF, "<<EOF>>");
         }
 
-        private Token ReadDocument()
+        private Token CreateToken(TokenKind kind, char c)
         {
-            _input.Mark();
-            int count = 0;
-            while(true)
-            {
-                // TODO: Need to account for opening and closing 
-                // braces inside quotes as well as escaped variants 
-                var c = _input.Consume();
-                if(c == '{')
-                {
-                    count++;
-                }
-                else if (c == '}')
-                {
-                    count--;
-                    if(count == 0)
-                    {
-                        break;
-                    }
-                }
-                else if (c == '\0')
-                {
-                    throw ParseException.Create("Unexpected EOF.");
-                }
-            }
-            return new Token(TokenKind.Document, new string(_input.ClearMark()));
+            return new Token(kind, c);
         }
 
         private Token ReadWord()
@@ -101,17 +92,17 @@ namespace MongoDB.Query.Structure.Parsing
             {
                 _input.Consume();
             }
-            return new Token(TokenKind.Word, new string(_input.ClearMark()));
+            return new Token(TokenKind.Text, new string(_input.ClearMark()));
         }
 
-        private void ReadWhiteSpace()
+        private Token ReadWhiteSpace()
         {
-            var c = _input.LA(0);
-            while (char.IsWhiteSpace(c))
+            _input.Mark();
+            while (char.IsWhiteSpace(_input.LA(0)))
             {
                 _input.Consume();
-                c = _input.LA(0);
             }
+            return new Token(TokenKind.Whitespace, new string(_input.ClearMark()));
         }
     }
 }

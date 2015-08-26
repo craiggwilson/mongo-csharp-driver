@@ -4,55 +4,34 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using FluentAssertions;
+using MongoDB.Query.Language.Structure;
 using NUnit.Framework;
 
-namespace MongoDB.Query.Structure.Parsing
+namespace MongoDB.Query.Language.Parsing
 {
     [TestFixture]
     public class ParserTests
     {
         [Test]
-        public void Minimal()
+        public void Select_statement()
         {
-            var subject = new Parser(new Lexer("FROM a"));
+            var subject = new Parser(new Lexer("SELECT f.lastName"));
 
-            var pipeline = subject.Parse();
-            pipeline.CollectionName.Should().Be("a");
-            pipeline.Stages.Should().HaveCount(0);
-        }
+            var statementList = subject.Parse();
+            statementList.Statements.Count.Should().Be(1);
+            var statement = statementList.Statements[0];
+            statement.Should().BeOfType<SqlSelectStatement>();
 
-        [Test]
-        public void Minimal_with_project()
-        {
-            var subject = new Parser(new Lexer("FROM a PROJECT {x:1, y:1}"));
+            var select = ((SqlSelectStatement)statement).Select;
+            select.Expressions.Count.Should().Be(1);
+            select.Expressions[0].Should().BeOfType<SqlFieldExpression>();
 
-            var pipeline = subject.Parse();
-            pipeline.CollectionName.Should().Be("a");
-            pipeline.Stages.Should().HaveCount(1);
-            pipeline.Stages[0].Document.Should().Be("{x:1, y:1}");
-        }
+            var field = (SqlFieldExpression)select.Expressions[0];
+            field.Name.Should().Be("lastName");
+            field.Expression.Should().BeOfType<SqlCollectionExpression>();
 
-        [Test]
-        public void Minimal_with_match()
-        {
-            var subject = new Parser(new Lexer("FROM a MATCH {x:1, y:1}"));
-
-            var pipeline = subject.Parse();
-            pipeline.CollectionName.Should().Be("a");
-            pipeline.Stages.Should().HaveCount(1);
-            pipeline.Stages[0].Document.Should().Be("{x:1, y:1}");
-        }
-
-        [Test]
-        public void Match_and_project()
-        {
-            var subject = new Parser(new Lexer("FROM a MATCH {x:1, y:1} PROJECT {x:1}"));
-
-            var pipeline = subject.Parse();
-            pipeline.CollectionName.Should().Be("a");
-            pipeline.Stages.Should().HaveCount(2);
-            pipeline.Stages[0].Document.Should().Be("{x:1, y:1}");
-            pipeline.Stages[1].Document.Should().Be("{x:1}");
+            var collection = (SqlCollectionExpression)field.Expression;
+            collection.Name.Should().Be("f");
         }
 
         private void AssertNext(Lexer lexer, TokenKind tokenKind, string text)

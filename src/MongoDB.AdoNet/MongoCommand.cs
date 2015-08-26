@@ -10,8 +10,8 @@ using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Operations;
 using MongoDB.Driver.Core.WireProtocol.Messages.Encoders;
-using MongoDB.Query.Structure;
-using MongoDB.Query.Structure.Parsing;
+using MongoDB.Query.Language;
+using MongoDB.Query.Language.Parsing;
 
 namespace MongoDB.AdoNet
 {
@@ -116,39 +116,25 @@ namespace MongoDB.AdoNet
 
         protected override DbDataReader ExecuteDbDataReader(CommandBehavior behavior)
         {
-            if(_connection == null)
-            {
-                throw new InvalidOperationException("A connection has not been provided.");
-            }
+            throw new NotSupportedException();
+            //if(_connection == null)
+            //{
+            //    throw new InvalidOperationException("A connection has not been provided.");
+            //}
 
-            var pipeline = new Parser(new Lexer(_commandText)).Parse();
+            //var pipeline = new Parser(new Lexer(_commandText)).Parse();
 
-            var collectionName = pipeline.CollectionName;
-            var pipelineDocuments = GetPipelineDocuments(pipeline.Stages);
+            //var collectionName = pipeline.CollectionName;
+            //var pipelineDocuments = GetPipelineDocuments(pipeline.Stages);
 
-            var operation = new AggregateOperation<BsonDocument>(
-                new CollectionNamespace(new DatabaseNamespace(_connection.Database), collectionName),
-                pipelineDocuments,
-                BsonDocumentSerializer.Instance,
-                new MessageEncoderSettings());
+            //var operation = new AggregateOperation<BsonDocument>(
+            //    new CollectionNamespace(new DatabaseNamespace(_connection.Database), collectionName),
+            //    pipelineDocuments,
+            //    BsonDocumentSerializer.Instance,
+            //    new MessageEncoderSettings());
 
-            var result = _connection.ExecuteOperation(operation);
-            return new MongoDataReader(result);
-        }
-
-        private IEnumerable<BsonDocument> GetPipelineDocuments(IEnumerable<PipelineStage> stages)
-        {
-            foreach (var stage in stages)
-            {
-                if (stage.PipelineOperator == "MATCH")
-                {
-                    yield return new BsonDocument("$match", BsonDocument.Parse(stage.Document));
-                }
-                else if (stage.PipelineOperator == "PROJECT")
-                {
-                    yield return new BsonDocument("$project", BsonDocument.Parse(stage.Document));
-                }
-            }
+            //var result = _connection.ExecuteOperation(operation);
+            //return new MongoDataReader(result);
         }
     }
 }

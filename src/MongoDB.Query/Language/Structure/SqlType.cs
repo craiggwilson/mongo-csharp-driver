@@ -4,10 +4,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MongoDB.Query.Structure
+namespace MongoDB.Query.Language.Structure
 {
-    public abstract class Node
+    public enum SqlType
     {
-        public abstract NodeKind Kind { get; }
+        Int32,
+        String,
+        Document,
+        Array
     }
 }

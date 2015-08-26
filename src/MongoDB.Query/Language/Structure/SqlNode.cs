@@ -4,12 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MongoDB.Query.Structure.Parsing
+namespace MongoDB.Query.Language.Structure
 {
-    public enum TokenKind
+    public abstract class SqlNode
     {
-        Document,
-        Word,
-        EOF
+
     }
 }

@@ -39,19 +39,31 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Structure\Parsing\Parser.cs" />
-    <Compile Include="Structure\Pipeline.cs" />
-    <Compile Include="Structure\Node.cs" />
-    <Compile Include="Structure\NodeKind.cs" />
-    <Compile Include="Structure\Parsing\AbstractBufferedInputStream.cs" />
-    <Compile Include="Structure\Parsing\BufferedCharInputStream.cs" />
-    <Compile Include="Structure\Parsing\IInputStream.cs" />
+    <Compile Include="Language\Parsing\Parser.cs" />
+    <Compile Include="Language\Parsing\AbstractBufferedInputStream.cs" />
+    <Compile Include="Language\Parsing\BufferedCharInputStream.cs" />
+    <Compile Include="Language\Parsing\IInputStream.cs" />
+    <Compile Include="Language\Structure\SqlAggregation.cs" />
+    <Compile Include="Language\Structure\SqlAliasExpression.cs" />
+    <Compile Include="Language\Structure\SqlArrayExpression.cs" />
+    <Compile Include="Language\Structure\SqlClause.cs" />
+    <Compile Include="Language\Structure\SqlCollectionExpression.cs" />
+    <Compile Include="Language\Structure\SqlConstantExpression.cs" />
+    <Compile Include="Language\Structure\SqlDocumentExpression.cs" />
+    <Compile Include="Language\Structure\SqlExpression.cs" />
+    <Compile Include="Language\Structure\SqlFieldExpression.cs" />
+    <Compile Include="Language\Structure\SqlNode.cs" />
+    <Compile Include="Language\Structure\SqlNodeType.cs" />
+    <Compile Include="Language\Structure\SqlSelectClause.cs" />
+    <Compile Include="Language\Structure\SqlSelectStatement.cs" />
+    <Compile Include="Language\Structure\SqlStatement.cs" />
+    <Compile Include="Language\Structure\SqlStatementList.cs" />
+    <Compile Include="Language\Structure\SqlType.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Structure\Parsing\Lexer.cs" />
-    <Compile Include="Structure\Parsing\ParseException.cs" />
-    <Compile Include="Structure\Parsing\Token.cs" />
-    <Compile Include="Structure\Parsing\TokenKind.cs" />
-    <Compile Include="Structure\PipelineStage.cs" />
+    <Compile Include="Language\Parsing\Lexer.cs" />
+    <Compile Include="Language\Parsing\ParseException.cs" />
+    <Compile Include="Language\Parsing\Token.cs" />
+    <Compile Include="Language\Parsing\TokenKind.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

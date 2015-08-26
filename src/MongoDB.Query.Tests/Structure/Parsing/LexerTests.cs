@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using FluentAssertions;
 using NUnit.Framework;
 
-namespace MongoDB.Query.Structure.Parsing
+namespace MongoDB.Query.Language.Parsing
 {
     [TestFixture]
     public class LexerTests
@@ -16,8 +16,9 @@ namespace MongoDB.Query.Structure.Parsing
         {
             var subject = new Lexer("FROM a");
 
-            AssertNext(subject, TokenKind.Word, "FROM");
-            AssertNext(subject, TokenKind.Word, "a");
+            AssertNext(subject, TokenKind.Text, "FROM");
+            AssertNext(subject, TokenKind.Whitespace, " ");
+            AssertNext(subject, TokenKind.Text, "a");
         }
 
         private void AssertNext(Lexer lexer, TokenKind tokenKind, string text)

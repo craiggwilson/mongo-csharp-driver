@@ -4,11 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace MongoDB.Query.Structure
+namespace MongoDB.Query.Language.Structure
 {
-    public enum NodeKind
+    public abstract class SqlStatement : SqlNode
     {
-        Pipeline,
-        PipelineStage
     }
 }
