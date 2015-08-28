@@ -46,6 +46,7 @@
     <Compile Include="Language\Structure\SqlAggregation.cs" />
     <Compile Include="Language\Structure\SqlAliasExpression.cs" />
     <Compile Include="Language\Structure\SqlArrayExpression.cs" />
+    <Compile Include="Language\Structure\SqlArrayIndexExpression.cs" />
     <Compile Include="Language\Structure\SqlClause.cs" />
     <Compile Include="Language\Structure\SqlCollectionExpression.cs" />
     <Compile Include="Language\Structure\SqlConstantExpression.cs" />
