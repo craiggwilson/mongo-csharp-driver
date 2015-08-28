@@ -7,7 +7,7 @@ using MongoDB.Query.Language.Structure;
 
 namespace MongoDB.Query.Language.Parsing
 {
-    public class Parser
+    public sealed class Parser
     {
         private readonly IInputStream<Token> _input;
 
@@ -18,26 +18,21 @@ namespace MongoDB.Query.Language.Parsing
 
         public SqlStatementList Parse()
         {
-            return ReadStatementList();
-        }
-
-        private SqlStatementList ReadStatementList()
-        {
             var statements = new List<SqlStatement>();
 
-            while (_input.LA(0).Kind != TokenKind.EOF)
+            while (LA(0).Kind != TokenKind.EOF)
             {
-                statements.Add(ReadStatement());
+                statements.Add(ParseStatement());
             }
 
             return new SqlStatementList(statements);
         }
 
-        private SqlStatement ReadStatement()
+        internal SqlStatement ParseStatement()
         {
             ConsumeWhiteSpace();
 
-            var token = _input.LA(0);
+            var token = LA(0);
             if (token.Kind != TokenKind.Text)
             {
                 throw new ParseException($"Expected {TokenKind.Text} but found {token.Kind}");
@@ -46,20 +41,20 @@ namespace MongoDB.Query.Language.Parsing
             switch (token.Text.ToUpperInvariant())
             {
                 case "SELECT":
-                    return ReadSelectStatement();
+                    return ParseSelectStatement();
             }
 
             throw new ParseException($"Unknown statement {token.Text}.");
         }
 
-        private SqlSelectStatement ReadSelectStatement()
+        internal SqlSelectStatement ParseSelectStatement()
         {
-            var select = ReadSelectClause();
+            var select = ParseSelectClause();
 
             return new SqlSelectStatement(select);
         }
 
-        private SqlSelectClause ReadSelectClause()
+        internal SqlSelectClause ParseSelectClause()
         {
             var select = ConsumeText("SELECT");
             ConsumeWhiteSpace();
@@ -72,11 +67,11 @@ namespace MongoDB.Query.Language.Parsing
         private List<SqlExpression> ReadExpressionList()
         {
             var expressions = new List<SqlExpression>();
-            while (_input.LA(0).Kind != TokenKind.EOF)
+            while (LA(0).Kind != TokenKind.EOF)
             {
                 expressions.Add(ReadExpression());
                 ConsumeWhiteSpace();
-                if (_input.LA(0).Kind != TokenKind.Comma)
+                if (LA(0).Kind != TokenKind.Comma)
                 {
                     break;
                 }
@@ -88,46 +83,62 @@ namespace MongoDB.Query.Language.Parsing
 
         private SqlExpression ReadExpression()
         {
-            switch (_input.LA(0).Kind)
+            switch (LA(0).Kind)
             {
                 case TokenKind.Text:
                     return ReadFieldExpression();
             }
 
-            throw new ParseException($"Unknown expression {_input.LA(0).Text}");
+            throw new ParseException($"Unknown expression {LA(0).Text}");
         }
 
-        private SqlFieldExpression ReadFieldExpression()
-        {
-            SqlExpression current = ReadCollectionExpression();
-
-            var token = _input.LA(0);
-
-            while (token.Kind == TokenKind.Dot)
-            {
-                Consume(TokenKind.Dot);
-                token = Consume(TokenKind.Text);
-                current = new SqlFieldExpression(current, token.Text);
-                token = _input.LA(0);
-            }
-
-            return (SqlFieldExpression)current;
-        }
-
-        private SqlCollectionExpression ReadCollectionExpression()
+        private SqlExpression ReadFieldExpression()
         {
             var token = Consume(TokenKind.Text);
-            return new SqlCollectionExpression(token.Text);
+
+            // we don't know yet whether the first guy in this list is a field off
+            // the ambient collection, or an actual collection reference.
+            SqlExpression current = new SqlFieldOrCollectionExpression(token.Text);
+
+            ReadFieldExpressionSwitch:
+            switch (LA(0).Kind)
+            {
+                case TokenKind.Dot:
+                    Consume(TokenKind.Dot);
+                    token = Consume(TokenKind.Text);
+                    current = new SqlFieldExpression(current, token.Text);
+                    goto ReadFieldExpressionSwitch;
+                case TokenKind.LBracket:
+                    Consume(TokenKind.LBracket);
+                    switch (LA(0).Kind)
+                    {
+                        case TokenKind.Number:
+                            token = Consume(TokenKind.Number);
+                            current = new SqlArrayIndexExpression(current, token.Text);
+                            Consume(TokenKind.RBracket);
+                            goto ReadFieldExpressionSwitch;
+                        case TokenKind.QuotedText:
+                            token = Consume(TokenKind.QuotedText);
+                            current = new SqlFieldExpression(current, token.Text);
+                            Consume(TokenKind.RBracket);
+                            goto ReadFieldExpressionSwitch;
+                        default:
+                            throw new ParseException($"Expected number of quoted string, but found {LA(0).Kind}.");
+                    }
+            }
+
+            while (LA(0).Kind == TokenKind.Dot)
+            {
+
+                token = LA(0);
+            }
+
+            return current;
         }
 
-        private Token ConsumeText(string text)
+        private Token Consume()
         {
-            var token = Consume(TokenKind.Text);
-            if (!token.Text.Equals(text, StringComparison.OrdinalIgnoreCase))
-            {
-                throw new ParseException($"Expected {text}, but found {token.Text}.");
-            }
-            return token;
+            return _input.Consume();
         }
 
         private Token Consume(TokenKind kind)
@@ -141,17 +152,27 @@ namespace MongoDB.Query.Language.Parsing
             return token;
         }
 
-        private Token Consume()
+        private Token ConsumeText(string text)
         {
-            return _input.Consume();
+            var token = Consume(TokenKind.Text);
+            if (!token.Text.Equals(text, StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ParseException($"Expected {text}, but found {token.Text}.");
+            }
+            return token;
         }
 
         private void ConsumeWhiteSpace()
         {
-            while (_input.LA(0).Kind == TokenKind.Whitespace)
+            while (LA(0).Kind == TokenKind.Whitespace)
             {
-                _input.Consume();
+                Consume();
             }
+        }
+
+        private Token LA(int count)
+        {
+            return _input.LA(count);
         }
     }
 }

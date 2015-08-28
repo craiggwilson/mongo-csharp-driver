@@ -52,6 +52,7 @@
     <Compile Include="Language\Structure\SqlDocumentExpression.cs" />
     <Compile Include="Language\Structure\SqlExpression.cs" />
     <Compile Include="Language\Structure\SqlFieldExpression.cs" />
+    <Compile Include="Language\Structure\SqlFieldOrCollectionExpression.cs" />
     <Compile Include="Language\Structure\SqlNode.cs" />
     <Compile Include="Language\Structure\SqlNodeType.cs" />
     <Compile Include="Language\Structure\SqlSelectClause.cs" />

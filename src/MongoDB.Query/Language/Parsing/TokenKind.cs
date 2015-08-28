@@ -11,6 +11,8 @@ namespace MongoDB.Query.Language.Parsing
         EOF,
         Whitespace,
         Text,
+        QuotedText,
+        Number,
         LBrace,
         RBrace,
         LBracket,

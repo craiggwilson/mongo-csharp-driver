@@ -13,25 +13,51 @@ namespace MongoDB.Query.Language.Parsing
     public class ParserTests
     {
         [Test]
-        public void Select_statement()
+        public void Select_clause_with_unanchored_fields()
         {
-            var subject = new Parser(new Lexer("SELECT f.lastName"));
+            var subject = new Parser(new Lexer(@"SELECT lastName, address.state, address[""city""]"));
 
-            var statementList = subject.Parse();
-            statementList.Statements.Count.Should().Be(1);
-            var statement = statementList.Statements[0];
-            statement.Should().BeOfType<SqlSelectStatement>();
+            var select = subject.ParseSelectClause();
+            select.Expressions.Count.Should().Be(3);
 
-            var select = ((SqlSelectStatement)statement).Select;
-            select.Expressions.Count.Should().Be(1);
-            select.Expressions[0].Should().BeOfType<SqlFieldExpression>();
+            AssertFieldPath("lastName", select.Expressions[0]);
+            AssertFieldPath("address.state", select.Expressions[1]);
+            AssertFieldPath("address.city", select.Expressions[3]);
+        }
 
-            var field = (SqlFieldExpression)select.Expressions[0];
-            field.Name.Should().Be("lastName");
-            field.Expression.Should().BeOfType<SqlCollectionExpression>();
+        private void AssertFieldPath(string expectedPath, SqlExpression expression)
+        {
+            Stack<string> parts = new Stack<string>();
+            var current = expression;
+            while (current != null)
+            {
+                var field = current as SqlFieldExpression;
+                if (field != null)
+                {
+                    parts.Push(field.Name);
+                    current = field.Expression;
+                    continue;
+                }
 
-            var collection = (SqlCollectionExpression)field.Expression;
-            collection.Name.Should().Be("f");
+                var fieldOrCollection = current as SqlFieldOrCollectionExpression;
+                if (fieldOrCollection != null)
+                {
+                    parts.Push(fieldOrCollection.Name);
+                    break;
+                }
+
+                var collection = current as SqlCollectionExpression;
+                if (collection != null)
+                {
+                    parts.Push(collection.Name);
+                    break;
+                }
+
+                Assert.Fail($"Expected SqlFieldExpression or SqlFieldOrCollectionExpression, but found {current.GetType()}.");
+            }
+
+            var path = string.Join(".", parts);
+            path.Should().Be(expectedPath);
         }
 
         private void AssertNext(Lexer lexer, TokenKind tokenKind, string text)

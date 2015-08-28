@@ -11,6 +11,11 @@ namespace MongoDB.Query.Language.Structure
         private readonly SqlExpression _expression;
         private readonly string _name;
 
+        public SqlFieldExpression(string name)
+        {
+            _name = name;
+        }
+
         public SqlFieldExpression(SqlExpression expression, string name)
         {
             _expression = expression;

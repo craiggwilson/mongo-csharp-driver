@@ -70,6 +70,8 @@ namespace MongoDB.Query.Language.Parsing
                     return CreateToken(TokenKind.Dot, _input.Consume());
                 case ',':
                     return CreateToken(TokenKind.Comma, _input.Consume());
+                case '"':
+                    return ReadQuotedText();
                 default:
                     return ReadWord();
             }
@@ -78,6 +80,40 @@ namespace MongoDB.Query.Language.Parsing
         private Token ReadEndOfFile()
         {
             return new Token(TokenKind.EOF, "<<EOF>>");
+        }
+
+        private Token ReadQuotedText()
+        {
+            var c = _input.Consume(); // double quote
+            _input.Mark();
+            bool hasEscapedQuotes = false;
+
+            ReadQuotedTextWhile:
+            while (_input.LA(0) != '\0' && _input.LA(0) != '"')
+            {
+                _input.Consume();
+            }
+
+            if (_input.LA(1) == '"')
+            {
+                hasEscapedQuotes = true;
+                _input.Consume(2);
+                // we are escaping the quote...
+                goto ReadQuotedTextWhile;
+            }
+
+            if (_input.LA(0) == '\0')
+            {
+                throw new ParseException("Unexpected end of file.");
+            }
+
+            _input.Consume(); // end quote
+            var text = new string(_input.ClearMark());
+            if (hasEscapedQuotes)
+            {
+                text = text.Replace("\"\"", "\"");
+            }
+            return new Token(TokenKind.QuotedText, text);
         }
 
         private Token CreateToken(TokenKind kind, char c)
