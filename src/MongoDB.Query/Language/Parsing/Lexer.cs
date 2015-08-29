@@ -66,20 +66,47 @@ namespace MongoDB.Query.Language.Parsing
                     return CreateToken(TokenKind.LBracket, _input.Consume());
                 case ']':
                     return CreateToken(TokenKind.RBracket, _input.Consume());
-                case '.':
-                    return CreateToken(TokenKind.Dot, _input.Consume());
+                case '(':
+                    return CreateToken(TokenKind.LParen, _input.Consume());
+                case ')':
+                    return CreateToken(TokenKind.RParen, _input.Consume());
                 case ',':
                     return CreateToken(TokenKind.Comma, _input.Consume());
                 case '"':
                     return ReadQuotedText();
                 default:
-                    return ReadWord();
+                    return ReadTextOrNumberOrDot();
             }
         }
 
         private Token ReadEndOfFile()
         {
-            return new Token(TokenKind.EOF, "<<EOF>>");
+            return CreateToken(TokenKind.EOF, "<<EOF>>");
+        }
+
+        private Token ReadNumber()
+        {
+            _input.Mark();
+            var c = _input.Consume(); // number, -, .
+            if (c == '-')
+            {
+                c = _input.Consume(); // ., number
+            }
+            while (char.IsNumber(_input.LA(0)))
+            {
+                _input.Consume();
+            }
+
+            if (_input.LA(0) == '.')
+            {
+                _input.Consume();
+                while (char.IsNumber(_input.LA(0)))
+                {
+                    _input.Consume();
+                }
+            }
+
+            return CreateTokenFromMark(TokenKind.Number);
         }
 
         private Token ReadQuotedText()
@@ -107,28 +134,78 @@ namespace MongoDB.Query.Language.Parsing
                 throw new ParseException("Unexpected end of file.");
             }
 
-            _input.Consume(); // end quote
             var text = new string(_input.ClearMark());
             if (hasEscapedQuotes)
             {
                 text = text.Replace("\"\"", "\"");
             }
-            return new Token(TokenKind.QuotedText, text);
+
+            _input.Consume(); // end quote
+
+            return CreateToken(TokenKind.QuotedText, text);
         }
 
-        private Token CreateToken(TokenKind kind, char c)
+        private Token ReadTextOrNumberOrDot()
         {
-            return new Token(kind, c);
+            char c = _input.LA(0);
+
+            // 123
+            if (char.IsNumber(c))
+            {
+                return ReadNumber();
+            }
+
+            // -123
+            if (c == '-' && char.IsNumber(_input.LA(1)))
+            {
+                return ReadNumber();
+            }
+
+            // -.123
+            if (c == '-' && _input.LA(1) == '.' && char.IsNumber(_input.LA(2)))
+            {
+                return ReadNumber();
+            }
+
+            // .123
+            if (c == '.' && char.IsNumber(_input.LA(1)))
+            {
+                return ReadNumber();
+            }
+
+            // .Text
+            if (c == '.')
+            {
+                return CreateToken(TokenKind.Dot, _input.Consume());
+            }
+
+            return ReadText();
         }
 
-        private Token ReadWord()
+        private Token ReadText()
         {
             _input.Mark();
-            while (char.IsLetterOrDigit(_input.LA(0)))
+
+            ReadTextSwitch:
+            switch (_input.LA(0))
             {
-                _input.Consume();
+                // terminals
+                case ',':
+                case '.':
+                case '[':
+                case ']':
+                case '{':
+                case '}':
+                case '(':
+                case ')':
+                case '\0':
+                    break;
+                default:
+                    _input.Consume();
+                    goto ReadTextSwitch;
             }
-            return new Token(TokenKind.Text, new string(_input.ClearMark()));
+
+            return CreateTokenFromMark(TokenKind.Text);
         }
 
         private Token ReadWhiteSpace()
@@ -138,7 +215,22 @@ namespace MongoDB.Query.Language.Parsing
             {
                 _input.Consume();
             }
-            return new Token(TokenKind.Whitespace, new string(_input.ClearMark()));
+            return CreateTokenFromMark(TokenKind.Whitespace);
+        }
+
+        private Token CreateToken(TokenKind kind, char c)
+        {
+            return new Token(kind, c);
+        }
+
+        private Token CreateToken(TokenKind kind, string text)
+        {
+            return new Token(kind, text);
+        }
+
+        private Token CreateTokenFromMark(TokenKind kind)
+        {
+            return new Token(kind, new string(_input.ClearMark()));
         }
     }
 }

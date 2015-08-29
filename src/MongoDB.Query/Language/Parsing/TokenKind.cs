@@ -17,7 +17,9 @@ namespace MongoDB.Query.Language.Parsing
         RBrace,
         LBracket,
         RBracket,
+        LParen,
+        RParen,
         Dot,
-        Comma
+        Comma,
     }
 }
