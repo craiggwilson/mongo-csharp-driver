@@ -525,6 +525,15 @@ p => p.Age != 20;
 
 See the [MongoDB documentation]({{< docsref "meta/aggregation-quick-reference/#arithmetic-expressions" >}}) for more information on each operator.
 
+#### $abs
+
+```csharp
+p => Math.Abs(p.Age);
+```
+```json
+{ $abs: "$Age" }
+```
+
 #### $add
 
 ```csharp
