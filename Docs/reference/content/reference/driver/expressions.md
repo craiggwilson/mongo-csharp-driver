@@ -633,6 +633,15 @@ p => Math.Pow(p.Age, 10);
 { $pow: ["$Age", 10] }
 ```
 
+#### $pow
+
+```csharp
+p => Math.Sqrt(p.Age);
+```
+```json
+{ $sqrt: ["$Age"] }
+```
+
 #### $subtract
 
 ```csharp
