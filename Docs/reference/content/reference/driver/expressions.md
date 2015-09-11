@@ -603,7 +603,7 @@ p => Math.Log(p.Age, 10);
 p => Math.Log10(p.Age);
 ```
 ```json
-{ $log: ["$Age"] }
+{ $log10: ["$Age"] }
 ```
 
 #### $mod
@@ -631,6 +631,15 @@ p => Math.Pow(p.Age, 10);
 ```
 ```json
 { $pow: ["$Age", 10] }
+```
+
+#### $sqrt
+
+```csharp
+p => Math.Sqrt(p.Age);
+```
+```json
+{ $sqrt: ["$Age"] }
 ```
 
 #### $subtract
