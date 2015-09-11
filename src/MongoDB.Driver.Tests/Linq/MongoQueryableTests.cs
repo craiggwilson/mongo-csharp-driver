@@ -463,9 +463,9 @@ namespace MongoDB.Driver.Tests.Linq
 
             Assert(query,
                 1,
-                "{ $project: { 'C.E': 1, _id: 0 } }",
-                "{ $match: { 'C.E._t': 'V' } }",
-                "{ $match: { 'C.E.W': 1111 } }");
+                "{ $project: { E: '$C.E', _id: 0 } }",
+                "{ $match: { 'E._t': 'V' } }",
+                "{ $match: { 'E.W': 1111 } }");
         }
 
         [Test]
@@ -642,7 +642,7 @@ namespace MongoDB.Driver.Tests.Linq
 
             Assert(query,
                 1,
-                "{ $project: { A: 1, _id: 0 } }",
+                "{ $project: { A: '$A', _id: 0 } }",
                 "{ $match: { A: 'Awesome' } }");
         }
 
@@ -674,7 +674,7 @@ namespace MongoDB.Driver.Tests.Linq
 
             Assert(query,
                 2,
-                "{ $project: { A: 1, _id: 0 } }");
+                "{ $project: { A: '$A', _id: 0 } }");
         }
 
         [Test]
@@ -685,7 +685,7 @@ namespace MongoDB.Driver.Tests.Linq
 
             Assert(query,
                 2,
-                "{ $project: { A: 1, _id: 0 } }");
+                "{ $project: { A: '$A', _id: 0 } }");
         }
 
         [Test]
@@ -716,7 +716,7 @@ namespace MongoDB.Driver.Tests.Linq
 
             Assert(query,
                 2,
-                "{ $project: { M: 1, _id: 0 } }");
+                "{ $project: { M: '$M', _id: 0 } }");
         }
 
         [Test]
@@ -727,7 +727,38 @@ namespace MongoDB.Driver.Tests.Linq
 
             Assert(query,
                 2,
-                "{ $project: { M: 1, _id: 0 } }");
+                "{ $project: { M: '$M', _id: 0 } }");
+        }
+
+        [Test]
+        public void Select_method_array_index()
+        {
+            var query = CreateQuery().Select(x => x.M[0]);
+
+            Assert(query,
+                2,
+                "{ $project: { __fld0: { $arrayElemAt: ['$M', 0] }, _id: 0 } }");
+        }
+
+        [Test]
+        public void Select_syntax_array_index()
+        {
+            var query = from x in CreateQuery()
+                        select x.M[0];
+
+            Assert(query,
+                2,
+                "{ $project: { __fld0: { $arrayElemAt: ['$M', 0] }, _id: 0 } }");
+        }
+
+        [Test]
+        public void Select_method_embedded_pipeline()
+        {
+            var query = CreateQuery().Select(x => x.M.First());
+
+            Assert(query,
+                2,
+                "{ $project: { __fld0: { $arrayElemAt: ['$M', 0] }, _id: 0 } }");
         }
 
         [Test]
@@ -763,7 +794,7 @@ namespace MongoDB.Driver.Tests.Linq
             Assert(query,
                 4,
                 "{ $unwind: '$G' }",
-                "{ $project: { G: 1, _id: 0 } }");
+                "{ $project: { G: '$G', _id: 0 } }");
         }
 
         [Test]
@@ -775,7 +806,7 @@ namespace MongoDB.Driver.Tests.Linq
             Assert(query,
                 4,
                 "{ $unwind: '$G' }",
-                "{ $project: { G: 1, _id: 0 } }");
+                "{ $project: { G: '$G', _id: 0 } }");
         }
 
         [Test]
@@ -788,7 +819,7 @@ namespace MongoDB.Driver.Tests.Linq
             Assert(query,
                 4,
                 "{ $unwind: '$G' }",
-                "{ $project: { G: 1, _id: 0 } }");
+                "{ $project: { G: '$G', _id: 0 } }");
         }
 
         [Test]
