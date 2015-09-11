@@ -615,6 +615,15 @@ p => p.Age * 2;
 { $multiply: [ '$Age', 2 ] }
 ```
 
+#### $pow
+
+```csharp
+p => Math.Pow(p.Age, 10);
+```
+```json
+{ $pow: ["$Age", 10] }
+```
+
 #### $subtract
 
 ```csharp
