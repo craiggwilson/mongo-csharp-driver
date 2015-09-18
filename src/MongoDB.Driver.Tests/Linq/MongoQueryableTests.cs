@@ -564,6 +564,16 @@ namespace MongoDB.Driver.Tests.Linq
         }
 
         [Test]
+        public void Sample()
+        {
+            var query = CreateQuery().Sample(100);
+
+            Assert(query,
+                2,
+                "{ $sample: { size: 100 } }");
+        }
+
+        [Test]
         public void Select_identity()
         {
             var query = CreateQuery().Select(x => x);
