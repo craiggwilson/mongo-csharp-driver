@@ -37,6 +37,7 @@ namespace MongoDB.Driver.Linq.Expressions
         // Bindings
         Accumulator,
         Collection,
+        Constant,
         Document,
         FieldAsDocument,
         Field,

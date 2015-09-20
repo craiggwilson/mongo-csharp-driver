@@ -86,6 +86,7 @@
     <Compile Include="Linq\Expressions\AccumulatorExpression.cs" />
     <Compile Include="Linq\Expressions\AccumulatorType.cs" />
     <Compile Include="Linq\Expressions\CollectionExpression.cs" />
+    <Compile Include="Linq\Expressions\ConstantSerializationExpression.cs" />
     <Compile Include="Linq\Expressions\CorrelatedExpression.cs" />
     <Compile Include="Linq\Expressions\ConcatExpression.cs" />
     <Compile Include="Linq\Expressions\DistinctExpression.cs" />
@@ -142,6 +143,7 @@
     <Compile Include="Linq\MongoQueryProviderImpl.cs" />
     <Compile Include="Linq\Processors\BinderHelper.cs" />
     <Compile Include="Linq\Processors\CompositeMethodCallBinder.cs" />
+    <Compile Include="Linq\Processors\ConstantSerializationBinder.cs" />
     <Compile Include="Linq\Processors\CorrelatedAccumulatorRemover.cs" />
     <Compile Include="Linq\Processors\CorrelatedGroupRewriter.cs" />
     <Compile Include="Linq\Processors\AccumulatorBinder.cs" />

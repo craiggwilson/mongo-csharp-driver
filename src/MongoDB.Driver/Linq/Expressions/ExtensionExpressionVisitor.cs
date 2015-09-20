@@ -35,6 +35,11 @@ namespace MongoDB.Driver.Linq.Expressions
             return node;
         }
 
+        protected internal virtual Expression VisitConstantSerialization(ConstantSerializationExpression node)
+        {
+            return node;
+        }
+
         protected internal virtual Expression VisitConcat(ConcatExpression node)
         {
             return node.Update(
