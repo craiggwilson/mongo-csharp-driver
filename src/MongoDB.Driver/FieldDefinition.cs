@@ -215,13 +215,13 @@ namespace MongoDB.Driver
         public override RenderedFieldDefinition Render(IBsonSerializer<TDocument> documentSerializer, IBsonSerializerRegistry serializerRegistry)
         {
             var bindingContext = new PipelineBindingContext(serializerRegistry);
-            var lambda = ExpressionHelper.GetLambda(PartialEvaluator.Evaluate(_expression));
+            var lambda = Linq.ExpressionHelper.GetLambda(PartialEvaluator.Evaluate(_expression));
             var parameterExpression = new DocumentExpression(documentSerializer);
             bindingContext.AddExpressionMapping(lambda.Parameters[0], parameterExpression);
             var bound = bindingContext.Bind(lambda.Body);
             bound = FieldExpressionFlattener.FlattenFields(bound);
             IFieldExpression field;
-            if (!ExpressionHelper.TryGetExpression(bound, out field))
+            if (!Linq.ExpressionHelper.TryGetExpression(bound, out field))
             {
                 var message = string.Format("Unable to determine the serialization information for {0}.", _expression);
                 throw new InvalidOperationException(message);
@@ -267,7 +267,7 @@ namespace MongoDB.Driver
             var bound = bindingContext.Bind(lambda.Body);
             bound = FieldExpressionFlattener.FlattenFields(bound);
             IFieldExpression field;
-            if (!ExpressionHelper.TryGetExpression(bound, out field))
+            if (!Linq.ExpressionHelper.TryGetExpression(bound, out field))
             {
                 var message = string.Format("Unable to determine the serialization information for {0}.", _expression);
                 throw new InvalidOperationException(message);
