@@ -74,6 +74,19 @@ namespace MongoDB.Driver
         IAggregateFluent<TResult> Limit(int limit);
 
         /// <summary>
+        /// Appends a lookup stage to the pipeline.
+        /// </summary>
+        /// <typeparam name="TForeignCollection">The type of the foreign collection.</typeparam>
+        /// <typeparam name="TNewResult">The type of the new result.</typeparam>
+        /// <param name="foreignCollectionName">Name of the other collection.</param>
+        /// <param name="localField">The local field.</param>
+        /// <param name="foreignField">The foreign field.</param>
+        /// <param name="as">The field in <typeparamref name="TNewResult" /> to place the foreign results.</param>
+        /// <param name="options">The options.</param>
+        /// <returns>The fluent aggregate interface.</returns>
+        IAggregateFluent<TNewResult> Lookup<TForeignCollection, TNewResult>(string foreignCollectionName, FieldDefinition<TResult> localField, FieldDefinition<TForeignCollection> foreignField, FieldDefinition<TNewResult> @as, AggregateLookupOptions<TForeignCollection, TNewResult> options = null);
+
+        /// <summary>
         /// Appends a match stage to the pipeline.
         /// </summary>
         /// <param name="filter">The filter.</param>

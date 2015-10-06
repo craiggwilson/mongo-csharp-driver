@@ -85,6 +85,30 @@ namespace MongoDB.Driver
             return AppendStage<TResult>(new BsonDocument("$limit", limit));
         }
 
+        public override IAggregateFluent<TNewResult> Lookup<TForeignCollection, TNewResult>(string foreignCollectionName, FieldDefinition<TResult> localField, FieldDefinition<TForeignCollection> foreignField, FieldDefinition<TNewResult> @as, AggregateLookupOptions<TForeignCollection, TNewResult> options)
+        {
+            options = options ?? new AggregateLookupOptions<TForeignCollection, TNewResult>();
+            const string operatorName = "$lookup";
+            var stage = new DelegatedPipelineStageDefinition<TResult, TNewResult>(
+                operatorName,
+                (localSerializer, sr) =>
+                {
+                    var foreignSerializer = options.ForeignSerializer ?? (localSerializer as IBsonSerializer<TForeignCollection>) ?? sr.GetSerializer<TForeignCollection>();
+                    var newResultSerializer = options.ResultSerializer ?? (localSerializer as IBsonSerializer<TNewResult>) ?? sr.GetSerializer<TNewResult>();
+                    return new RenderedPipelineStageDefinition<TNewResult>(
+                        operatorName, new BsonDocument(operatorName, new BsonDocument
+                        {
+                            { "from", foreignCollectionName },
+                            { "localField", localField.Render(localSerializer, sr).FieldName },
+                            { "foreignField", foreignField.Render(foreignSerializer, sr).FieldName },
+                            { "as", @as.Render(newResultSerializer, sr).FieldName }
+                        }),
+                        newResultSerializer);
+                });
+
+            return AppendStage<TNewResult>(stage);
+        }
+
         public override IAggregateFluent<TResult> Match(FilterDefinition<TResult> filter)
         {
             const string operatorName = "$match";

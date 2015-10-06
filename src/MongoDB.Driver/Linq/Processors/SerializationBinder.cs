@@ -86,6 +86,21 @@ namespace MongoDB.Driver.Linq.Processors
             return newNode;
         }
 
+        protected override Expression VisitConstant(ConstantExpression node)
+        {
+            if (node.Type.IsGenericType &&
+                node.Type.GetGenericTypeDefinition() == typeof(IMongoQueryable<>))
+            {
+                var queryable = (IMongoQueryable)node.Value;
+                var provider = (IMongoQueryProvider)queryable.Provider;
+                return new CollectionExpression(
+                    provider.CollectionNamespace,
+                    provider.CollectionDocumentSerializer);
+            }
+
+            return base.VisitConstant(node);
+        }
+
         protected override Expression VisitLambda<T>(Expression<T> node)
         {
             // Don't visit the parameters. We cannot replace a parameter expression
@@ -123,11 +138,18 @@ namespace MongoDB.Driver.Linq.Processors
                     BsonSerializationInfo memberSerializationInfo;
                     if (documentSerializer != null && documentSerializer.TryGetMemberSerializationInfo(node.Member.Name, out memberSerializationInfo))
                     {
-                        newNode = new FieldExpression(
-                            mex.Expression,
-                            memberSerializationInfo.ElementName,
-                            memberSerializationInfo.Serializer,
-                            mex);
+                        if (memberSerializationInfo.ElementName == null)
+                        {
+                            newNode = new DocumentExpression(memberSerializationInfo.Serializer);
+                        }
+                        else
+                        {
+                            newNode = new FieldExpression(
+                                mex.Expression,
+                                memberSerializationInfo.ElementName,
+                                memberSerializationInfo.Serializer,
+                                mex);
+                        }
                     }
                 }
             }
@@ -206,6 +228,9 @@ namespace MongoDB.Driver.Linq.Processors
             {
                 return node;
             }
+
+            // we need to discover if this is rooted at an IMongoQueryable... If so, it 
+            // gets processed as a top-level pipeline...
 
             return EmbeddedPipelineBinder.Bind(node, _bindingContext);
         }

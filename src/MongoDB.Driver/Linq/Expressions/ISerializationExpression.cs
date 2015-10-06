@@ -13,6 +13,7 @@
 * limitations under the License.
 */
 
+using System;
 using System.Collections;
 using MongoDB.Bson;
 using MongoDB.Bson.IO;
@@ -24,6 +25,8 @@ namespace MongoDB.Driver.Linq.Expressions
     internal interface ISerializationExpression
     {
         IBsonSerializer Serializer { get; }
+
+        Type Type { get; }
     }
 
     internal static class ISerializationExpressionExtensions
