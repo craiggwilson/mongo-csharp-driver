@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.31101.0
+# Visual Studio 14
+VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongoDB.Bson", "MongoDB.Bson\MongoDB.Bson.csproj", "{0E9A3A2A-49CD-4F6C-847C-DC79B4B65CE6}"
 EndProject
@@ -51,6 +51,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{6307AC
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongoDB.Driver.GridFS.Tests", "MongoDB.Driver.GridFS.Tests\MongoDB.Driver.GridFS.Tests.csproj", "{1537C58E-BECD-4ED2-A900-1AFBB601D2B2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MongoDB.Driver.TestWebApplication", "MongoDB.Driver.TestWebApplication\MongoDB.Driver.TestWebApplication.csproj", "{121543B8-331D-4393-809D-C44B6943FC84}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -126,6 +128,10 @@ Global
 		{1537C58E-BECD-4ED2-A900-1AFBB601D2B2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1537C58E-BECD-4ED2-A900-1AFBB601D2B2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1537C58E-BECD-4ED2-A900-1AFBB601D2B2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{121543B8-331D-4393-809D-C44B6943FC84}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{121543B8-331D-4393-809D-C44B6943FC84}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{121543B8-331D-4393-809D-C44B6943FC84}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{121543B8-331D-4393-809D-C44B6943FC84}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -148,5 +154,6 @@ Global
 		{0B7600F4-A343-4007-8977-933DBEFC0CC7} = {391D831D-5AC7-43F8-8BCB-6AE81B027658}
 		{6B5D1EA6-1088-4122-B8C4-B341822C7915} = {11282844-4584-4F65-9857-D4329046E84D}
 		{1537C58E-BECD-4ED2-A900-1AFBB601D2B2} = {11282844-4584-4F65-9857-D4329046E84D}
+		{121543B8-331D-4393-809D-C44B6943FC84} = {391D831D-5AC7-43F8-8BCB-6AE81B027658}
 	EndGlobalSection
 EndGlobal
