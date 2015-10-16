@@ -185,11 +185,55 @@ namespace MongoDB.Driver.Linq.Processors
         protected override Expression VisitUnary(UnaryExpression node)
         {
             var newNode = (UnaryExpression)base.VisitUnary(node);
-            if (newNode.NodeType == ExpressionType.Convert || newNode.NodeType == ExpressionType.ConvertChecked)
+            var serializationExpression = newNode.Operand as SerializationExpression;
+            if (serializationExpression != null &&
+                (newNode.NodeType == ExpressionType.Convert || newNode.NodeType == ExpressionType.ConvertChecked))
             {
-                if (newNode.Method == null && !newNode.IsLiftedToNull && newNode.Type.IsAssignableFrom(newNode.Operand.Type))
+                IBsonSerializer newSerializer = null;
+                if (newNode.Type.IsAssignableFrom(newNode.Operand.Type))
                 {
-                    return newNode.Operand;
+                    if (newNode.Method == null && !newNode.IsLiftedToNull)
+                    {
+                        return newNode.Operand;
+                    }
+
+                    // what does this mean? this mean that it's a nullable conversion...
+                    // Should we create a new nullable converter for this thing?
+                    //newSerializer = _bindingContext.GetSerializer(newNode.Type, newNode);
+                }
+                else
+                {
+                    newSerializer = _bindingContext.GetSerializer(newNode.Type, newNode);
+                }
+
+                if (newSerializer != null)
+                {
+                    switch (serializationExpression.ExtensionType)
+                    {
+                        case ExtensionExpressionType.ArrayIndex:
+                            var arrayIndex = (ArrayIndexExpression)serializationExpression;
+                            return new ArrayIndexExpression(
+                                arrayIndex.Array,
+                                arrayIndex.Index,
+                                newSerializer);
+                        case ExtensionExpressionType.Document:
+                            return new DocumentExpression(newSerializer);
+                        case ExtensionExpressionType.Field:
+                            var field = (FieldExpression)serializationExpression;
+                            return new FieldExpression(
+                                field.Document,
+                                field.FieldName,
+                                newSerializer,
+                                newNode);
+                        case ExtensionExpressionType.FieldAsDocument:
+                            var fieldAsDocument = (FieldAsDocumentExpression)serializationExpression;
+                            return new FieldAsDocumentExpression(
+                                fieldAsDocument.Expression,
+                                fieldAsDocument.FieldName,
+                                newSerializer);
+                        default:
+                            throw new NotSupportedException();
+                    }
                 }
             }
 

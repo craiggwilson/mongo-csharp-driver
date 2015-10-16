@@ -108,6 +108,36 @@ namespace MongoDB.Driver.Tests.Linq
         }
 
         [Test]
+        public void Cast_explicit_to_interface()
+        {
+            var query = CreateQuery().Where(x => ((IRoot)x).Id == 10);
+
+            Assert(query,
+                1,
+                "{ $match: { _id: 10 } }");
+        }
+
+        [Test]
+        public void Cast_explicit_to_subclass()
+        {
+            var query = CreateQuery().Where(x => x.Id == 20 && ((RootDescended)x).P == 1.1);
+
+            Assert(query,
+                1,
+                "{ $match: { _id: 20, P: 1.1 } }");
+        }
+
+        //[Test]
+        //public void Cast_explicit_to_nullable()
+        //{
+        //    var query = CreateQuery().Where(x => x.R == new DateTime(2013, 1, 2, 3, 4, 5, 6, DateTimeKind.Utc));
+
+        //    Assert(query,
+        //        1,
+        //        "{ $match: { R: null } }");
+        //}
+
+        [Test]
         public void Count()
         {
             var result = CreateQuery().Count();
