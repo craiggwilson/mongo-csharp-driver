@@ -75,7 +75,7 @@ namespace MongoDB.Driver.Core.Configuration
                 streamFactory,
                 _eventAggregator);
 
-            var connectionPoolFactory = new ExclusiveConnectionPoolFactory(
+            var connectionPoolFactory = new NonExclusiveConnectionPoolFactory(
                 _connectionPoolSettings,
                 connectionFactory,
                 _eventAggregator);
