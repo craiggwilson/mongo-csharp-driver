@@ -15,8 +15,8 @@ namespace Benchmarking
     {
         private static int _numWarmupIterations = 10;
         private static int _numIterations = 100;
-        private static TimeSpan _minTime = TimeSpan.FromMinutes(1);
-        private static TimeSpan _maxTime = TimeSpan.FromMinutes(5);
+        private static TimeSpan _minTime = TimeSpan.FromMinutes(0);
+        private static TimeSpan _maxTime = TimeSpan.FromMinutes(.2);
         private static List<IBenchmarkResultWriter> _writers = new List<IBenchmarkResultWriter>
         {
             new TextBasedBenchmarkResultWriter(Console.Out)

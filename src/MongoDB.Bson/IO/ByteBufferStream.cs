@@ -15,6 +15,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace MongoDB.Bson.IO
@@ -531,16 +532,18 @@ namespace MongoDB.Bson.IO
                 throw new ArgumentNullException("value");
             }
             ThrowIfDisposed();
-            
+
             var maxLength = Utf8Encodings.Strict.GetMaxByteCount(value.Length) + 1;
             PrepareToWrite(maxLength);
 
             int actualLength;
             var segment = _buffer.AccessBackingBytes(_position);
+            bool? hasNullBytes;
             if (segment.Count >= maxLength)
             {
-                actualLength = Utf8Encodings.Strict.GetBytes(value, 0, value.Length, segment.Array, segment.Offset);
-                if (Array.IndexOf<byte>(segment.Array, 0, segment.Offset, actualLength) != -1)
+                actualLength = EncodingHelper.GetBytes(value, segment.Array, segment.Offset, out hasNullBytes);
+                //actualLength = encoding.GetBytes(value, 0, value.Length, segment.Array, segment.Offset);
+                if (hasNullBytes == true || (!hasNullBytes.HasValue && Array.IndexOf<byte>(segment.Array, 0, segment.Offset, actualLength) != -1))
                 {
                     throw new ArgumentException("UTF8 representation of a CString cannot contain null bytes.", "value");
                 }
@@ -553,15 +556,17 @@ namespace MongoDB.Bson.IO
                 if (maxLength <= _tempUtf8.Length)
                 {
                     bytes = _tempUtf8;
-                    actualLength = Utf8Encodings.Strict.GetBytes(value, 0, value.Length, bytes, 0);
+                    actualLength = EncodingHelper.GetBytes(value, bytes, 0, out hasNullBytes);
+                    //actualLength = encoding.GetBytes(value, 0, value.Length, bytes, 0);
                 }
                 else
                 {
-                    bytes = Utf8Encodings.Strict.GetBytes(value);
+                    bytes = EncodingHelper.GetBytes(value, out hasNullBytes);
+                    //bytes = encoding.GetBytes(value);
                     actualLength = bytes.Length;
                 }
 
-                if (Array.IndexOf<byte>(bytes, 0, 0, actualLength) != -1)
+                if (hasNullBytes == true || (!hasNullBytes.HasValue && Array.IndexOf<byte>(bytes, 0, 0, actualLength) != -1))
                 {
                     throw new ArgumentException("UTF8 representation of a CString cannot contain null bytes.", "value");
                 }
@@ -571,6 +576,11 @@ namespace MongoDB.Bson.IO
             }
 
             SetPositionAfterWrite(_position + actualLength + 1);
+        }
+
+        private bool IsAscii(string value)
+        {
+            return value.All(c => c <= 127);
         }
 
         /// <inheritdoc/>
@@ -600,7 +610,7 @@ namespace MongoDB.Bson.IO
         public override void WriteDouble(double value)
         {
             ThrowIfDisposed();
-            
+
             PrepareToWrite(8);
 
             var bytes = BitConverter.GetBytes(value);
@@ -613,7 +623,7 @@ namespace MongoDB.Bson.IO
         public override void WriteInt32(int value)
         {
             ThrowIfDisposed();
-            
+
             PrepareToWrite(4);
 
             var segment = _buffer.AccessBackingBytes(_position);
@@ -640,7 +650,7 @@ namespace MongoDB.Bson.IO
         public override void WriteInt64(long value)
         {
             ThrowIfDisposed();
-            
+
             PrepareToWrite(8);
 
             var bytes = BitConverter.GetBytes(value);
@@ -653,7 +663,7 @@ namespace MongoDB.Bson.IO
         public override void WriteObjectId(ObjectId value)
         {
             ThrowIfDisposed();
-            
+
             PrepareToWrite(12);
 
             var segment = _buffer.AccessBackingBytes(_position);
@@ -674,7 +684,7 @@ namespace MongoDB.Bson.IO
         public override void WriteString(string value, UTF8Encoding encoding)
         {
             ThrowIfDisposed();
-            
+
             var maxLength = encoding.GetMaxByteCount(value.Length) + 5;
             PrepareToWrite(maxLength);
 
