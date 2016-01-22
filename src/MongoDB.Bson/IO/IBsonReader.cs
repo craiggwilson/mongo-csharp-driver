@@ -63,7 +63,7 @@ namespace MongoDB.Bson.IO
         /// Reads BSON binary data from the reader.
         /// </summary>
         /// <returns>A BsonBinaryData.</returns>
-         BsonBinaryData ReadBinaryData();
+        BsonBinaryData ReadBinaryData();
 
         /// <summary>
         /// Reads a BSON boolean from the reader.
@@ -88,6 +88,12 @@ namespace MongoDB.Bson.IO
         /// </summary>
         /// <returns>The number of milliseconds since the Unix epoch.</returns>
         long ReadDateTime();
+
+        /// <summary>
+        /// Reads a BSON Decimal from the reader.
+        /// </summary>
+        /// <returns>A <see cref="Decimal128" />.</returns>
+        Decimal128 ReadDecimal();
 
         /// <summary>
         /// Reads a BSON Double from the reader.

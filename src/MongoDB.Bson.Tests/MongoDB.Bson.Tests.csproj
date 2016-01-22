@@ -108,6 +108,8 @@
     <Compile Include="Jira\CSharp783Tests.cs" />
     <Compile Include="Jira\CSharp803Tests.cs" />
     <Compile Include="ObjectModel\BsonBooleanTests.cs" />
+    <Compile Include="ObjectModel\BsonDecimalTests.cs" />
+    <Compile Include="ObjectModel\Decimal128Tests.cs" />
     <Compile Include="ObjectModel\BsonDoubleTests.cs" />
     <Compile Include="ObjectModel\BsonInt32Tests.cs" />
     <Compile Include="ObjectModel\BsonInt64Tests.cs" />

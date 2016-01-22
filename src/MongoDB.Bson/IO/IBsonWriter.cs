@@ -33,7 +33,7 @@ namespace MongoDB.Bson.IO
         /// </summary>
         BsonWriterSettings Settings { get; }
 
-            // methods
+        // methods
         /// <summary>
         /// Gets the current state of the writer.
         /// </summary>
@@ -85,6 +85,12 @@ namespace MongoDB.Bson.IO
         /// </summary>
         /// <param name="value">The number of milliseconds since the Unix epoch.</param>
         void WriteDateTime(long value);
+
+        /// <summary>
+        /// Writes a BSON Decimal to the writer.
+        /// </summary>
+        /// <param name="value">The <see cref="Decimal128"/> value.</param>
+        void WriteDecimal(Decimal128 value);
 
         /// <summary>
         /// Writes a BSON Double to the writer.

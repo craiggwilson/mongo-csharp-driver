@@ -80,6 +80,11 @@ namespace MongoDB.Bson.TestHelpers.IO
             throw new NotSupportedException();
         }
 
+        public override Decimal128 ReadDecimal()
+        {
+            throw new NotSupportedException();
+        }
+
         public override double ReadDouble()
         {
             throw new NotSupportedException();
@@ -151,6 +156,11 @@ namespace MongoDB.Bson.TestHelpers.IO
         public override void WriteCStringBytes(byte[] value)
         {
             Position += value.Length + 1;
+        }
+
+        public override void WriteDecimal(Decimal128 value)
+        {
+            Position += 16;
         }
 
         public override void WriteDouble(double value)

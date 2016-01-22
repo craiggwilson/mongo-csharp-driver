@@ -293,6 +293,20 @@ namespace MongoDB.Bson.IO
         }
 
         /// <inheritdoc/>
+        public override Decimal128 ReadDecimal()
+        {
+            var high = ReadInt64();
+            var low = ReadInt64();
+
+            var bits = new uint[4];
+            bits[0] = (uint)(high >> 32);
+            bits[1] = (uint)high;
+            bits[2] = (uint)(low >> 32);
+            bits[3] = (uint)low;
+            return new Decimal128(bits);
+        }
+
+        /// <inheritdoc/>
         public override double ReadDouble()
         {
             ThrowIfDisposed();
@@ -461,6 +475,22 @@ namespace MongoDB.Bson.IO
 
             this.WriteBytes(value, 0, value.Length);
             WriteByte(0);
+        }
+
+        /// <inheritdoc/>
+        public override void WriteDecimal(Decimal128 value)
+        {
+            ThrowIfDisposed();
+            var bits = Decimal128.GetBits(value);
+
+            var bytes = BitConverter.GetBytes(bits[0]);
+            _stream.Write(bytes, 0, 4);
+            bytes = BitConverter.GetBytes(bits[1]);
+            _stream.Write(bytes, 0, 4);
+            bytes = BitConverter.GetBytes(bits[2]);
+            _stream.Write(bytes, 0, 4);
+            bytes = BitConverter.GetBytes(bits[3]);
+            _stream.Write(bytes, 0, 4);
         }
 
         /// <inheritdoc/>

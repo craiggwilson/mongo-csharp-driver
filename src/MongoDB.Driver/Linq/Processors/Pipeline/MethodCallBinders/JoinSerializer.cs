@@ -193,6 +193,11 @@ namespace MongoDB.Driver.Linq.Processors.Pipeline.MethodCallBinders
                 return _parent.ReadDateTime();
             }
 
+            public Decimal128 ReadDecimal()
+            {
+                return _parent.ReadDecimal();
+            }
+
             public double ReadDouble()
             {
                 return _parent.ReadDouble();

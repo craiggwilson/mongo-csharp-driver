@@ -87,7 +87,7 @@ namespace MongoDB.Bson.IO
         /// </value>
         public BsonStream BsonStream
         {
-            get { return _bsonStream;  }
+            get { return _bsonStream; }
         }
 
         // public methods
@@ -264,6 +264,22 @@ namespace MongoDB.Bson.IO
             _bsonStream.WriteBsonType(BsonType.DateTime);
             WriteNameHelper();
             _bsonStream.WriteInt64(value);
+
+            State = GetNextState();
+        }
+
+        /// <inheritdoc />
+        public override void WriteDecimal(Decimal128 value)
+        {
+            if (Disposed) { throw new ObjectDisposedException("BsonBinaryWriter"); }
+            if (State != BsonWriterState.Value)
+            {
+                ThrowInvalidState(nameof(WriteDecimal), BsonWriterState.Value);
+            }
+
+            _bsonStream.WriteBsonType(BsonType.Decimal);
+            WriteNameHelper();
+            _bsonStream.WriteDecimal(value);
 
             State = GetNextState();
         }

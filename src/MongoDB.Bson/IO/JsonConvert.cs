@@ -71,6 +71,16 @@ namespace MongoDB.Bson.IO
         }
 
         /// <summary>
+        /// Converts a string to a <see cref="Decimal128"/>.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <returns>A <see cref="Decimal128"/>.</returns>
+        public static Decimal128 ToDecimal128(string value)
+        {
+            return Decimal128.Parse(value, NumberFormatInfo.InvariantInfo);
+        }
+
+        /// <summary>
         /// Converts a string to a Double.
         /// </summary>
         /// <param name="value">The value.</param>
@@ -158,6 +168,16 @@ namespace MongoDB.Bson.IO
         public static string ToString(decimal value)
         {
             return value.ToString("G", NumberFormatInfo.InvariantInfo);
+        }
+
+        /// <summary>
+        /// Converts a <see cref="Decimal128"/> to a string.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <returns>A string.</returns>
+        public static string ToString(Decimal128 value)
+        {
+            return value.ToString(NumberFormatInfo.InvariantInfo);
         }
 
         /// <summary>

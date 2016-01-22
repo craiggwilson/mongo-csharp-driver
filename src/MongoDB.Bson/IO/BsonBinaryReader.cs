@@ -282,6 +282,15 @@ namespace MongoDB.Bson.IO
             return value;
         }
 
+        /// <inheritdoc />
+        public override Decimal128 ReadDecimal()
+        {
+            if (Disposed) { ThrowObjectDisposedException(); }
+            VerifyBsonType(nameof(ReadDecimal), BsonType.Decimal);
+            State = GetNextState();
+            return _bsonStream.ReadDecimal();
+        }
+
         /// <summary>
         /// Reads a BSON Double from the reader.
         /// </summary>

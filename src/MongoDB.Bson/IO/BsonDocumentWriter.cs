@@ -146,6 +146,19 @@ namespace MongoDB.Bson.IO
             State = GetNextState();
         }
 
+        /// <inheritdoc />
+        public override void WriteDecimal(Decimal128 value)
+        {
+            if (Disposed) { throw new ObjectDisposedException("BsonDocumentWriter"); }
+            if (State != BsonWriterState.Value)
+            {
+                ThrowInvalidState(nameof(WriteDecimal), BsonWriterState.Value);
+            }
+
+            WriteValue(new BsonDecimal(value));
+            State = GetNextState();
+        }
+
         /// <summary>
         /// Writes a BSON Double to the writer.
         /// </summary>

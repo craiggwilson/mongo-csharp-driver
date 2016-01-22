@@ -41,6 +41,15 @@ namespace MongoDB.Bson.IO
         public abstract ArraySegment<byte> ReadCStringBytes();
 
         /// <summary>
+        /// Reads a BSON decimal from the stream.
+        /// </summary>
+        /// <returns>A <see cref="Decimal128"/>.</returns>
+        public virtual Decimal128 ReadDecimal()
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <summary>
         /// Reads a BSON double from the stream.
         /// </summary>
         /// <returns>A double.</returns>
@@ -93,6 +102,15 @@ namespace MongoDB.Bson.IO
         /// </summary>
         /// <param name="value">The value.</param>
         public abstract void WriteCStringBytes(byte[] value);
+
+        /// <summary>
+        /// Writes the <paramref name="value"/> to the stream.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        public virtual void WriteDecimal(Decimal128 value)
+        {
+            throw new NotImplementedException();
+        }
 
         /// <summary>
         /// Writes a BSON double to the stream.

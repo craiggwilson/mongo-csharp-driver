@@ -130,7 +130,7 @@ namespace MongoDB.Bson.IO
                             break;
 
                         default:
-                        _textWriter.Write("new BinData({0}, \"{1}\")", (int)subType, Convert.ToBase64String(bytes));
+                            _textWriter.Write("new BinData({0}, \"{1}\")", (int)subType, Convert.ToBase64String(bytes));
                             break;
                     }
                     break;
@@ -200,6 +200,21 @@ namespace MongoDB.Bson.IO
                     }
                     break;
             }
+
+            State = GetNextState();
+        }
+
+        /// <inheritdoc />
+        public override void WriteDecimal(Decimal128 value)
+        {
+            if (Disposed) { throw new ObjectDisposedException("JsonWriter"); }
+            if (State != BsonWriterState.Value && State != BsonWriterState.Initial)
+            {
+                ThrowInvalidState(nameof(WriteDecimal), BsonWriterState.Value, BsonWriterState.Initial);
+            }
+
+            WriteNameHelper(Name);
+            _textWriter.Write("{{ \"$numberDecimal\" : \"{0}\" }}", value.ToString(NumberFormatInfo.InvariantInfo));
 
             State = GetNextState();
         }

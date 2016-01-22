@@ -125,6 +125,18 @@ namespace MongoDB.Bson.IO
         }
 
         /// <summary>
+        /// Reads a BSON Decimal element from the reader.
+        /// </summary>
+        /// <param name="reader">The reader.</param>
+        /// <param name="name">The name of the element.</param>
+        /// <returns>A <see cref="Decimal128"/>.</returns>
+        public static Decimal128 ReadDecimal(this IBsonReader reader, string name)
+        {
+            VerifyName(reader, name);
+            return reader.ReadDecimal();
+        }
+
+        /// <summary>
         /// Reads a BSON Double element from the reader.
         /// </summary>
         /// <param name="reader">The reader.</param>

@@ -395,6 +395,15 @@ namespace MongoDB.Bson.IO
             return _currentValue.AsBsonDateTime.MillisecondsSinceEpoch;
         }
 
+        /// <inheritdoc />
+        public override Decimal128 ReadDecimal()
+        {
+            if (Disposed) { ThrowObjectDisposedException(); }
+            VerifyBsonType(nameof(ReadDecimal), BsonType.DateTime);
+            State = GetNextState();
+            return _currentValue.AsDecimal128;
+        }
+
         /// <summary>
         /// Reads a BSON Double from the reader.
         /// </summary>

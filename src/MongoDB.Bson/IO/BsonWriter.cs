@@ -170,6 +170,12 @@ namespace MongoDB.Bson.IO
         /// <param name="value">The number of milliseconds since the Unix epoch.</param>
         public abstract void WriteDateTime(long value);
 
+        /// <inheritdoc />
+        public virtual void WriteDecimal(Decimal128 value)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Writes a BSON Double to the writer.
         /// </summary>
