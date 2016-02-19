@@ -389,16 +389,24 @@ namespace MongoDB.Bson.IO
         public override Decimal128 ReadDecimal()
         {
             ThrowIfDisposed();
-            ThrowIfEndOfStream(8);
+            ThrowIfEndOfStream(16);
 
-            var high = ReadInt64();
-            var low = ReadInt64();
+            var bytes = new byte[16];
+            this.ReadBytes(bytes, 0, bytes.Length);
+
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(bytes, 0, 4);
+                Array.Reverse(bytes, 4, 4);
+                Array.Reverse(bytes, 8, 4);
+                Array.Reverse(bytes, 12, 4);
+            }
 
             var bits = new uint[4];
-            bits[0] = (uint)(high >> 32);
-            bits[1] = (uint)high;
-            bits[2] = (uint)(low >> 32);
-            bits[3] = (uint)low;
+            bits[0] = BitConverter.ToUInt32(bytes, 0);
+            bits[1] = BitConverter.ToUInt32(bytes, 4);
+            bits[2] = BitConverter.ToUInt32(bytes, 8);
+            bits[3] = BitConverter.ToUInt32(bytes, 12);
             return new Decimal128(bits);
         }
 
@@ -548,7 +556,7 @@ namespace MongoDB.Bson.IO
                 throw new ArgumentNullException("value");
             }
             ThrowIfDisposed();
-            
+
             var maxLength = CStringUtf8Encoding.GetMaxByteCount(value.Length) + 1;
             PrepareToWrite(maxLength);
 
@@ -613,12 +621,28 @@ namespace MongoDB.Bson.IO
             var bits = Decimal128.GetBits(value);
 
             var bytes = BitConverter.GetBytes(bits[0]);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(bytes);
+            }
             _buffer.SetBytes(_position, bytes, 0, 4);
             bytes = BitConverter.GetBytes(bits[1]);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(bytes);
+            }
             _buffer.SetBytes(_position + 4, bytes, 0, 4);
             bytes = BitConverter.GetBytes(bits[2]);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(bytes);
+            }
             _buffer.SetBytes(_position + 8, bytes, 0, 4);
             bytes = BitConverter.GetBytes(bits[3]);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(bytes);
+            }
             _buffer.SetBytes(_position + 12, bytes, 0, 4);
 
             SetPositionAfterWrite(_position + 16);
@@ -628,7 +652,7 @@ namespace MongoDB.Bson.IO
         public override void WriteDouble(double value)
         {
             ThrowIfDisposed();
-            
+
             PrepareToWrite(8);
 
             var bytes = BitConverter.GetBytes(value);
@@ -641,7 +665,7 @@ namespace MongoDB.Bson.IO
         public override void WriteInt32(int value)
         {
             ThrowIfDisposed();
-            
+
             PrepareToWrite(4);
 
             var segment = _buffer.AccessBackingBytes(_position);
@@ -668,7 +692,7 @@ namespace MongoDB.Bson.IO
         public override void WriteInt64(long value)
         {
             ThrowIfDisposed();
-            
+
             PrepareToWrite(8);
 
             var bytes = BitConverter.GetBytes(value);
@@ -681,7 +705,7 @@ namespace MongoDB.Bson.IO
         public override void WriteObjectId(ObjectId value)
         {
             ThrowIfDisposed();
-            
+
             PrepareToWrite(12);
 
             var segment = _buffer.AccessBackingBytes(_position);
@@ -702,7 +726,7 @@ namespace MongoDB.Bson.IO
         public override void WriteString(string value, UTF8Encoding encoding)
         {
             ThrowIfDisposed();
-            
+
             var maxLength = encoding.GetMaxByteCount(value.Length) + 5;
             PrepareToWrite(maxLength);
 

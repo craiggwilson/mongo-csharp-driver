@@ -15,6 +15,7 @@
 
 using System;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -295,14 +296,22 @@ namespace MongoDB.Bson.IO
         /// <inheritdoc/>
         public override Decimal128 ReadDecimal()
         {
-            var high = ReadInt64();
-            var low = ReadInt64();
+            var bytes = new byte[16];
+            this.ReadBytes(bytes, 0, bytes.Length);
+
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(bytes, 0, 4);
+                Array.Reverse(bytes, 4, 4);
+                Array.Reverse(bytes, 8, 4);
+                Array.Reverse(bytes, 12, 4);
+            }
 
             var bits = new uint[4];
-            bits[0] = (uint)(high >> 32);
-            bits[1] = (uint)high;
-            bits[2] = (uint)(low >> 32);
-            bits[3] = (uint)low;
+            bits[0] = BitConverter.ToUInt32(bytes, 0);
+            bits[1] = BitConverter.ToUInt32(bytes, 4);
+            bits[2] = BitConverter.ToUInt32(bytes, 8);
+            bits[3] = BitConverter.ToUInt32(bytes, 12);
             return new Decimal128(bits);
         }
 
@@ -484,12 +493,28 @@ namespace MongoDB.Bson.IO
             var bits = Decimal128.GetBits(value);
 
             var bytes = BitConverter.GetBytes(bits[0]);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(bytes);
+            }
             _stream.Write(bytes, 0, 4);
             bytes = BitConverter.GetBytes(bits[1]);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(bytes);
+            }
             _stream.Write(bytes, 0, 4);
             bytes = BitConverter.GetBytes(bits[2]);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(bytes);
+            }
             _stream.Write(bytes, 0, 4);
             bytes = BitConverter.GetBytes(bits[3]);
+            if (BitConverter.IsLittleEndian)
+            {
+                Array.Reverse(bytes);
+            }
             _stream.Write(bytes, 0, 4);
         }
 
