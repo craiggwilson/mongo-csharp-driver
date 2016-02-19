@@ -62,6 +62,7 @@ namespace MongoDB.Bson.Serialization.Serializers
                 case BsonType.Binary: return BsonBinaryDataSerializer.Instance.Deserialize(context);
                 case BsonType.Boolean: return BsonBooleanSerializer.Instance.Deserialize(context);
                 case BsonType.DateTime: return BsonDateTimeSerializer.Instance.Deserialize(context);
+                case BsonType.Decimal: return BsonDecimalSerializer.Instance.Deserialize(context);
                 case BsonType.Document: return BsonDocumentSerializer.Instance.Deserialize(context);
                 case BsonType.Double: return BsonDoubleSerializer.Instance.Deserialize(context);
                 case BsonType.Int32: return BsonInt32Serializer.Instance.Deserialize(context);
@@ -131,6 +132,7 @@ namespace MongoDB.Bson.Serialization.Serializers
                 case BsonType.Binary: BsonBinaryDataSerializer.Instance.Serialize(context, (BsonBinaryData)value); break;
                 case BsonType.Boolean: BsonBooleanSerializer.Instance.Serialize(context, (BsonBoolean)value); break;
                 case BsonType.DateTime: BsonDateTimeSerializer.Instance.Serialize(context, (BsonDateTime)value); break;
+                case BsonType.Decimal: BsonDecimalSerializer.Instance.Serialize(context, (BsonDecimal)value); break;
                 case BsonType.Document: BsonDocumentSerializer.Instance.Serialize(context, (BsonDocument)value); break;
                 case BsonType.Double: BsonDoubleSerializer.Instance.Serialize(context, (BsonDouble)value); break;
                 case BsonType.Int32: BsonInt32Serializer.Instance.Serialize(context, (BsonInt32)value); break;

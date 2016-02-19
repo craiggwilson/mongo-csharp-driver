@@ -317,6 +317,30 @@ namespace MongoDB.Bson.Tests.IO
             Assert.AreEqual(expected, BsonSerializer.Deserialize<DateTime>(json).ToJson(jsonSettings));
         }
 
+        [TestCase("{ $numberDecimal: 1 }", "1")]
+        [TestCase("{ $numberDecimal: -9223372036854775808 }", "-9223372036854775808")]
+        [TestCase("{ $numberDecimal: 9223372036854775807 }", "9223372036854775807")]
+        [TestCase("{ $numberDecimal: \"1\" }", "1")]
+        [TestCase("{ $numberDecimal: \"-9223372036854775808\" }", "-9223372036854775808")]
+        [TestCase("{ $numberDecimal: \"9223372036854775807\" }", "9223372036854775807")]
+        [TestCase("NumberDecimal(1)", "1")]
+        [TestCase("NumberDecimal(-9223372036854775808)", "-9223372036854775808")]
+        [TestCase("NumberDecimal(9223372036854775807)", "9223372036854775807")]
+        [TestCase("NumberDecimal(\"1\")", "1")]
+        [TestCase("NumberDecimal(\"-9223372036854775808\")", "-9223372036854775808")]
+        [TestCase("NumberDecimal(\"9223372036854775807\")", "9223372036854775807")]
+        public void TestDecimal128(string json, string expectedResultString)
+        {
+            using (var reader = new JsonReader(json))
+            {
+                var result = reader.ReadDecimal();
+                var expectedResult = Decimal128.Parse(expectedResultString);
+
+                result.Should().Be(expectedResult);
+                reader.IsAtEndOfFile().Should().BeTrue();
+            }
+        }
+
         [Test]
         public void TestDocumentEmpty()
         {

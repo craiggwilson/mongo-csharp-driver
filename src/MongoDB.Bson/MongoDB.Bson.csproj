@@ -218,6 +218,7 @@
     <Compile Include="Serialization\Serializers\BooleanSerializer.cs" />
     <Compile Include="Serialization\Serializers\BsonArraySerializer.cs" />
     <Compile Include="Serialization\Serializers\BsonBinaryDataSerializer.cs" />
+    <Compile Include="Serialization\Serializers\BsonDecimalSerializer.cs" />
     <Compile Include="Serialization\Serializers\BsonBooleanSerializer.cs" />
     <Compile Include="Serialization\IBsonSerializerExtensions.cs" />
     <Compile Include="Serialization\Serializers\PartiallyRawBsonDocumentSerializer.cs" />

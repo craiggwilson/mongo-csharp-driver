@@ -274,8 +274,13 @@ namespace MongoDB.Bson
         /// <inheritdoc />
         public int CompareTo(Decimal128 other)
         {
-            // TODO: must figure out how to compare these things.
-            throw new NotImplementedException();
+            if (Equals(other))
+            {
+                return 0;
+            }
+
+            // TODO: obviously, this needs to get fixed
+            return -1;
         }
 
         /// <inheritdoc />
@@ -285,7 +290,13 @@ namespace MongoDB.Bson
             // doesn't normalize... Hence 120 * 10^3 and 12.0 * 10 ^ 4
             // aren't stored the same way. We need to normalize both
             // prior to an equality comparison.
-            throw new NotImplementedException();
+            // For now, we'll simply compare the bits...
+            var bits = GetBits(this);
+            var otherBits = GetBits(other);
+            return bits[0] == otherBits[0] &&
+                bits[1] == otherBits[1] &&
+                bits[2] == otherBits[2] &&
+                bits[3] == otherBits[3];
         }
 
         /// <inheritdoc />
