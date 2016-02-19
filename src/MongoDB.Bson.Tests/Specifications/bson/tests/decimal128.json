@@ -1,0 +1,41 @@
+﻿{
+    "description": "Decimal128 type",
+    "documents": [
+        {
+            "decoded": {
+                "d": { "$numberDecimal": "NaN" }
+            },
+            "encoded": "180000001364007C00000000000000000000000000000000"
+        },
+        {
+            "decoded": {
+                "d": { "$numberDecimal": "Infinity" }
+            },
+            "encoded": "180000001364007800000000000000000000000000000000"
+        },
+        {
+            "decoded": {
+                "d": { "$numberDecimal": "-Infinity" }
+            },
+            "encoded": "18000000136400F800000000000000000000000000000000"
+        },
+        {
+            "decoded": {
+                "d": { "$numberDecimal": "0" }
+            },
+            "encoded": "180000001364003040000000000000000000000000000000"
+        },
+        {
+            "decoded": {
+                "d": { "$numberDecimal": "2.000" }
+            },
+            "encoded": "18000000136400303A00000000000000000000000007D000"
+        },
+        {
+            "decoded": {
+                "d": { "$numberDecimal": "0.1234567890123456789012345678901234" }
+            },
+            "encoded": "180000001364002FFC3CDE6FFF9732DE825CD07E96AFF200"
+        },
+    ]
+}

@@ -259,6 +259,7 @@
     <Compile Include="Serialization\IdGenerators\IdGeneratorsTests.cs" />
     <Compile Include="Serialization\Serializers\VersionSerializerTests.cs" />
     <Compile Include="PowerOf2Tests.cs" />
+    <Compile Include="Specifications\bson\TestRunner.cs" />
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include="Microsoft.Net.Client.3.5">
@@ -292,6 +293,11 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <EmbeddedResource Include="Specifications\bson\tests\int32.json" />
+    <EmbeddedResource Include="Specifications\bson\tests\corrupted.json" />
+    <EmbeddedResource Include="Specifications\bson\tests\boolean.json" />
+    <EmbeddedResource Include="Specifications\bson\tests\array.json" />
+    <EmbeddedResource Include="Specifications\bson\tests\decimal128.json" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
