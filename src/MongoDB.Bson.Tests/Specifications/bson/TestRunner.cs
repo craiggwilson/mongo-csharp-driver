@@ -32,12 +32,12 @@ namespace MongoDB.Bson.Specifications.bson
         [TestCaseSource(typeof(TestCaseFactory), "GetTestCases")]
         public void RunTestDefinition(BsonDocument definition)
         {
-            var encodedHex = ((string)definition["encoded"]).ToLowerInvariant();
-            var bytes = BsonUtils.ParseHexString(encodedHex);
+            var subjectHex = ((string)definition["subject"]).ToLowerInvariant();
+            var subjectBytes = BsonUtils.ParseHexString(subjectHex);
 
             if (definition.Contains("error"))
             {
-                using (var stream = new MemoryStream(bytes))
+                using (var stream = new MemoryStream(subjectBytes))
                 using (var reader = new BsonBinaryReader(stream))
                 {
                     var context = BsonDeserializationContext.CreateRoot(reader);
@@ -47,28 +47,40 @@ namespace MongoDB.Bson.Specifications.bson
             }
             else
             {
-                var decoded = (BsonDocument)definition["decoded"];
-
-                // test decoding
-                using (var stream = new MemoryStream(bytes))
+                BsonDocument subject = null;
+                using (var stream = new MemoryStream(subjectBytes))
                 using (var reader = new BsonBinaryReader(stream))
                 {
                     var context = BsonDeserializationContext.CreateRoot(reader);
-                    var actualDecoded = BsonDocumentSerializer.Instance.Deserialize(context);
-                    actualDecoded.Should().Be(decoded);
+                    subject = BsonDocumentSerializer.Instance.Deserialize(context);
                 }
 
-                if (!definition.GetValue("decodeOnly", false).ToBoolean())
+                foreach (string s in definition["tests"].AsBsonArray.Cast<BsonString>())
                 {
-                    // test encoding
-                    using (var stream = new MemoryStream())
-                    using (var writer = new BsonBinaryWriter(stream))
+                    switch (s)
                     {
-                        var context = BsonSerializationContext.CreateRoot(writer);
-                        BsonDocumentSerializer.Instance.Serialize(context, decoded);
+                        case "extjson":
+                            var extjson = (BsonDocument)definition["extjson"];
+                            extjson.Should().Be(subject);
+                            break;
+                        case "string":
+                            var value = subject.GetElement(0).Value;
+                            value.ToString().Should().Be(definition["string"].ToString());
+                            break;
+                        case "encode":
+                            using (var stream = new MemoryStream())
+                            using (var writer = new BsonBinaryWriter(stream))
+                            {
+                                var context = BsonSerializationContext.CreateRoot(writer);
+                                BsonDocumentSerializer.Instance.Serialize(context, subject);
 
-                        var actualEncodedHex = BsonUtils.ToHexString(stream.ToArray());
-                        actualEncodedHex.Should().Be(encodedHex);
+                                var actualEncodedHex = BsonUtils.ToHexString(stream.ToArray());
+                                actualEncodedHex.Should().Be(subjectHex);
+                            }
+                            break;
+                        default:
+                            Assert.Fail($"Unknown test type {s}");
+                            break;
                     }
                 }
             }
@@ -118,7 +130,11 @@ namespace MongoDB.Bson.Specifications.bson
             private static string GetTestName(string description, BsonDocument definition)
             {
                 var name = description;
-                if (definition.Contains("error"))
+                if (definition.Contains("description"))
+                {
+                    name += " - " + (string)definition["description"];
+                }
+                else if (definition.Contains("error"))
                 {
                     name += " - " + (string)definition["error"];
                 }

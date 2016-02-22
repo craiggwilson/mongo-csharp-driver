@@ -2,36 +2,46 @@
     "description": "Array type",
     "documents": [
         {
-            "decoded": {
+            "description": "Empty",
+            "tests": [ "extjson", "encode", "string" ],
+            "subject": "0D000000046100050000000000",
+            "extjson": {
                 "a": [ ]
             },
-            "encoded": "0D000000046100050000000000"
+            "string": "[]"
         },
         {
-            "decoded": {
+            "description": "Single Element Array",
+            "tests": [ "extjson", "encode", "string" ],
+            "subject": "140000000461000C0000001030000A0000000000",
+            "extjson": {
                 "a": [
                     10
                 ]
             },
-            "encoded": "140000000461000C0000001030000A0000000000"
+            "string": "[10]"
         },
         {
-            "decodeOnly": true,
-            "decoded": {
+            "description": "Single Element Array with index set incorrectly",
+            "tests": [ "extjson", "string" ],
+            "subject": "130000000461000B00000010000A0000000000",
+            "extjson": {
                 "a": [
                     10
                 ]
             },
-            "encoded": "130000000461000B00000010000A0000000000"
+            "string": "[10]"
         },
         {
-            "decodeOnly": true,
-            "decoded": {
+            "description": "Single Element Array with index set incorrectly",
+            "tests": [ "extjson", "string" ],
+            "subject": "150000000461000D000000106162000A0000000000",
+            "extjson": {
                 "a": [
                     10
                 ]
             },
-            "encoded": "150000000461000D000000106162000A0000000000"
+            "string": "[10]"
         }
     ]
 }

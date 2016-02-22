@@ -2,16 +2,22 @@
     "description": "Boolean type",
     "documents": [
         {
-            "decoded": {
+            "description": "True",
+            "tests": [ "extjson", "encode", "string" ],
+            "subject": "090000000862000100",
+            "extjson": {
                 "b": true
             },
-            "encoded": "090000000862000100"
+            "string": "true"
         },
         {
-            "decoded": {
+            "description": "False",
+            "tests": [ "extjson", "encode", "string" ],
+            "subject": "090000000862000000",
+            "extjson": {
                 "b": false
             },
-            "encoded": "090000000862000000"
+            "string": "false"
         }
     ]
 }
