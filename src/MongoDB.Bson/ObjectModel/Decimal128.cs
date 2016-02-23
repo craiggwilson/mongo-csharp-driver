@@ -16,6 +16,8 @@ namespace MongoDB.Bson
     [Serializable]
     public struct Decimal128 : IConvertible, IComparable<Decimal128>, IEquatable<Decimal128>
     {
+        private const short __exponentMax = 6111;
+        private const short __exponentMin = -6176;
         private const short __exponentBias = 6176;
 
         /// <summary>
@@ -1339,7 +1341,6 @@ namespace MongoDB.Bson
                 bool exponentNegative = false;
                 var digits = new List<byte>();
                 var scale = 0;
-                var precision = 0;
                 ParseState state = ParseState.None;
                 int i = 0;
                 int i2;
@@ -1413,18 +1414,12 @@ namespace MongoDB.Bson
                         if (_s[i] != '0' || (state & ParseState.SeenNonZero) != 0)
                         {
                             digits.Add((byte)(_s[i] - '0'));
-                            precision++;
-
-                            if ((state & ParseState.Decimal) != 0)
-                            {
-                                scale++;
-                            }
-
                             state |= ParseState.SeenNonZero;
                         }
-                        else if ((state & ParseState.Decimal) != 0)
+
+                        if ((state & ParseState.Decimal) != 0)
                         {
-                            scale++;
+                            scale--;
                         }
                     }
                     else if ((_style & NumberStyles.AllowDecimalPoint) != 0 && (state & ParseState.Decimal) == 0 && (i2 = MatchChars(_s, i, _formatInfo.NumberDecimalSeparator)) != i)
@@ -1467,21 +1462,21 @@ namespace MongoDB.Bson
                             {
                                 tempScale = tempScale * 10 + (_s[i] - '0');
                                 i++;
-                                if (tempScale > 1000)
-                                {
-                                    tempScale = 9999;
-                                    while (char.IsDigit(_s, i))
-                                    {
-                                        i++;
-                                    }
-                                }
-                                if (exponentNegative)
-                                {
-                                    tempScale = -tempScale;
-                                }
-                                scale += tempScale;
                             }
                             while (i < _s.Length && char.IsDigit(_s, i));
+
+                            if (exponentNegative)
+                            {
+                                tempScale = -tempScale;
+                            }
+                            if (tempScale <= scale && (scale - tempScale) > (1 << 14))
+                            {
+                                scale = __exponentMin;
+                            }
+                            else
+                            {
+                                scale += tempScale;
+                            }
                         }
                     }
                 }
@@ -1534,11 +1529,7 @@ namespace MongoDB.Bson
 
                 ulong sigHigh = 0;
                 ulong sigLow = 0;
-                if (digits.Count == 0)
-                {
-                    // 0
-                }
-                else if (digits.Count < 17)
+                if (digits.Count != 0 && digits.Count < 17)
                 {
                     var digitIndex = 0;
                     sigLow = digits[digitIndex++];
@@ -1548,7 +1539,7 @@ namespace MongoDB.Bson
                         sigLow += digits[digitIndex];
                     }
                 }
-                else
+                else if (digits.Count != 0)
                 {
                     var digitIndex = 0;
                     sigHigh = digits[digitIndex++];
@@ -1583,7 +1574,7 @@ namespace MongoDB.Bson
                 bits[2] = (uint)(newSigLow >> 32);
                 bits[3] = (uint)newSigLow;
 
-                short exponent = (short)-scale;
+                short exponent = (short)scale;
                 byte flags = 0;
                 if (negative)
                 {

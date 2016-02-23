@@ -135,14 +135,20 @@
         },
         {
             "description": "Scientific - Tiniest",
-            "tests": [ "encode", "string" ],
+            "tests": [ "extjson", "encode", "string" ],
             "subject": "180000001364000001ED09BEAD87C0378D8E63FFFFFFFF00",
+            "extjson": {
+                "d": { "$numberDecimal": "9.999999999999999999999999999999999E-6143" }
+            },
             "string": "9.999999999999999999999999999999999E-6143"
         },
         {
             "description": "Scientific - Tiny",
-            "tests": [ "encode", "string" ],
+            "tests": [ "extjson", "encode", "string" ],
             "subject": "180000001364000000000000000000000000000000000100",
+            "extjson": {
+                "d": { "$numberDecimal": "1E-6176" }
+            },
             "string": "1E-6176"
         },
         {
