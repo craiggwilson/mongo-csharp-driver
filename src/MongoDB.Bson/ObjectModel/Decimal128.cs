@@ -490,16 +490,13 @@ namespace MongoDB.Bson
                     uint remainder;
                     DivideByOneBillion(ref high, ref highMid, ref lowMid, ref low, out remainder);
 
-                    // we now have the 9 least significant digits (in base 2).
-                    if (remainder == 0)
+                    if (remainder != 0)
                     {
-                        break;
-                    }
-
-                    for (int j = 8; j >= 0; j--)
-                    {
-                        significand[k * 9 + j] = (byte)(remainder % 10);
-                        remainder /= 10;
+                        for (int j = 8; j >= 0; j--)
+                        {
+                            significand[k * 9 + j] = (byte)(remainder % 10);
+                            remainder /= 10;
+                        }
                     }
                 }
             }
@@ -542,7 +539,11 @@ namespace MongoDB.Bson
                 }
 
                 result.Append('E');
-                result.Append(scientificExponent);
+                if (scientificExponent > 0)
+                {
+                    result.Append(formatInfo.PositiveSign);
+                }
+                result.Append(scientificExponent.ToString(formatInfo));
             }
             else
             {

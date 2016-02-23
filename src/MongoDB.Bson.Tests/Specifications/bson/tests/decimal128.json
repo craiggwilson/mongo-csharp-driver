@@ -161,19 +161,19 @@
             "description": "Scientific - 105",
             "tests": [ "encode", "string" ],
             "subject": "180000001364003046000000000000000000000000000100",
-            "string": "1E3"
+            "string": "1E+3"
         },
         {
             "description": "Scientific - 105 with a Trailing Zero",
             "tests": [ "encode", "string" ],
             "subject": "180000001364003042000000000000000000000000041A00",
-            "string": "1.050E4"
+            "string": "1.050E+4"
         },
         {
             "description": "Scientific - 105 with 2 Decimal Places",
             "tests": [ "encode", "string" ],
             "subject": "180000001364003042000000000000000000000000006900",
-            "string": "1.05E3"
+            "string": "1.05E+3"
         }
     ]
 }
