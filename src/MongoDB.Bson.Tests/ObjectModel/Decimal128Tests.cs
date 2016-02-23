@@ -22,26 +22,6 @@ namespace MongoDB.Bson.Tests
         }
 
         [Test]
-        [TestCaseSource("TestCases")]
-        public void GetBits(TestCase tc)
-        {
-            var subject = new Decimal128(tc.Bits);
-
-            var bits = Decimal128.GetBits(subject);
-
-            bits.Should().BeEquivalentTo(tc.Bits);
-        }
-
-        [Test]
-        [TestCaseSource("TestCases")]
-        public void ToString(TestCase tc)
-        {
-            var subject = new Decimal128(tc.Bits);
-
-            subject.ToString().Should().Be(tc.String);
-        }
-
-        [Test]
         [TestCase("-1.01", "-1.01")]
         [TestCase("-1", "-1")]
         [TestCase("0", "0")]
@@ -344,17 +324,6 @@ namespace MongoDB.Bson.Tests
             AssertSpecialProperties(subject, sNaN: true);
         }
 
-        [Test]
-        [TestCaseSource("ParsingTestCases")]
-        public void TryParse(TestCase tc)
-        {
-            var subject = Decimal128.Parse(tc.String);
-
-            var bits = Decimal128.GetBits(subject);
-
-            bits.Should().BeEquivalentTo(tc.Bits);
-        }
-
         private void AssertSpecialProperties(Decimal128 subject, bool qNaN = false, bool sNaN = false, bool posInfinity = false, bool negInfinity = false)
         {
             Decimal128.IsNaN(subject).Should().Be(qNaN || sNaN);
@@ -363,51 +332,6 @@ namespace MongoDB.Bson.Tests
             Decimal128.IsInfinity(subject).Should().Be(posInfinity || negInfinity);
             Decimal128.IsNegativeInfinity(subject).Should().Be(negInfinity);
             Decimal128.IsPositiveInfinity(subject).Should().Be(posInfinity);
-        }
-
-        public class TestCase
-        {
-            public uint[] Bits;
-            public string String;
-            public bool CanRoundTripString;
-
-            public TestCase(uint high, uint highMid, uint lowMid, uint low, string s, bool canRoundTripString = true)
-            {
-                Bits = new uint[] { high, highMid, lowMid, low };
-                String = s;
-                CanRoundTripString = canRoundTripString;
-            }
-        }
-
-        private IEnumerable<TestCase> ParsingTestCases
-        {
-            get { return TestCases.Where(x => x.CanRoundTripString); }
-        }
-
-        private IEnumerable<TestCase> TestCases
-        {
-            get
-            {
-                yield return new TestCase(0x78000000, 0, 0, 0, "Infinity");
-                yield return new TestCase(0xF8000000, 0, 0, 0, "-Infinity");
-                yield return new TestCase(0x7C000000, 0, 0, 0, "NaN");
-                yield return new TestCase(0xFC000000, 0, 0, 0, "NaN", canRoundTripString: false);
-                yield return new TestCase(0x7E000000, 0, 0, 0, "NaN", canRoundTripString: false);
-                yield return new TestCase(0xFE000000, 0, 0, 0, "NaN", canRoundTripString: false);
-                yield return new TestCase(0x7C000000, 0, 0, 0, "NaN", canRoundTripString: false);
-                yield return new TestCase(0x7C000000, 0, 0, 12, "NaN", canRoundTripString: false);
-                yield return new TestCase(0x30400000, 0, 0, 1, "1");
-                yield return new TestCase(0x30400000, 0, 0, 0, "0");
-                yield return new TestCase(0x30400000, 0, 0, 2, "2");
-                yield return new TestCase(0xB0400000, 0, 0, 1, "-1");
-                yield return new TestCase(0xB0400000, 0, 0, 0, "-0");
-                yield return new TestCase(0x303e0000, 0, 0, 1, "0.1");
-                yield return new TestCase(0xB03e0000, 0, 0, 1, "-0.1");
-                yield return new TestCase(0x30340000, 0, 0, 0x4D2, "0.001234");
-                yield return new TestCase(0x30400000, 0, 0x1C, 0xBE991A14, "123456789012");
-                yield return new TestCase(0x302A0000, 0, 0, 0x75AEF40, "0.00123400000");
-                yield return new TestCase(0x2FFC3CDE, 0x6FFF9732, 0xDE825CD0, 0x7E96AFF2, "0.1234567890123456789012345678901234");
-            }
         }
     }
 }

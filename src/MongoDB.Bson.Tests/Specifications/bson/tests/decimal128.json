@@ -152,28 +152,43 @@
             "string": "-1E-6176"
         },
         {
-            "description": "Scientific - Huge",
-            "tests": [ "encode", "string" ],
-            "subject": "180000001364005FFE314DC6448D9338C15B0A0000000000",
-            "string": "1.000000000000000000000000000000000E+6144"
-        },
-        {
-            "description": "Scientific - 105",
-            "tests": [ "encode", "string" ],
+            "description": "Scientific - No Decimal",
+            "tests": [ "extjson", "encode", "string" ],
             "subject": "180000001364003046000000000000000000000000000100",
+            "extjson": {
+                "d": { "$numberDecimal": "1E+3" }
+            },
             "string": "1E+3"
         },
         {
-            "description": "Scientific - 105 with a Trailing Zero",
+            "description": "Scientific - Trailing Zero",
             "tests": [ "encode", "string" ],
             "subject": "180000001364003042000000000000000000000000041A00",
             "string": "1.050E+4"
         },
         {
-            "description": "Scientific - 105 with 2 Decimal Places",
+            "description": "Scientific - With Decimal",
             "tests": [ "encode", "string" ],
             "subject": "180000001364003042000000000000000000000000006900",
             "string": "1.05E+3"
+        },
+        {
+            "description": "Scientific - Full",
+            "tests": [ "encode", "string" ],
+            "subject": "180000001364003040FFFFFFFFFFFFFFFFFFFFFFFFFFFF00",
+            "string": "5.192296858534827628530496329220095E+33"
+        },
+        {
+            "description": "Scientific - Large",
+            "tests": [ "encode", "string" ],
+            "subject": "180000001364005FFE314DC6448D9338C15B0A0000000000",
+            "string": "1.000000000000000000000000000000000E+6144"
+        },
+        {
+            "description": "Scientific - Largest",
+            "tests": [ "encode", "string" ],
+            "subject": "180000001364005FFFED09BEAD87C0378D8E63FFFFFFFF00",
+            "string": "9.999999999999999999999999999999999E+6144"
         }
     ]
 }

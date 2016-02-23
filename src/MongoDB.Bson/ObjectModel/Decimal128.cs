@@ -692,7 +692,7 @@ namespace MongoDB.Bson
         /// </returns>
         public static Decimal128 Parse(string s)
         {
-            return Parse(s, NumberStyles.Number, NumberFormatInfo.CurrentInfo);
+            return Parse(s, NumberStyles.Float, NumberFormatInfo.CurrentInfo);
         }
 
         /// <summary>
@@ -718,7 +718,7 @@ namespace MongoDB.Bson
         /// </returns>
         public static Decimal128 Parse(string s, IFormatProvider provider)
         {
-            return Parse(s, NumberStyles.Number, provider);
+            return Parse(s, NumberStyles.Float, provider);
         }
 
         /// <summary>
@@ -765,7 +765,7 @@ namespace MongoDB.Bson
         /// </returns>
         public static bool TryParse(string s, out Decimal128 result)
         {
-            return TryParse(s, NumberStyles.Number, NumberFormatInfo.CurrentInfo, out result);
+            return TryParse(s, NumberStyles.Float, NumberFormatInfo.CurrentInfo, out result);
         }
 
         /// <summary>
@@ -1447,20 +1447,20 @@ namespace MongoDB.Bson
                 // parse exponent and scale
                 if ((state & ParseState.Digits) != 0 && i < _s.Length)
                 {
-                    if ((_s[i] == 'E' || _s[i] == 'e') && (_style & NumberStyles.AllowExponent) != 0)
+                    if (_s[i] == 'E' && (_style & NumberStyles.AllowExponent) != 0)
                     {
                         i++;
 
                         if ((i2 = MatchChars(_s, i, _formatInfo.PositiveSign)) != i)
                         {
-                            i++;
+                            i = i2;
                         }
                         else if ((i2 = MatchChars(_s, i, _formatInfo.NegativeSign)) != i)
                         {
                             exponentNegative = true;
-                            i++;
+                            i = i2;
                         }
-                        if (char.IsDigit(_s, i))
+                        if (i < _s.Length && char.IsDigit(_s, i))
                         {
                             int tempScale = 0;
                             do
@@ -1481,7 +1481,7 @@ namespace MongoDB.Bson
                                 }
                                 scale += tempScale;
                             }
-                            while (char.IsDigit(_s, i));
+                            while (i < _s.Length && char.IsDigit(_s, i));
                         }
                     }
                 }
