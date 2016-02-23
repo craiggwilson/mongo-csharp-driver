@@ -3,7 +3,6 @@
     "documents": [
         {
             "description": "MinValue",
-            "tests": [ "extjson", "encode", "string" ],
             "subject": "0C0000001069000000008000",
             "extjson": {
                 "i": -2147483648
@@ -12,7 +11,6 @@
         },
         {
             "description": "MaxValue",
-            "tests": [ "extjson", "encode", "string" ],
             "subject": "0C000000106900FFFFFF7F00",
             "extjson": {
                 "i": 2147483647
@@ -21,7 +19,6 @@
         },
         {
             "description": "-1",
-            "tests": [ "extjson", "encode", "string" ],
             "subject": "0C000000106900FFFFFFFF00",
             "extjson": {
                 "i": -1
@@ -30,7 +27,6 @@
         },
         {
             "description": "0",
-            "tests": [ "extjson", "encode", "string" ],
             "subject": "0C0000001069000000000000",
             "extjson": {
                 "i": 0
@@ -39,7 +35,6 @@
         },
         {
             "description": "1",
-            "tests": [ "extjson", "encode", "string" ],
             "subject": "0C0000001069000100000000",
             "extjson": {
                 "i": 1

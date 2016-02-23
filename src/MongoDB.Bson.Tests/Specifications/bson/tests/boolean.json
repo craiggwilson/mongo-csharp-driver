@@ -3,7 +3,6 @@
     "documents": [
         {
             "description": "True",
-            "tests": [ "extjson", "encode", "string" ],
             "subject": "090000000862000100",
             "extjson": {
                 "b": true
@@ -12,7 +11,6 @@
         },
         {
             "description": "False",
-            "tests": [ "extjson", "encode", "string" ],
             "subject": "090000000862000000",
             "extjson": {
                 "b": false

@@ -55,33 +55,29 @@ namespace MongoDB.Bson.Specifications.bson
                     subject = BsonDocumentSerializer.Instance.Deserialize(context);
                 }
 
-                foreach (string s in definition["tests"].AsBsonArray.Cast<BsonString>())
+                if (!definition.GetValue("decodeOnly", false).ToBoolean())
                 {
-                    switch (s)
+                    using (var stream = new MemoryStream())
+                    using (var writer = new BsonBinaryWriter(stream))
                     {
-                        case "extjson":
-                            var extjson = (BsonDocument)definition["extjson"];
-                            extjson.Should().Be(subject);
-                            break;
-                        case "string":
-                            var value = subject.GetElement(0).Value;
-                            value.ToString().Should().Be(definition["string"].ToString());
-                            break;
-                        case "encode":
-                            using (var stream = new MemoryStream())
-                            using (var writer = new BsonBinaryWriter(stream))
-                            {
-                                var context = BsonSerializationContext.CreateRoot(writer);
-                                BsonDocumentSerializer.Instance.Serialize(context, subject);
+                        var context = BsonSerializationContext.CreateRoot(writer);
+                        BsonDocumentSerializer.Instance.Serialize(context, subject);
 
-                                var actualEncodedHex = BsonUtils.ToHexString(stream.ToArray());
-                                actualEncodedHex.Should().Be(subjectHex);
-                            }
-                            break;
-                        default:
-                            Assert.Fail($"Unknown test type {s}");
-                            break;
+                        var actualEncodedHex = BsonUtils.ToHexString(stream.ToArray());
+                        actualEncodedHex.Should().Be(subjectHex);
                     }
+                }
+
+                if (definition.Contains("extjson"))
+                {
+                    var extjson = (BsonDocument)definition["extjson"];
+                    extjson.Should().Be(subject);
+                }
+
+                if (definition.Contains("string"))
+                {
+                    var value = subject.GetElement(0).Value;
+                    value.ToString().Should().Be(definition["string"].ToString());
                 }
             }
         }
