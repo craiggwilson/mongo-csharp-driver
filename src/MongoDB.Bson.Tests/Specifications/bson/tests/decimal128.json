@@ -7,7 +7,7 @@
             "extjson": {
                 "d": { "$numberDecimal": "NaN" }
             },
-            "string": "NaN"
+            "string": "NaN",
         },
         {
             "description": "Special - Negative NaN",
@@ -140,6 +140,39 @@
                 "d": { "$numberDecimal": "-1E-6176" }
             },
             "string": "-1E-6176"
+        },
+        {
+            "description": "Scientific - Fractional",
+            "subject": "18000000136400B02C000000000000000000000000006400",
+            "extjson": {
+                "d": { "$numberDecimal": "-1.00E-8" }
+            },
+            "string": "-1.00E-8",
+            "parse": [ "-100E-10" ]
+        },
+        {
+            "description": "Scientific - -0 with Exponent",
+            "subject": "18000000136400B03E000000000000000000000000000000",
+            "extjson": {
+                "d": { "$numberDecimal": "-0E-1" }
+            },
+            "string": "-0E-1"
+        },
+        {
+            "description": "Scientific - 0 with Exponent",
+            "subject": "180000001364005F20000000000000000000000000000000",
+            "extjson": {
+                "d": { "$numberDecimal": "0E+6000" }
+            },
+            "string": "0E+6000"
+        },
+        {
+            "description": "Scientific - 0 with Negative Exponent",
+            "subject": "180000001364002B7A000000000000000000000000000000",
+            "extjson": {
+                "d": { "$numberDecimal": "0E-611" }
+            },
+            "string": "0E-611"
         },
         {
             "description": "Scientific - No Decimal",

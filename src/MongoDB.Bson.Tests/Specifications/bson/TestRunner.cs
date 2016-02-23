@@ -79,6 +79,16 @@ namespace MongoDB.Bson.Specifications.bson
                     var value = subject.GetElement(0).Value;
                     value.ToString().Should().Be(definition["string"].ToString());
                 }
+
+                if (definition.Contains("parse"))
+                {
+                    var expected = subject.GetElement(0).Value.AsBsonDecimal.Value;
+                    foreach (string s in definition["parse"].AsBsonArray.Cast<BsonString>())
+                    {
+                        var parsed = Decimal128.Parse(s);
+                        parsed.Should().Be(expected);
+                    }
+                }
             }
         }
 
