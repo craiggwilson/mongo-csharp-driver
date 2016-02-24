@@ -4,10 +4,10 @@
         {
             "description": "Special - Canonical NaN",
             "subject": "180000001364007C00000000000000000000000000000000",
+            "string": "NaN",
             "extjson": {
                 "d": { "$numberDecimal": "NaN" }
-            },
-            "string": "NaN",
+            }
         },
         {
             "description": "Special - Negative NaN",
@@ -32,195 +32,226 @@
         {
             "description": "Special - Canonical Positive Infinity",
             "subject": "180000001364007800000000000000000000000000000000",
+            "string": "Infinity",
             "extjson": {
                 "d": { "$numberDecimal": "Infinity" }
-            },
-            "string": "Infinity"
+            }
         },
         {
             "description": "Special - Canonical Negative Infinity",
             "subject": "18000000136400F800000000000000000000000000000000",
+            "string": "-Infinity",
             "extjson": {
                 "d": { "$numberDecimal": "-Infinity" }
-            },
-            "string": "-Infinity"
+            }
         },
         {
             "description": "Regular - Smallest",
             "subject": "18000000136400303400000000000000000000000004D200",
+            "string": "0.001234",
             "extjson": {
                 "d": { "$numberDecimal": "0.001234" }
-            },
-            "string": "0.001234"
+            }
         },
         {
             "description": "Regular - Smallest with Trailing Zeros",
             "subject": "18000000136400302A00000000000000000000075AEF4000",
+            "string": "0.00123400000",
             "extjson": {
                 "d": { "$numberDecimal": "0.00123400000" }
-            },
-            "string": "0.00123400000"
+            }
         },
         {
             "description": "Regular - 0.1",
             "subject": "18000000136400303E000000000000000000000000000100",
+            "string": "0.1",
             "extjson": {
                 "d": { "$numberDecimal": "0.1" }
-            },
-            "string": "0.1"
+            }
         },
         {
             "description": "Regular - 0.1234567890123456789012345678901234",
             "subject": "180000001364002FFC3CDE6FFF9732DE825CD07E96AFF200",
+            "string": "0.1234567890123456789012345678901234",
             "extjson": {
                 "d": { "$numberDecimal": "0.1234567890123456789012345678901234" }
-            },
-            "string": "0.1234567890123456789012345678901234"
+            }
         },
         {
             "description": "Regular - 0",
             "subject": "180000001364003040000000000000000000000000000000",
+            "string": "0",
             "extjson": {
                 "d": { "$numberDecimal": "0" }
-            },
-            "string": "0"
+            }
         },
         {
             "description": "Regular - -0",
             "subject": "18000000136400B040000000000000000000000000000000",
+            "string": "-0",
             "extjson": {
                 "d": { "$numberDecimal": "-0" }
-            },
-            "string": "-0"
+            }
         },
         {
             "description": "Regular - 2",
             "subject": "180000001364003040000000000000000000000000000200",
+            "string": "2",
             "extjson": {
                 "d": { "$numberDecimal": "2" }
-            },
-            "string": "2"
+            }
         },
         {
             "description": "Regular - 2.000",
             "subject": "18000000136400303A00000000000000000000000007D000",
+            "string": "2.000",
             "extjson": {
                 "d": { "$numberDecimal": "2.000" }
-            },
-            "string": "2.000"
+            }
         },
         {
             "description": "Regular - Largest",
             "subject": "1800000013640030400000000000000000001CBE991A1400",
+            "string": "123456789012",
             "extjson": {
                 "d": { "$numberDecimal": "123456789012" }
-            },
-            "string": "123456789012"
+            }
         },
         {
             "description": "Scientific - Tiniest",
             "subject": "180000001364000001ED09BEAD87C0378D8E63FFFFFFFF00",
+            "string": "9.999999999999999999999999999999999E-6143",
             "extjson": {
                 "d": { "$numberDecimal": "9.999999999999999999999999999999999E-6143" }
-            },
-            "string": "9.999999999999999999999999999999999E-6143"
+            }
         },
         {
             "description": "Scientific - Tiny",
             "subject": "180000001364000000000000000000000000000000000100",
+            "string": "1E-6176",
             "extjson": {
                 "d": { "$numberDecimal": "1E-6176" }
-            },
-            "string": "1E-6176"
+            }
         },
         {
             "description": "Scientific - Negative Tiny",
             "subject": "180000001364008000000000000000000000000000000100",
+            "string": "-1E-6176",
             "extjson": {
                 "d": { "$numberDecimal": "-1E-6176" }
-            },
-            "string": "-1E-6176"
+            }
         },
         {
             "description": "Scientific - Fractional",
             "subject": "18000000136400B02C000000000000000000000000006400",
+            "string": "-1.00E-8",
             "extjson": {
                 "d": { "$numberDecimal": "-1.00E-8" }
             },
-            "string": "-1.00E-8",
-            "parse": [ "-100E-10" ]
         },
         {
             "description": "Scientific - -0 with Exponent",
             "subject": "18000000136400B03E000000000000000000000000000000",
+            "string": "-0E-1",
             "extjson": {
                 "d": { "$numberDecimal": "-0E-1" }
-            },
-            "string": "-0E-1"
+            }
         },
         {
             "description": "Scientific - 0 with Exponent",
             "subject": "180000001364005F20000000000000000000000000000000",
+            "string": "0E+6000",
             "extjson": {
                 "d": { "$numberDecimal": "0E+6000" }
-            },
-            "string": "0E+6000"
+            }
         },
         {
             "description": "Scientific - 0 with Negative Exponent",
             "subject": "180000001364002B7A000000000000000000000000000000",
+            "string": "0E-611",
             "extjson": {
                 "d": { "$numberDecimal": "0E-611" }
-            },
-            "string": "0E-611"
+            }
         },
         {
-            "description": "Scientific - No Decimal",
+            "description": "Scientific - No Decimal with Signed Exponent",
             "subject": "180000001364003046000000000000000000000000000100",
+            "string": "1E+3",
             "extjson": {
                 "d": { "$numberDecimal": "1E+3" }
-            },
-            "string": "1E+3"
+            }
         },
         {
             "description": "Scientific - Trailing Zero",
             "subject": "180000001364003042000000000000000000000000041A00",
+            "string": "1.050E+4",
             "extjson": {
                 "d": { "$numberDecimal": "1.050E+4" }
-            },
-            "string": "1.050E+4"
+            }
         },
         {
             "description": "Scientific - With Decimal",
             "subject": "180000001364003042000000000000000000000000006900",
+            "string": "1.05E+3",
             "extjson": {
                 "d": { "$numberDecimal": "1.05E+3" }
-            },
-            "string": "1.05E+3"
+            }
         },
         {
             "description": "Scientific - Full",
             "subject": "180000001364003040FFFFFFFFFFFFFFFFFFFFFFFFFFFF00",
+            "string": "5.192296858534827628530496329220095E+33",
             "extjson": {
                 "d": { "$numberDecimal": "5.192296858534827628530496329220095E+33" }
-            },
-            "string": "5.192296858534827628530496329220095E+33"
+            }
         },
         {
             "description": "Scientific - Large",
             "subject": "180000001364005FFE314DC6448D9338C15B0A0000000000",
+            "string": "1.000000000000000000000000000000000E+6144",
             "extjson": {
                 "d": { "$numberDecimal": "1.000000000000000000000000000000000E+6144" }
-            },
-            "string": "1.000000000000000000000000000000000E+6144"
+            }
         },
         {
             "description": "Scientific - Largest",
             "subject": "180000001364005FFFED09BEAD87C0378D8E63FFFFFFFF00",
+            "string": "9.999999999999999999999999999999999E+6144",
             "extjson": {
                 "d": { "$numberDecimal": "9.999999999999999999999999999999999E+6144" }
-            },
-            "string": "9.999999999999999999999999999999999E+6144"
+            }
+        },
+        {
+            "description": "Non-Canonical Parsing - Exponent Normalization",
+            "subject": "18000000136400B02C000000000000000000000000006400",
+            "string": "-1.00E-8",
+            "extjson": {
+                "d": { "$numberDecimal": "-100E-10" }
+            }
+        },
+        {
+            "description": "Non-Canonical Parsing - Unsigned Positive Exponent",
+            "subject": "180000001364003046000000000000000000000000000100",
+            "string": "1E+3",
+            "extjson": {
+                "d": { "$numberDecimal": "1E3" }
+            }
+        },
+        {
+            "description": "Non-Canonical Parsing - Long Significand with Exponent",
+            "subject": "18000000136400305800000000029D42DA3A76f9E0D97900",
+            "string": "1.2345689012345789012345E+34",
+            "extjson": {
+                "d": { "$numberDecimal": "12345689012345789012345E+12" }
+            }
+        },
+        {
+            "description": "Non-Canonical Parsing - Long Significand",
+            "subject": "1800000013640030403CDE6FFF9732DE825CD07E96AFF200",
+            "string": "1.234567890123456789012345678901234E+33",
+            "extjson": {
+                "d": { "$numberDecimal": "1234567890123456789012345678901234" }
+            }
         }
     ]
 }
