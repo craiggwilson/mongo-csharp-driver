@@ -30,66 +30,91 @@ namespace MongoDB.Bson.Specifications.bson
     public class TestRunner
     {
         [TestCaseSource(typeof(TestCaseFactory), "GetTestCases")]
-        public void RunTestDefinition(BsonDocument definition)
+        public void RunTestDefinition(TestType testType, BsonDocument definition)
+        {
+            switch (testType)
+            {
+                case TestType.Valid:
+                    RunValid(definition);
+                    break;
+                case TestType.ParseError:
+                    RunParseError(definition);
+                    break;
+                case TestType.DecodeError:
+                    RunDecodeError(definition);
+                    break;
+            }
+        }
+
+        private void RunValid(BsonDocument definition)
         {
             var subjectHex = ((string)definition["subject"]).ToLowerInvariant();
             var subjectBytes = BsonUtils.ParseHexString(subjectHex);
 
-            if (definition.Contains("error"))
+            BsonDocument subject = null;
+            using (var stream = new MemoryStream(subjectBytes))
+            using (var reader = new BsonBinaryReader(stream))
             {
-                using (var stream = new MemoryStream(subjectBytes))
-                using (var reader = new BsonBinaryReader(stream))
+                var context = BsonDeserializationContext.CreateRoot(reader);
+                subject = BsonDocumentSerializer.Instance.Deserialize(context);
+            }
+
+            if (!definition.GetValue("decodeOnly", false).ToBoolean())
+            {
+                using (var stream = new MemoryStream())
+                using (var writer = new BsonBinaryWriter(stream))
                 {
-                    var context = BsonDeserializationContext.CreateRoot(reader);
-                    Action act = () => BsonDocumentSerializer.Instance.Deserialize(context);
-                    act.ShouldThrow<Exception>();
+                    var context = BsonSerializationContext.CreateRoot(writer);
+                    BsonDocumentSerializer.Instance.Serialize(context, subject);
+
+                    var actualEncodedHex = BsonUtils.ToHexString(stream.ToArray());
+                    actualEncodedHex.Should().Be(subjectHex);
                 }
             }
-            else
+
+            if (definition.Contains("extjson"))
             {
-                BsonDocument subject = null;
-                using (var stream = new MemoryStream(subjectBytes))
-                using (var reader = new BsonBinaryReader(stream))
-                {
-                    var context = BsonDeserializationContext.CreateRoot(reader);
-                    subject = BsonDocumentSerializer.Instance.Deserialize(context);
-                }
-
-                if (!definition.GetValue("decodeOnly", false).ToBoolean())
-                {
-                    using (var stream = new MemoryStream())
-                    using (var writer = new BsonBinaryWriter(stream))
-                    {
-                        var context = BsonSerializationContext.CreateRoot(writer);
-                        BsonDocumentSerializer.Instance.Serialize(context, subject);
-
-                        var actualEncodedHex = BsonUtils.ToHexString(stream.ToArray());
-                        actualEncodedHex.Should().Be(subjectHex);
-                    }
-                }
-
-                if (definition.Contains("extjson"))
-                {
-                    var extjson = (BsonDocument)definition["extjson"];
-                    extjson.Should().Be(subject);
-                }
-
-                if (definition.Contains("string"))
-                {
-                    var value = subject.GetElement(0).Value;
-                    value.ToString().Should().Be(definition["string"].ToString());
-                }
-
-                if (definition.Contains("parse"))
-                {
-                    var expected = subject.GetElement(0).Value.AsBsonDecimal.Value;
-                    foreach (string s in definition["parse"].AsBsonArray.Cast<BsonString>())
-                    {
-                        var parsed = Decimal128.Parse(s);
-                        parsed.Should().Be(expected);
-                    }
-                }
+                var extjson = (BsonDocument)definition["extjson"];
+                extjson.Should().Be(subject);
             }
+
+            if (definition.Contains("string"))
+            {
+                var value = subject.GetElement(0).Value;
+                value.ToString().Should().Be(definition["string"].ToString());
+            }
+
+        }
+
+        private void RunParseError(BsonDocument definition)
+        {
+            var subject = (string)definition["subject"];
+            Decimal128 result;
+            if (Decimal128.TryParse(subject, out result))
+            {
+                Assert.Fail($"{subject} should have resulted in a parse failure.");
+            }
+        }
+
+        private void RunDecodeError(BsonDocument definition)
+        {
+            var subjectHex = ((string)definition["subject"]).ToLowerInvariant();
+            var subjectBytes = BsonUtils.ParseHexString(subjectHex);
+
+            using (var stream = new MemoryStream(subjectBytes))
+            using (var reader = new BsonBinaryReader(stream))
+            {
+                var context = BsonDeserializationContext.CreateRoot(reader);
+                Action act = () => BsonDocumentSerializer.Instance.Deserialize(context);
+                act.ShouldThrow<Exception>();
+            }
+        }
+
+        public enum TestType
+        {
+            Valid,
+            ParseError,
+            DecodeError
         }
 
         private static class TestCaseFactory
@@ -106,31 +131,57 @@ namespace MongoDB.Bson.Specifications.bson
                         var definition = ReadDefinition(path);
                         var fullName = path.Remove(0, prefix.Length);
 
-                        var dataList = new List<ITestCaseData>();
-                        var nameList = new Dictionary<string, int>();
-                        foreach (BsonDocument document in (BsonArray)definition["documents"])
+                        IEnumerable<ITestCaseData> tests = Enumerable.Empty<ITestCaseData>();
+
+                        if (definition.Contains("valid"))
                         {
-                            var data = new TestCaseData(document);
-                            data.Categories.Add("Specifications");
-                            data.Categories.Add("bson");
-
-                            var name = GetTestName((string)definition["description"], document);
-                            int i = 0;
-                            if (nameList.TryGetValue(name, out i))
-                            {
-                                nameList[name] = i + 1;
-                                name += " #" + i;
-                            }
-                            else
-                            {
-                                nameList[name] = 1;
-                            }
-
-                            dataList.Add(data.SetName(name));
+                            tests = tests.Concat(GetTestCases(
+                                TestType.Valid,
+                                (string)definition["description"],
+                                definition["valid"].AsBsonArray.Cast<BsonDocument>()));
                         }
-
-                        return dataList;
+                        if (definition.Contains("parseErrors"))
+                        {
+                            tests = tests.Concat(GetTestCases(
+                            TestType.ParseError,
+                            (string)definition["description"],
+                            definition["parseErrors"].AsBsonArray.Cast<BsonDocument>()));
+                        }
+                        if (definition.Contains("decodeErrors"))
+                        {
+                            tests = tests.Concat(GetTestCases(
+                                TestType.DecodeError,
+                                (string)definition["description"],
+                                definition["decodeErrors"].AsBsonArray.Cast<BsonDocument>()));
+                        }
+                        return tests;
                     });
+            }
+
+            private static IEnumerable<TestCaseData> GetTestCases(TestType type, string description, IEnumerable<BsonDocument> documents)
+            {
+                var dataList = new List<ITestCaseData>();
+                var nameList = new Dictionary<string, int>();
+                foreach (BsonDocument document in documents)
+                {
+                    var data = new TestCaseData(type, document);
+                    data.Categories.Add("Specifications");
+                    data.Categories.Add("bson");
+
+                    var name = GetTestName(description, document);
+                    int i = 0;
+                    if (nameList.TryGetValue(name, out i))
+                    {
+                        nameList[name] = i + 1;
+                        name += " #" + i;
+                    }
+                    else
+                    {
+                        nameList[name] = 1;
+                    }
+
+                    yield return data.SetName(name);
+                }
             }
 
             private static string GetTestName(string description, BsonDocument definition)
@@ -139,10 +190,6 @@ namespace MongoDB.Bson.Specifications.bson
                 if (definition.Contains("description"))
                 {
                     name += " - " + (string)definition["description"];
-                }
-                else if (definition.Contains("error"))
-                {
-                    name += " - " + (string)definition["error"];
                 }
 
                 return name;

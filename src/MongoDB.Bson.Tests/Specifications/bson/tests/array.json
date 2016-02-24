@@ -1,6 +1,6 @@
 ﻿{
-    "description": "Array type",
-    "documents": [
+    "description": "Array",
+    "valid": [
         {
             "description": "Empty",
             "subject": "0D000000046100050000000000",

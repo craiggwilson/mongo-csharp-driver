@@ -1,6 +1,6 @@
 ﻿{
-    "description": "Boolean type",
-    "documents": [
+    "description": "Boolean",
+    "valid": [
         {
             "description": "True",
             "subject": "090000000862000100",

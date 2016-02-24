@@ -1577,6 +1577,10 @@ namespace MongoDB.Bson
                         sigLow += digits[digitIndex];
                     }
                 }
+                else
+                {
+                    //return false;
+                }
 
                 ulong newSigHigh;
                 ulong newSigLow;

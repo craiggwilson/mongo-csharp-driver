@@ -1,6 +1,6 @@
 ﻿{
     "description": "Int32 type",
-    "documents": [
+    "valid": [
         {
             "description": "MinValue",
             "subject": "0C0000001069000000008000",
