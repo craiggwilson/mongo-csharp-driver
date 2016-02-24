@@ -16,6 +16,7 @@ namespace MongoDB.Bson
     [Serializable]
     public struct Decimal128 : IConvertible, IComparable<Decimal128>, IEquatable<Decimal128>
     {
+        private const short __maxSignificandDigits = 34;
         private const short __exponentMax = 6111;
         private const short __exponentMin = -6176;
         private const short __exponentBias = 6176;
@@ -1413,8 +1414,28 @@ namespace MongoDB.Bson
 
                         if (_s[i] != '0' || (state & ParseState.SeenNonZero) != 0)
                         {
-                            digits.Add((byte)(_s[i] - '0'));
-                            state |= ParseState.SeenNonZero;
+                            if (_s[i] == '0' && digits.Count >= __maxSignificandDigits)
+                            {
+                                if ((state & ParseState.Decimal) == 0)
+                                {
+                                    scale++;
+                                }
+                                else
+                                {
+                                    // too many digits... we cannot represent this number...
+                                    return false;
+                                }
+                            }
+                            else
+                            {
+                                if (digits.Count >= __maxSignificandDigits)
+                                {
+                                    // too many digits... we cannot represent this number...
+                                    return false;
+                                }
+                                digits.Add((byte)(_s[i] - '0'));
+                                state |= ParseState.SeenNonZero;
+                            }
                         }
 
                         if ((state & ParseState.Decimal) != 0)
