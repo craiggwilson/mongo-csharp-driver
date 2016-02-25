@@ -25,25 +25,25 @@ namespace MongoDB.Bson
         /// Represents negative infinity.
         /// </summary>
         public static Decimal128 NegativeInfinity =>
-            new Decimal128(new uint[] { 0xF8000000, 0, 0, 0 });
+            new Decimal128(new uint[] { 0, 0, 0, 0xF8000000 });
 
         /// <summary>
         /// Represents positive infinity.
         /// </summary>
         public static Decimal128 PositiveInfinity =>
-            new Decimal128(new uint[] { 0x78000000, 0, 0, 0 });
+            new Decimal128(new uint[] { 0, 0, 0, 0x78000000 });
 
         /// <summary>
         /// Represents a value that is not a number.
         /// </summary>
         public static Decimal128 QNaN =>
-            new Decimal128(new uint[] { 0x7C000000, 0, 0, 0 });
+            new Decimal128(new uint[] { 0, 0, 0, 0x7C000000 });
 
         /// <summary>
         /// Represents a value that is not a number and raises errors when used in calculations.
         /// </summary>
         public static Decimal128 SNaN =>
-            new Decimal128(new uint[] { 0x7E000000, 0, 0, 0 });
+            new Decimal128(new uint[] { 0, 0, 0, 0x7E000000 });
 
         private readonly byte _flags;
         private readonly short _exponent;
@@ -57,10 +57,10 @@ namespace MongoDB.Bson
         private Decimal128(byte flags, uint[] bits, short exponent)
         {
             _flags = flags;
-            _high = bits[0];
-            _highMid = bits[1];
-            _lowMid = bits[2];
-            _low = bits[3];
+            _high = bits[3];
+            _highMid = bits[2];
+            _lowMid = bits[1];
+            _low = bits[0];
             _exponent = exponent;
         }
 
@@ -248,7 +248,7 @@ namespace MongoDB.Bson
                 throw new ArgumentException("Must be of length 4.", "parts");
             }
 
-            _flags = (byte)(bits[0] >> 24);
+            _flags = (byte)(bits[3] >> 24);
 
             // combination will be the low 5 bits
             var combination = (_flags >> 2) & 0x1F;
@@ -257,21 +257,21 @@ namespace MongoDB.Bson
             // 2 high combination bits are set
             if ((combination >> 3) == 0x3)
             {
-                biasedExponent = (bits[0] >> 15) & 0x3FFF;
-                significandMsb = 0x8 + ((bits[0] >> 14) & 0x1);
+                biasedExponent = (bits[3] >> 15) & 0x3FFF;
+                significandMsb = 0x8 + ((bits[3] >> 14) & 0x1);
             }
             else
             {
-                biasedExponent = (bits[0] >> 17) & 0x3FFF;
-                significandMsb = (bits[0] >> 14) & 0x7;
+                biasedExponent = (bits[3] >> 17) & 0x3FFF;
+                significandMsb = (bits[3] >> 14) & 0x7;
             }
 
             _exponent = (short)(biasedExponent - __exponentBias);
 
-            _high = (bits[0] & 0x3FFF) + ((significandMsb & 0xF) << 14);
-            _highMid = bits[1];
-            _lowMid = bits[2];
-            _low = bits[3];
+            _high = (bits[3] & 0x3FFF) + ((significandMsb & 0xF) << 14);
+            _highMid = bits[2];
+            _lowMid = bits[1];
+            _low = bits[0];
         }
 
         /// <inheritdoc />
@@ -613,25 +613,25 @@ namespace MongoDB.Bson
             var parts = new uint[4];
             var biasedExponent = (uint)(d._exponent + __exponentBias);
 
-            parts[3] = d._low;
-            parts[2] = d._lowMid;
-            parts[1] = d._highMid;
+            parts[0] = d._low;
+            parts[1] = d._lowMid;
+            parts[2] = d._highMid;
 
             if (((d._high >> 17) & 0x1) == 0x1)
             {
-                parts[0] |= 0x3 << 29;
-                parts[0] |= (biasedExponent & 0x3FFF) << 15;
-                parts[0] |= d._high & 0x7FFF;
+                parts[3] |= 0x3 << 29;
+                parts[3] |= (biasedExponent & 0x3FFF) << 15;
+                parts[3] |= d._high & 0x7FFF;
             }
             else
             {
-                parts[0] |= (biasedExponent & 0x3FFF) << 17;
-                parts[0] |= d._high & 0x1FFFFFFF;
+                parts[3] |= (biasedExponent & 0x3FFF) << 17;
+                parts[3] |= d._high & 0x1FFFFFFF;
             }
 
             if ((d._flags & 0x80) == 0x80)
             {
-                parts[0] |= 0x80000000;
+                parts[3] |= 0x80000000;
             }
 
             return parts;
@@ -1585,10 +1585,10 @@ namespace MongoDB.Bson
                 }
 
                 uint[] bits = new uint[4];
-                bits[0] = (uint)(newSigHigh >> 32);
-                bits[1] = (uint)newSigHigh;
-                bits[2] = (uint)(newSigLow >> 32);
-                bits[3] = (uint)newSigLow;
+                bits[3] = (uint)(newSigHigh >> 32);
+                bits[2] = (uint)newSigHigh;
+                bits[1] = (uint)(newSigLow >> 32);
+                bits[0] = (uint)newSigLow;
 
                 short exponent = (short)scale;
                 byte flags = 0;

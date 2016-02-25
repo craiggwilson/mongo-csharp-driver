@@ -27,8 +27,8 @@ namespace MongoDB.Bson.Tests
         [TestCase("0", "0")]
         [TestCase("1", "1")]
         [TestCase("1.01", "1.01")]
-        [TestCase("79228162514264337593543950335", "7.9228162514264337593543950335E28")]
-        [TestCase("-79228162514264337593543950335", "-7.9228162514264337593543950335E28")]
+        [TestCase("79228162514264337593543950335", "7.9228162514264337593543950335E+28")]
+        [TestCase("-79228162514264337593543950335", "-7.9228162514264337593543950335E+28")]
         public void Decimal(string valueString, string s)
         {
             var value = decimal.Parse(valueString);
@@ -145,8 +145,8 @@ namespace MongoDB.Bson.Tests
         [TestCase(-1, "-1")]
         [TestCase(0, "0")]
         [TestCase(1, "1")]
-        [TestCase(long.MaxValue, "9.223372036854775807E18")]
-        [TestCase(long.MinValue, "-9.223372036854775808E18")]
+        [TestCase(long.MaxValue, "9.223372036854775807E+18")]
+        [TestCase(long.MinValue, "-9.223372036854775808E+18")]
         public void Int64(long value, string s)
         {
             var subject = new Decimal128(value);
@@ -263,7 +263,7 @@ namespace MongoDB.Bson.Tests
         [Test]
         [TestCase(0ul, "0")]
         [TestCase(1ul, "1")]
-        [TestCase(ulong.MaxValue, "1.8446744073709551615E19")]
+        [TestCase(ulong.MaxValue, "1.8446744073709551615E+19")]
         public void UInt64(ulong value, string s)
         {
             var subject = new Decimal128(value);
