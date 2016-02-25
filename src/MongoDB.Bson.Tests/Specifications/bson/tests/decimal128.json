@@ -255,7 +255,7 @@
         },
         {
             "description": "Non-Canonical Parsing - Long Significand with Exponent",
-            "subject": "1800000013640079D9E0f9763ADA429D0200000000583000",
+            "subject": "1800000013640079D9E0F9763ADA429D0200000000583000",
             "string": "1.2345689012345789012345E+34",
             "extjson": {
                 "d": { "$numberDecimal": "12345689012345789012345E+12" }
