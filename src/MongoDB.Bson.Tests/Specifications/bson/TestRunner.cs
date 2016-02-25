@@ -59,17 +59,14 @@ namespace MongoDB.Bson.Specifications.bson
                 subject = BsonDocumentSerializer.Instance.Deserialize(context);
             }
 
-            if (!definition.GetValue("decodeOnly", false).ToBoolean())
+            using (var stream = new MemoryStream())
+            using (var writer = new BsonBinaryWriter(stream))
             {
-                using (var stream = new MemoryStream())
-                using (var writer = new BsonBinaryWriter(stream))
-                {
-                    var context = BsonSerializationContext.CreateRoot(writer);
-                    BsonDocumentSerializer.Instance.Serialize(context, subject);
+                var context = BsonSerializationContext.CreateRoot(writer);
+                BsonDocumentSerializer.Instance.Serialize(context, subject);
 
-                    var actualEncodedHex = BsonUtils.ToHexString(stream.ToArray());
-                    actualEncodedHex.Should().Be(subjectHex);
-                }
+                var actualEncodedHex = BsonUtils.ToHexString(stream.ToArray());
+                actualEncodedHex.Should().Be(subjectHex);
             }
 
             if (definition.Contains("extjson"))

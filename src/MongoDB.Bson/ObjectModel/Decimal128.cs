@@ -1414,28 +1414,13 @@ namespace MongoDB.Bson
 
                         if (_s[i] != '0' || (state & ParseState.SeenNonZero) != 0)
                         {
-                            if (_s[i] == '0' && digits.Count >= __maxSignificandDigits)
+                            if (digits.Count >= __maxSignificandDigits)
                             {
-                                if ((state & ParseState.Decimal) == 0)
-                                {
-                                    scale++;
-                                }
-                                else
-                                {
-                                    // too many digits... we cannot represent this number...
-                                    return false;
-                                }
+                                // too many digits
+                                return false;
                             }
-                            else
-                            {
-                                if (digits.Count >= __maxSignificandDigits)
-                                {
-                                    // too many digits... we cannot represent this number...
-                                    return false;
-                                }
-                                digits.Add((byte)(_s[i] - '0'));
-                                state |= ParseState.SeenNonZero;
-                            }
+                            digits.Add((byte)(_s[i] - '0'));
+                            state |= ParseState.SeenNonZero;
                         }
 
                         if ((state & ParseState.Decimal) != 0)
@@ -1463,7 +1448,7 @@ namespace MongoDB.Bson
                 // parse exponent and scale
                 if ((state & ParseState.Digits) != 0 && i < _s.Length)
                 {
-                    if (_s[i] == 'E' && (_style & NumberStyles.AllowExponent) != 0)
+                    if ((_s[i] == 'E' || _s[i] == 'e') && (_style & NumberStyles.AllowExponent) != 0)
                     {
                         i++;
 
@@ -1498,6 +1483,11 @@ namespace MongoDB.Bson
                             {
                                 scale += tempScale;
                             }
+                        }
+                        else
+                        {
+                            // after an exponent, we must have some digits
+                            return false;
                         }
                     }
                 }
@@ -1579,6 +1569,7 @@ namespace MongoDB.Bson
                 }
                 else if (digits.Count == 0 && (state & ParseState.Digits) == ParseState.None)
                 {
+                    // we read no digits at all
                     return false;
                 }
 
@@ -1616,7 +1607,7 @@ namespace MongoDB.Bson
                 int matchIndex = 0;
                 while (matchIndex < match.Length)
                 {
-                    if (s[sIndex] != match[matchIndex] && (match[matchIndex] != '\u00a0' || s[sIndex] != ' '))
+                    if (sIndex >= s.Length || (s[sIndex] != match[matchIndex] && (match[matchIndex] != '\u00a0' || s[sIndex] != ' ')))
                     {
                         return i;
                     }
