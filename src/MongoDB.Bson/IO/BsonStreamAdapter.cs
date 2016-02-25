@@ -299,19 +299,24 @@ namespace MongoDB.Bson.IO
             var bytes = new byte[16];
             this.ReadBytes(bytes, 0, bytes.Length);
 
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(bytes, 0, 4);
-                Array.Reverse(bytes, 4, 4);
-                Array.Reverse(bytes, 8, 4);
-                Array.Reverse(bytes, 12, 4);
-            }
-
             var bits = new uint[4];
-            bits[0] = BitConverter.ToUInt32(bytes, 0);
-            bits[1] = BitConverter.ToUInt32(bytes, 4);
-            bits[2] = BitConverter.ToUInt32(bytes, 8);
-            bits[3] = BitConverter.ToUInt32(bytes, 12);
+            bits[3] = (uint)(((bytes[0] |
+              (bytes[1] << 0x08)) |
+              (bytes[2] << 0x10)) |
+              (bytes[3] << 0x18));
+            bits[2] = (uint)(((bytes[4] |
+              (bytes[5] << 0x08)) |
+              (bytes[6] << 0x10)) |
+              (bytes[7] << 0x18));
+            bits[1] = (uint)(((bytes[8] |
+              (bytes[9] << 0x08)) |
+              (bytes[10] << 0x10)) |
+              (bytes[11] << 0x18));
+            bits[0] = (uint)(((bytes[12] |
+              (bytes[13] << 0x08)) |
+              (bytes[14] << 0x10)) |
+              (bytes[15] << 0x18));
+
             return new Decimal128(bits);
         }
 
@@ -492,30 +497,24 @@ namespace MongoDB.Bson.IO
             ThrowIfDisposed();
             var bits = Decimal128.GetBits(value);
 
-            var bytes = BitConverter.GetBytes(bits[0]);
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(bytes);
-            }
-            _stream.Write(bytes, 0, 4);
-            bytes = BitConverter.GetBytes(bits[1]);
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(bytes);
-            }
-            _stream.Write(bytes, 0, 4);
-            bytes = BitConverter.GetBytes(bits[2]);
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(bytes);
-            }
-            _stream.Write(bytes, 0, 4);
-            bytes = BitConverter.GetBytes(bits[3]);
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(bytes);
-            }
-            _stream.Write(bytes, 0, 4);
+            var bytes = new byte[16];
+            bytes[0] = (byte)bits[3];
+            bytes[1] = (byte)(bits[3] >> 8);
+            bytes[2] = (byte)(bits[3] >> 16);
+            bytes[3] = (byte)(bits[3] >> 24);
+            bytes[4] = (byte)bits[2];
+            bytes[5] = (byte)(bits[2] >> 8);
+            bytes[6] = (byte)(bits[2] >> 16);
+            bytes[7] = (byte)(bits[2] >> 24);
+            bytes[8] = (byte)bits[1];
+            bytes[9] = (byte)(bits[1] >> 8);
+            bytes[10] = (byte)(bits[1] >> 16);
+            bytes[11] = (byte)(bits[1] >> 24);
+            bytes[12] = (byte)bits[0];
+            bytes[13] = (byte)(bits[0] >> 8);
+            bytes[14] = (byte)(bits[0] >> 16);
+            bytes[15] = (byte)(bits[0] >> 24);
+            _stream.Write(bytes, 0, 16);
         }
 
         /// <inheritdoc/>
