@@ -94,6 +94,14 @@
             }
         },
         {
+            "description": "Regular - -0.0",
+            "subject": "1800000013640000000000000000000000000000003EB000",
+            "string": "-0.0",
+            "extjson": {
+                "d": { "$numberDecimal": "-0.0" }
+            }
+        },
+        {
             "description": "Regular - 2",
             "subject": "180000001364000200000000000000000000000000403000",
             "string": "2",
@@ -150,11 +158,11 @@
             },
         },
         {
-            "description": "Scientific - -0 with Exponent",
+            "description": "Regular - -0.0",
             "subject": "1800000013640000000000000000000000000000003EB000",
-            "string": "-0E-1",
+            "string": "-0.0",
             "extjson": {
-                "d": { "$numberDecimal": "-0E-1" }
+                "d": { "$numberDecimal": "-0.0" }
             }
         },
         {

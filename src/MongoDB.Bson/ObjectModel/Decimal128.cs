@@ -525,8 +525,7 @@ namespace MongoDB.Bson
 
             if (scientificExponent >= 12
                 || scientificExponent <= -4
-                || _exponent > 0
-                || (isZero && scientificExponent != 0))
+                || _exponent > 0)
             {
                 result.Append(significand[significandRead++]);
                 significandDigits--;
