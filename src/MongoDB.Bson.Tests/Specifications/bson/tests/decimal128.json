@@ -158,14 +158,6 @@
             },
         },
         {
-            "description": "Regular - -0.0",
-            "subject": "1800000013640000000000000000000000000000003EB000",
-            "string": "-0.0",
-            "extjson": {
-                "d": { "$numberDecimal": "-0.0" }
-            }
-        },
-        {
             "description": "Scientific - 0 with Exponent",
             "subject": "180000001364000000000000000000000000000000205F00",
             "string": "0E+6000",
