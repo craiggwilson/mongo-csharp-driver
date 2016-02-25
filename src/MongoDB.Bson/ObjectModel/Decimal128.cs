@@ -1577,9 +1577,9 @@ namespace MongoDB.Bson
                         sigLow += digits[digitIndex];
                     }
                 }
-                else
+                else if (digits.Count == 0 && (state & ParseState.Digits) == ParseState.None)
                 {
-                    //return false;
+                    return false;
                 }
 
                 ulong newSigHigh;
