@@ -46,6 +46,21 @@
             }
         },
         {
+            "description": "Special - Invalid representation treated as 0",
+            "subject": "180000001364000000000000000000000000000000106C00",
+            "string": "0",
+        },
+        {
+            "description": "Special - Invalid representation treated as -0",
+            "subject": "180000001364FEDCBA9876543210DEADBEEF00000010EC00",
+            "string": "-0",
+        },
+        {
+            "description": "Special - Invalid representation treated as 0E3",
+            "subject": "180000001364FFFFFFFFFFFFFFFFFFFFFFFFFFFFFF116C00",
+            "string": "0E+3",
+        },
+        {
             "description": "Regular - Smallest",
             "subject": "18000000136400D204000000000000000000000000343000",
             "string": "0.001234",
