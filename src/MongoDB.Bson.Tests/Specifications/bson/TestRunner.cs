@@ -59,20 +59,29 @@ namespace MongoDB.Bson.Specifications.bson
                 subject = BsonDocumentSerializer.Instance.Deserialize(context);
             }
 
-            using (var stream = new MemoryStream())
-            using (var writer = new BsonBinaryWriter(stream))
+            if (!definition.GetValue("decodeOnly", false).ToBoolean())
             {
-                var context = BsonSerializationContext.CreateRoot(writer);
-                BsonDocumentSerializer.Instance.Serialize(context, subject);
+                using (var stream = new MemoryStream())
+                using (var writer = new BsonBinaryWriter(stream))
+                {
+                    var context = BsonSerializationContext.CreateRoot(writer);
+                    BsonDocumentSerializer.Instance.Serialize(context, subject);
 
-                var actualEncodedHex = BsonUtils.ToHexString(stream.ToArray());
-                actualEncodedHex.Should().Be(subjectHex);
+                    var actualEncodedHex = BsonUtils.ToHexString(stream.ToArray());
+                    actualEncodedHex.Should().Be(subjectHex);
+                }
             }
 
-            if (definition.Contains("extjson"))
+            var extjson = ((string)definition["extjson"]).Replace(" ", "");
+            if (definition.GetValue("from_extjson", true).ToBoolean())
             {
-                var extjson = (BsonDocument)definition["extjson"];
-                extjson.Should().Be(subject);
+                var fromExtjson = BsonDocument.Parse(extjson);
+                fromExtjson.Should().Be(subject);
+            }
+            if (definition.GetValue("to_extjson", true).ToBoolean())
+            {
+                var toExtjson = subject.ToString().Replace(" ", "");
+                toExtjson.Should().Be(extjson);
             }
 
             if (definition.Contains("string"))
@@ -80,7 +89,6 @@ namespace MongoDB.Bson.Specifications.bson
                 var value = subject.GetElement(0).Value;
                 value.ToString().Should().Be(definition["string"].ToString());
             }
-
         }
 
         private void RunParseError(BsonDocument definition)

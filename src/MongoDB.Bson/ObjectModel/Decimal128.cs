@@ -1,12 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.Specialized;
 using System.Globalization;
-using System.IO;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using MongoDB.Shared;
 
 namespace MongoDB.Bson
 {
@@ -458,6 +453,25 @@ namespace MongoDB.Bson
                     // TODO: should put an S in front when SNaN...
                     return result.ToString();
                 }
+                else if (combination == 0x1B)
+                {
+                    if (isNegative)
+                    {
+                        result.Append("-");
+                    }
+
+                    result.Append("0");
+                    if (_exponent != 0)
+                    {
+                        result.Append("E");
+                        if (_exponent > 0)
+                        {
+                            result.Append("+");
+                        }
+                        result.Append(_exponent);
+                    }
+                    return result.ToString();
+                }
             }
 
             if (isNegative && formatInfo.NumberNegativePattern <= 2)
@@ -523,9 +537,7 @@ namespace MongoDB.Bson
 
             var scientificExponent = significandDigits - 1 + _exponent;
 
-            if (scientificExponent >= 12
-                || scientificExponent <= -4
-                || _exponent > 0)
+            if (_exponent > 0 || scientificExponent < -6)
             {
                 result.Append(significand[significandRead++]);
                 significandDigits--;
@@ -545,7 +557,7 @@ namespace MongoDB.Bson
                 {
                     result.Append(formatInfo.PositiveSign);
                 }
-                result.Append(scientificExponent.ToString(formatInfo));
+                result.Append(scientificExponent.ToString());
             }
             else
             {
@@ -1626,7 +1638,6 @@ namespace MongoDB.Bson
                     low = 0;
                     return;
                 }
-
 
                 ulong leftHigh = left >> 32;
                 ulong leftLow = (uint)left;
