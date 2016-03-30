@@ -71,6 +71,12 @@
             "extjson": "{\"d\" : {\"$numberDecimal\" : \"0E+3\"}}"
         },
         {
+            "description": "Regular - Adjusted Exponent Limit",
+            "subject": "18000000136400F2AF967ED05C82DE3297FF6FDE3CF22F00",
+            "string": "0.000001234567890123456789012345678901234",
+            "extjson": "{\"d\": { \"$numberDecimal\": \"0.000001234567890123456789012345678901234\" }}"
+        },
+        {
             "description": "Regular - Smallest",
             "subject": "18000000136400D204000000000000000000000000343000",
             "string": "0.001234",
@@ -147,6 +153,12 @@
             "subject": "180000001364000100000000000000000000000000008000",
             "string": "-1E-6176",
             "extjson": "{\"d\" : {\"$numberDecimal\" : \"-1E-6176\"}}"
+        },
+        {
+            "description": "Scientific - Adjusted Exponent Limit",
+            "subject": "18000000136400F2AF967ED05C82DE3297FF6FDE3CF02F00",
+            "string": "1.234567890123456789012345678901234E-7",
+            "extjson": "{\"d\": { \"$numberDecimal\": \"1.234567890123456789012345678901234E-7\" }}"
         },
         {
             "description": "Scientific - Fractional",
