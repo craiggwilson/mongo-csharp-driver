@@ -56,6 +56,11 @@ namespace MongoDB.Bson
             _highMid = bits[2];
             _lowMid = bits[1];
             _low = bits[0];
+
+            if (exponent > __exponentMax || exponent < __exponentMin)
+            {
+                throw new ArgumentException($"Exponent must be between {__exponentMin} and {__exponentMax}.", "exponent");
+            }
             _exponent = exponent;
         }
 
@@ -437,20 +442,17 @@ namespace MongoDB.Bson
                 {
                     if (isNegative)
                     {
-                        // TODO: should we use formatInfo.NegativeInfinitySymbol?
-                        result.Append("-Infinity");
+                        result.Append("-Inf");
                     }
                     else
                     {
-                        // TODO: should we use formatInfo.PositiveInfinitySymbol?
-                        result.Append("Infinity");
+                        result.Append("Inf");
                     }
                     return result.ToString();
                 }
                 else if (combination == 0x1F)
                 {
                     result.Append("NaN");
-                    // TODO: should put an S in front when SNaN...
                     return result.ToString();
                 }
                 else if (combination == 0x1B)
@@ -1380,8 +1382,9 @@ namespace MongoDB.Bson
                             i = i2 - 1;
                         }
                         else if (allowSpecial && (
-                            (i2 = MatchChars(_s, i, "Infinity")) != i ||
-                            (i2 = MatchChars(_s, i, "Inf")) != i))
+                            (i2 = MatchChars(_s, i, _formatInfo.PositiveInfinitySymbol)) != i ||
+                            (i2 = MatchChars(_s, i, "Inf")) != i ||
+                            (i2 = MatchChars(_s, i, "Infinity")) != i))
                         {
                             state |= ParseState.Infinity;
                             i = i2 - 1;
@@ -1602,6 +1605,10 @@ namespace MongoDB.Bson
                 bits[0] = (uint)newSigLow;
 
                 short exponent = (short)scale;
+                if (exponent > __exponentMax || exponent < __exponentMin)
+                {
+                    return false;
+                }
                 byte flags = 0;
                 if (negative)
                 {
@@ -1618,7 +1625,7 @@ namespace MongoDB.Bson
                 int matchIndex = 0;
                 while (matchIndex < match.Length)
                 {
-                    if (sIndex >= s.Length || (s[sIndex] != match[matchIndex] && (match[matchIndex] != '\u00a0' || s[sIndex] != ' ')))
+                    if (sIndex >= s.Length || (char.ToLowerInvariant(s[sIndex]) != char.ToLowerInvariant(match[matchIndex]) && (match[matchIndex] != '\u00a0' || s[sIndex] != ' ')))
                     {
                         return i;
                     }
