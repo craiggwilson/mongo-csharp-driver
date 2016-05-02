@@ -22,9 +22,26 @@ using MongoDB.Bson;
 namespace MongoDB.Driver.GridFS
 {
     /// <summary>
+    /// 
+    /// </summary>
+    public interface IGridFSBucket : IGridFSBucket<ObjectId, GridFSFileInfo>
+    {
+
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <typeparam name="TId">The type of the identifier.</typeparam>
+    public interface IGridFSBucket<TId> : IGridFSBucket<TId, GridFSFileInfo<TId>>
+    {
+
+    }
+
+    /// <summary>
     /// Represents a GridFS system bucket.
     /// </summary>
-    public interface IGridFSBucket
+    public interface IGridFSBucket<TId, TFileInfo> where TFileInfo : GridFSFileInfo<TId>
     {
         // properties
         /// <summary>
@@ -49,7 +66,7 @@ namespace MongoDB.Driver.GridFS
         /// </summary>
         /// <param name="id">The file id.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        void Delete(ObjectId id, CancellationToken cancellationToken = default(CancellationToken));
+        void Delete(TId id, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Deletes a file from GridFS.
@@ -57,7 +74,7 @@ namespace MongoDB.Driver.GridFS
         /// <param name="id">The file id.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A Task.</returns>
-        Task DeleteAsync(ObjectId id, CancellationToken cancellationToken = default(CancellationToken));
+        Task DeleteAsync(TId id, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Downloads a file stored in GridFS and returns it as a byte array.
@@ -66,7 +83,7 @@ namespace MongoDB.Driver.GridFS
         /// <param name="options">The options.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The contents of the file stored in GridFS.</returns>
-        byte[] DownloadAsBytes(ObjectId id, GridFSDownloadOptions options = null, CancellationToken cancellationToken = default(CancellationToken));
+        byte[] DownloadAsBytes(TId id, GridFSDownloadOptions options = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Downloads a file stored in GridFS and returns it as a byte array.
@@ -75,7 +92,7 @@ namespace MongoDB.Driver.GridFS
         /// <param name="options">The options.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A Task whose result is a byte array containing the contents of the file stored in GridFS.</returns>
-        Task<byte[]> DownloadAsBytesAsync(ObjectId id, GridFSDownloadOptions options = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<byte[]> DownloadAsBytesAsync(TId id, GridFSDownloadOptions options = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Downloads a file stored in GridFS and returns it as a byte array.
@@ -102,7 +119,7 @@ namespace MongoDB.Driver.GridFS
         /// <param name="destination">The destination.</param>
         /// <param name="options">The options.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        void DownloadToStream(ObjectId id, Stream destination, GridFSDownloadOptions options = null, CancellationToken cancellationToken = default(CancellationToken));
+        void DownloadToStream(TId id, Stream destination, GridFSDownloadOptions options = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Downloads a file stored in GridFS and writes the contents to a stream.
@@ -112,7 +129,7 @@ namespace MongoDB.Driver.GridFS
         /// <param name="options">The options.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A Task.</returns>
-        Task DownloadToStreamAsync(ObjectId id, Stream destination, GridFSDownloadOptions options = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task DownloadToStreamAsync(TId id, Stream destination, GridFSDownloadOptions options = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Downloads a file stored in GridFS and writes the contents to a stream.
@@ -171,7 +188,7 @@ namespace MongoDB.Driver.GridFS
         /// <param name="options">The options.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A Stream.</returns>
-        GridFSDownloadStream OpenDownloadStream(ObjectId id, GridFSDownloadOptions options = null, CancellationToken cancellationToken = default(CancellationToken));
+        GridFSDownloadStream OpenDownloadStream(TId id, GridFSDownloadOptions options = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Opens a Stream that can be used by the application to read data from a GridFS file.
@@ -180,7 +197,7 @@ namespace MongoDB.Driver.GridFS
         /// <param name="options">The options.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A Task whose result is a Stream.</returns>
-        Task<GridFSDownloadStream> OpenDownloadStreamAsync(ObjectId id, GridFSDownloadOptions options = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<GridFSDownloadStream> OpenDownloadStreamAsync(TId id, GridFSDownloadOptions options = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Opens a Stream that can be used by the application to read data from a GridFS file.
@@ -224,7 +241,7 @@ namespace MongoDB.Driver.GridFS
         /// <param name="id">The file id.</param>
         /// <param name="newFilename">The new filename.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
-        void Rename(ObjectId id, string newFilename, CancellationToken cancellationToken = default(CancellationToken));
+        void Rename(TId id, string newFilename, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Renames a GridFS file.
@@ -233,7 +250,7 @@ namespace MongoDB.Driver.GridFS
         /// <param name="newFilename">The new filename.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A Task.</returns>
-        Task RenameAsync(ObjectId id, string newFilename, CancellationToken cancellationToken = default(CancellationToken));
+        Task RenameAsync(TId id, string newFilename, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Uploads a file (or a new revision of a file) to GridFS.
@@ -243,7 +260,7 @@ namespace MongoDB.Driver.GridFS
         /// <param name="options">The options.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The id of the new file.</returns>
-        ObjectId UploadFromBytes(string filename, byte[] source, GridFSUploadOptions options = null, CancellationToken cancellationToken = default(CancellationToken));
+        TId UploadFromBytes(string filename, byte[] source, GridFSUploadOptions options = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Uploads a file (or a new revision of a file) to GridFS.
@@ -253,7 +270,7 @@ namespace MongoDB.Driver.GridFS
         /// <param name="options">The options.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A Task whose result is the id of the new file.</returns>
-        Task<ObjectId> UploadFromBytesAsync(string filename, byte[] source, GridFSUploadOptions options = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<TId> UploadFromBytesAsync(string filename, byte[] source, GridFSUploadOptions options = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Uploads a file (or a new revision of a file) to GridFS.
@@ -263,7 +280,7 @@ namespace MongoDB.Driver.GridFS
         /// <param name="options">The options.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>The id of the new file.</returns>
-        ObjectId UploadFromStream(string filename, Stream source, GridFSUploadOptions options = null, CancellationToken cancellationToken = default(CancellationToken));
+        TId UploadFromStream(string filename, Stream source, GridFSUploadOptions options = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Uploads a file (or a new revision of a file) to GridFS.
@@ -273,6 +290,6 @@ namespace MongoDB.Driver.GridFS
         /// <param name="options">The options.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A Task whose result is the id of the new file.</returns>
-        Task<ObjectId> UploadFromStreamAsync(string filename, Stream source, GridFSUploadOptions options = null, CancellationToken cancellationToken = default(CancellationToken));
+        Task<TId> UploadFromStreamAsync(string filename, Stream source, GridFSUploadOptions options = null, CancellationToken cancellationToken = default(CancellationToken));
     }
 }

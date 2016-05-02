@@ -25,10 +25,26 @@ using MongoDB.Driver.Core.Misc;
 namespace MongoDB.Driver.GridFS
 {
     /// <summary>
+    /// 
+    /// </summary>
+    public class GridFSFileInfo : GridFSFileInfo<ObjectId>
+    {
+        // constructors
+        /// <summary>
+        /// Initializes a new instance of the <see cref="GridFSFileInfo"/> class.
+        /// </summary>
+        /// <param name="backingDocument">The backing document.</param>
+        public GridFSFileInfo(BsonDocument backingDocument)
+            : base(backingDocument)
+        {
+        }
+    }
+
+    /// <summary>
     /// Represents information about a stored GridFS file (backed by a files collection document).
     /// </summary>
     [BsonSerializer(typeof(GridFSFileInfoSerializer))]
-    public class GridFSFileInfo : BsonDocumentBackedClass
+    public class GridFSFileInfo<TId> : BsonDocumentBackedClass
     {
         // constructors
         /// <summary>
@@ -104,9 +120,9 @@ namespace MongoDB.Driver.GridFS
         /// <value>
         /// The identifier.
         /// </value>
-        public ObjectId Id
+        public TId Id
         {
-            get { return GetValue<BsonValue>("IdAsBsonValue").AsObjectId; }
+            get { return GetValue<BsonValue>("IdAsBsonValue"); }
         }
 
         /// <summary>
@@ -115,7 +131,7 @@ namespace MongoDB.Driver.GridFS
         /// <value>
         /// The identifier as a BsonValue.
         /// </value>
-        [Obsolete("All new GridFS files should use an ObjectId as the Id.")]
+        [Obsolete("All new GridFS files should use an TId as the Id.")]
         public BsonValue IdAsBsonValue
         {
             get { return GetValue<BsonValue>("IdAsBsonValue"); }
