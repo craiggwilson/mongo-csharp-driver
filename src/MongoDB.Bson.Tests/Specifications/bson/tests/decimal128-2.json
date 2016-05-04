@@ -5,137 +5,137 @@
     "valid": [
        {
           "description": "[decq021] Normality",
-          "subject": "18000000136400f2af967ed05c82de3297ff6fde3c40b000",
+          "subject": "18000000136400F2AF967ED05C82DE3297FF6FDE3C40B000",
           "string": "-1234567890123456789012345678901234"
        },
        {
           "description": "[decq200] underflow edge cases (Subnormal)",
-          "subject": "18000000136400ffffffff095bc138938d44c64d31008000",
+          "subject": "18000000136400FFFFFFFF095BC138938D44C64D31008000",
           "string": "-9.99999999999999999999999999999999E-6144"
        },
        {
           "description": "[decq823] values around [u]int32 edges (zeros done earlier)",
-          "subject": "18000000136400010000800000000000000000000040b000",
+          "subject": "18000000136400010000800000000000000000000040B000",
           "string": "-2147483649"
        },
        {
           "description": "[decq822] values around [u]int32 edges (zeros done earlier)",
-          "subject": "18000000136400000000800000000000000000000040b000",
+          "subject": "18000000136400000000800000000000000000000040B000",
           "string": "-2147483648"
        },
        {
           "description": "[decq821] values around [u]int32 edges (zeros done earlier)",
-          "subject": "18000000136400ffffff7f0000000000000000000040b000",
+          "subject": "18000000136400FFFFFF7F0000000000000000000040B000",
           "string": "-2147483647"
        },
        {
           "description": "[decq820] values around [u]int32 edges (zeros done earlier)",
-          "subject": "18000000136400feffff7f0000000000000000000040b000",
+          "subject": "18000000136400FEFFFF7F0000000000000000000040B000",
           "string": "-2147483646"
        },
        {
           "description": "[decq152] fold-downs (more below)",
-          "subject": "18000000136400393000000000000000000000000040b000",
+          "subject": "18000000136400393000000000000000000000000040B000",
           "string": "-12345"
        },
        {
           "description": "[decq154] fold-downs (more below)",
-          "subject": "18000000136400d20400000000000000000000000040b000",
+          "subject": "18000000136400D20400000000000000000000000040B000",
           "string": "-1234"
        },
        {
           "description": "[decq006] derivative canonical plain strings",
-          "subject": "18000000136400ee0200000000000000000000000040b000",
+          "subject": "18000000136400EE0200000000000000000000000040B000",
           "string": "-750"
        },
        {
           "description": "[decq164] fold-downs (more below)",
-          "subject": "1800000013640039300000000000000000000000003cb000",
+          "subject": "1800000013640039300000000000000000000000003CB000",
           "string": "-123.45"
        },
        {
           "description": "[decq156] fold-downs (more below)",
-          "subject": "180000001364007b0000000000000000000000000040b000",
+          "subject": "180000001364007B0000000000000000000000000040B000",
           "string": "-123"
        },
        {
           "description": "[decq008] derivative canonical plain strings",
-          "subject": "18000000136400ee020000000000000000000000003eb000",
+          "subject": "18000000136400EE020000000000000000000000003EB000",
           "string": "-75.0"
        },
        {
           "description": "[decq158] fold-downs (more below)",
-          "subject": "180000001364000c0000000000000000000000000040b000",
+          "subject": "180000001364000C0000000000000000000000000040B000",
           "string": "-12"
        },
        {
           "description": "[decq122] Nmax and similar",
-          "subject": "18000000136400ffffffff638e8d37c087adbe09edffdf00",
+          "subject": "18000000136400FFFFFFFF638E8D37C087ADBE09EDFFDF00",
           "string": "-9.999999999999999999999999999999999E+6144"
        },
        {
           "description": "[decq002] (mostly derived from the Strawman 4 document and examples)",
-          "subject": "18000000136400ee020000000000000000000000003cb000",
+          "subject": "18000000136400EE020000000000000000000000003CB000",
           "string": "-7.50"
        },
        {
           "description": "[decq004] derivative canonical plain strings",
-          "subject": "18000000136400ee0200000000000000000000000042b000",
+          "subject": "18000000136400EE0200000000000000000000000042B000",
           "string": "-7.50E+3"
        },
        {
           "description": "[decq018] derivative canonical plain strings",
-          "subject": "18000000136400ee020000000000000000000000002eb000",
+          "subject": "18000000136400EE020000000000000000000000002EB000",
           "string": "-7.50E-7"
        },
        {
           "description": "[decq125] Nmax and similar",
-          "subject": "18000000136400f2af967ed05c82de3297ff6fde3cfedf00",
+          "subject": "18000000136400F2AF967ED05C82DE3297FF6FDE3CFEDF00",
           "string": "-1.234567890123456789012345678901234E+6144"
        },
        {
           "description": "[decq131] fold-downs (more below)",
-          "subject": "18000000136400000000807f1bcf85b27059c8a43cfedf00",
+          "subject": "18000000136400000000807F1BCF85B27059C8A43CFEDF00",
           "string": "-1.230000000000000000000000000000000E+6144"
        },
        {
           "description": "[decq162] fold-downs (more below)",
-          "subject": "180000001364007b000000000000000000000000003cb000",
+          "subject": "180000001364007B000000000000000000000000003CB000",
           "string": "-1.23"
        },
        {
           "description": "[decq130] fold-downs (more below) (Clamped)",
-          "subject": "18000000136400000000807f1bcf85b27059c8a43cfedf00",
+          "subject": "18000000136400000000807F1BCF85B27059C8A43CFEDF00",
           "string": "-1.230000000000000000000000000000000E+6144"
        },
        {
           "description": "[decq176] Nmin and below",
-          "subject": "18000000136400010000000a5bc138938d44c64d31008000",
+          "subject": "18000000136400010000000A5BC138938D44C64D31008000",
           "string": "-1.000000000000000000000000000000001E-6143"
        },
        {
           "description": "[decq174] Nmin and below",
-          "subject": "18000000136400000000000a5bc138938d44c64d31008000",
+          "subject": "18000000136400000000000A5BC138938D44C64D31008000",
           "string": "-1.000000000000000000000000000000000E-6143"
        },
        {
           "description": "[decq133] fold-downs (more below)",
-          "subject": "18000000136400000000000a5bc138938d44c64d31fedf00",
+          "subject": "18000000136400000000000A5BC138938D44C64D31FEDF00",
           "string": "-1.000000000000000000000000000000000E+6144"
        },
        {
           "description": "[decq178] Nmin and below (Subnormal)",
-          "subject": "180000001364000000000081efac855b416d2dee04008000",
+          "subject": "180000001364000000000081EFAC855B416D2DEE04008000",
           "string": "-1.00000000000000000000000000000000E-6144"
        },
        {
           "description": "[decq180] Nmin and below (Subnormal)",
-          "subject": "180000001364000a00000000000000000000000000008000",
+          "subject": "180000001364000A00000000000000000000000000008000",
           "string": "-1.0E-6175"
        },
        {
           "description": "[decq160] fold-downs (more below)",
-          "subject": "18000000136400010000000000000000000000000040b000",
+          "subject": "18000000136400010000000000000000000000000040B000",
           "string": "-1"
        },
        {
@@ -145,7 +145,7 @@
        },
        {
           "description": "[decq132] fold-downs (more below) (Clamped)",
-          "subject": "18000000136400000000000a5bc138938d44c64d31fedf00",
+          "subject": "18000000136400000000000A5BC138938D44C64D31FEDF00",
           "string": "-1.000000000000000000000000000000000E+6144"
        },
        {
@@ -165,32 +165,32 @@
        },
        {
           "description": "[decq010] derivative canonical plain strings",
-          "subject": "18000000136400ee020000000000000000000000003ab000",
+          "subject": "18000000136400EE020000000000000000000000003AB000",
           "string": "-0.750"
        },
        {
           "description": "[decq177] Nmin and below (Subnormal)",
-          "subject": "180000001364000000000081efac855b416d2dee04008000",
+          "subject": "180000001364000000000081EFAC855B416D2DEE04008000",
           "string": "-1.00000000000000000000000000000000E-6144"
        },
        {
           "description": "[decq012] derivative canonical plain strings",
-          "subject": "18000000136400ee0200000000000000000000000038b000",
+          "subject": "18000000136400EE0200000000000000000000000038B000",
           "string": "-0.0750"
        },
        {
           "description": "[decq014] derivative canonical plain strings",
-          "subject": "18000000136400ee0200000000000000000000000034b000",
+          "subject": "18000000136400EE0200000000000000000000000034B000",
           "string": "-0.000750"
        },
        {
           "description": "[decq016] derivative canonical plain strings",
-          "subject": "18000000136400ee0200000000000000000000000030b000",
+          "subject": "18000000136400EE0200000000000000000000000030B000",
           "string": "-0.00000750"
        },
        {
           "description": "[decq179] Nmin and below (Subnormal)",
-          "subject": "180000001364000a00000000000000000000000000008000",
+          "subject": "180000001364000A00000000000000000000000000008000",
           "string": "-1.0E-6175"
        },
        {
@@ -215,12 +215,12 @@
        },
        {
           "description": "[decq407] zeros",
-          "subject": "1800000013640000000000000000000000000000003c3000",
+          "subject": "1800000013640000000000000000000000000000003C3000",
           "string": "0.00"
        },
        {
           "description": "[decq427] negative zeros",
-          "subject": "1800000013640000000000000000000000000000003cb000",
+          "subject": "1800000013640000000000000000000000000000003CB000",
           "string": "-0.00"
        },
        {
@@ -230,7 +230,7 @@
        },
        {
           "description": "[decq428] negative zeros",
-          "subject": "18000000136400000000000000000000000000000040b000",
+          "subject": "18000000136400000000000000000000000000000040B000",
           "string": "-0"
        },
        {
@@ -240,12 +240,12 @@
        },
        {
           "description": "[decq406] zeros",
-          "subject": "1800000013640000000000000000000000000000003c3000",
+          "subject": "1800000013640000000000000000000000000000003C3000",
           "string": "0.00"
        },
        {
           "description": "[decq426] negative zeros",
-          "subject": "1800000013640000000000000000000000000000003cb000",
+          "subject": "1800000013640000000000000000000000000000003CB000",
           "string": "-0.00"
        },
        {
@@ -255,37 +255,37 @@
        },
        {
           "description": "[decq431] negative zeros",
-          "subject": "18000000136400000000000000000000000000000046b000",
+          "subject": "18000000136400000000000000000000000000000046B000",
           "string": "-0E+3"
        },
        {
           "description": "[decq419] clamped zeros...",
-          "subject": "180000001364000000000000000000000000000000fe5f00",
+          "subject": "180000001364000000000000000000000000000000FE5F00",
           "string": "0E+6111"
        },
        {
           "description": "[decq432] negative zeros",
-          "subject": "180000001364000000000000000000000000000000fedf00",
+          "subject": "180000001364000000000000000000000000000000FEDF00",
           "string": "-0E+6111"
        },
        {
           "description": "[decq414] clamped zeros... (Clamped)",
-          "subject": "180000001364000000000000000000000000000000fe5f00",
+          "subject": "180000001364000000000000000000000000000000FE5F00",
           "string": "0E+6111"
        },
        {
           "description": "[decq434] clamped zeros... (Clamped)",
-          "subject": "180000001364000000000000000000000000000000fedf00",
+          "subject": "180000001364000000000000000000000000000000FEDF00",
           "string": "-0E+6111"
        },
        {
           "description": "[decq416] clamped zeros... (Clamped)",
-          "subject": "180000001364000000000000000000000000000000fe5f00",
+          "subject": "180000001364000000000000000000000000000000FE5F00",
           "string": "0E+6111"
        },
        {
           "description": "[decq436] clamped zeros... (Clamped)",
-          "subject": "180000001364000000000000000000000000000000fedf00",
+          "subject": "180000001364000000000000000000000000000000FEDF00",
           "string": "-0E+6111"
        },
        {
@@ -315,7 +315,7 @@
        },
        {
           "description": "[decq418] clamped zeros... (Clamped)",
-          "subject": "180000001364000000000000000000000000000000fe5f00",
+          "subject": "180000001364000000000000000000000000000000FE5F00",
           "string": "0E+6111"
        },
        {
@@ -325,7 +325,7 @@
        },
        {
           "description": "[decq438] clamped zeros... (Clamped)",
-          "subject": "180000001364000000000000000000000000000000fedf00",
+          "subject": "180000001364000000000000000000000000000000FEDF00",
           "string": "-0E+6111"
        },
        {
@@ -335,12 +335,12 @@
        },
        {
           "description": "[decq528] Specials",
-          "subject": "18000000136400000000000000000000000000000000f800",
+          "subject": "18000000136400000000000000000000000000000000F800",
           "string": "-Infinity"
        },
        {
           "description": "[decq541] Specials",
-          "subject": "180000001364000000000000000000000000000000007c00",
+          "subject": "180000001364000000000000000000000000000000007C00",
           "string": "NaN"
        },
        {
@@ -350,7 +350,7 @@
        },
        {
           "description": "[decq079] Nmin and below (Subnormal)",
-          "subject": "180000001364000a00000000000000000000000000000000",
+          "subject": "180000001364000A00000000000000000000000000000000",
           "string": "1.0E-6175"
        },
        {
@@ -360,187 +360,187 @@
        },
        {
           "description": "[decq077] Nmin and below (Subnormal)",
-          "subject": "180000001364000000000081efac855b416d2dee04000000",
+          "subject": "180000001364000000000081EFAC855B416D2DEE04000000",
           "string": "1.00000000000000000000000000000000E-6144"
        },
        {
           "description": "[decq074] Nmin and below",
-          "subject": "18000000136400000000000a5bc138938d44c64d31000000",
+          "subject": "18000000136400000000000A5BC138938D44C64D31000000",
           "string": "1.000000000000000000000000000000000E-6143"
        },
        {
           "description": "[decq602] fold-down full sequence",
-          "subject": "18000000136400000000000a5bc138938d44c64d31fe5f00",
+          "subject": "18000000136400000000000A5BC138938D44C64D31FE5F00",
           "string": "1.000000000000000000000000000000000E+6144"
        },
        {
           "description": "[decq604] fold-down full sequence",
-          "subject": "180000001364000000000081efac855b416d2dee04fe5f00",
+          "subject": "180000001364000000000081EFAC855B416D2DEE04FE5F00",
           "string": "1.00000000000000000000000000000000E+6143"
        },
        {
           "description": "[decq078] Nmin and below (Subnormal)",
-          "subject": "180000001364000000000081efac855b416d2dee04000000",
+          "subject": "180000001364000000000081EFAC855B416D2DEE04000000",
           "string": "1.00000000000000000000000000000000E-6144"
        },
        {
           "description": "[decq606] fold-down full sequence",
-          "subject": "1800000013640000000080264b91c02220be377e00fe5f00",
+          "subject": "1800000013640000000080264B91C02220BE377E00FE5F00",
           "string": "1.0000000000000000000000000000000E+6142"
        },
        {
           "description": "[decq608] fold-down full sequence",
-          "subject": "1800000013640000000040eaed7446d09c2c9f0c00fe5f00",
+          "subject": "1800000013640000000040EAED7446D09C2C9F0C00FE5F00",
           "string": "1.000000000000000000000000000000E+6141"
        },
        {
           "description": "[decq610] fold-down full sequence",
-          "subject": "18000000136400000000a0ca17726dae0f1e430100fe5f00",
+          "subject": "18000000136400000000A0CA17726DAE0F1E430100FE5F00",
           "string": "1.00000000000000000000000000000E+6140"
        },
        {
           "description": "[decq612] fold-down full sequence",
-          "subject": "18000000136400000000106102253e5ece4f200000fe5f00",
+          "subject": "18000000136400000000106102253E5ECE4F200000FE5F00",
           "string": "1.0000000000000000000000000000E+6139"
        },
        {
           "description": "[decq614] fold-down full sequence",
-          "subject": "18000000136400000000e83c80d09f3c2e3b030000fe5f00",
+          "subject": "18000000136400000000E83C80D09F3C2E3B030000FE5F00",
           "string": "1.000000000000000000000000000E+6138"
        },
        {
           "description": "[decq616] fold-down full sequence",
-          "subject": "18000000136400000000e4d20cc8dcd2b752000000fe5f00",
+          "subject": "18000000136400000000E4D20CC8DCD2B752000000FE5F00",
           "string": "1.00000000000000000000000000E+6137"
        },
        {
           "description": "[decq618] fold-down full sequence",
-          "subject": "180000001364000000004a48011416954508000000fe5f00",
+          "subject": "180000001364000000004A48011416954508000000FE5F00",
           "string": "1.0000000000000000000000000E+6136"
        },
        {
           "description": "[decq620] fold-down full sequence",
-          "subject": "18000000136400000000a1edccce1bc2d300000000fe5f00",
+          "subject": "18000000136400000000A1EDCCCE1BC2D300000000FE5F00",
           "string": "1.000000000000000000000000E+6135"
        },
        {
           "description": "[decq622] fold-down full sequence",
-          "subject": "18000000136400000080f64ae1c7022d1500000000fe5f00",
+          "subject": "18000000136400000080F64AE1C7022D1500000000FE5F00",
           "string": "1.00000000000000000000000E+6134"
        },
        {
           "description": "[decq624] fold-down full sequence",
-          "subject": "18000000136400000040b2bac9e0191e0200000000fe5f00",
+          "subject": "18000000136400000040B2BAC9E0191E0200000000FE5F00",
           "string": "1.0000000000000000000000E+6133"
        },
        {
           "description": "[decq626] fold-down full sequence",
-          "subject": "180000001364000000a0dec5adc935360000000000fe5f00",
+          "subject": "180000001364000000A0DEC5ADC935360000000000FE5F00",
           "string": "1.000000000000000000000E+6132"
        },
        {
           "description": "[decq628] fold-down full sequence",
-          "subject": "18000000136400000010632d5ec76b050000000000fe5f00",
+          "subject": "18000000136400000010632D5EC76B050000000000FE5F00",
           "string": "1.00000000000000000000E+6131"
        },
        {
           "description": "[decq630] fold-down full sequence",
-          "subject": "180000001364000000e8890423c78a000000000000fe5f00",
+          "subject": "180000001364000000E8890423C78A000000000000FE5F00",
           "string": "1.0000000000000000000E+6130"
        },
        {
           "description": "[decq632] fold-down full sequence",
-          "subject": "18000000136400000064a7b3b6e00d000000000000fe5f00",
+          "subject": "18000000136400000064A7B3B6E00D000000000000FE5F00",
           "string": "1.000000000000000000E+6129"
        },
        {
           "description": "[decq634] fold-down full sequence",
-          "subject": "1800000013640000008a5d78456301000000000000fe5f00",
+          "subject": "1800000013640000008A5D78456301000000000000FE5F00",
           "string": "1.00000000000000000E+6128"
        },
        {
           "description": "[decq636] fold-down full sequence",
-          "subject": "180000001364000000c16ff2862300000000000000fe5f00",
+          "subject": "180000001364000000C16FF2862300000000000000FE5F00",
           "string": "1.0000000000000000E+6127"
        },
        {
           "description": "[decq638] fold-down full sequence",
-          "subject": "180000001364000080c6a47e8d0300000000000000fe5f00",
+          "subject": "180000001364000080C6A47E8D0300000000000000FE5F00",
           "string": "1.000000000000000E+6126"
        },
        {
           "description": "[decq640] fold-down full sequence",
-          "subject": "1800000013640000407a10f35a0000000000000000fe5f00",
+          "subject": "1800000013640000407A10F35A0000000000000000FE5F00",
           "string": "1.00000000000000E+6125"
        },
        {
           "description": "[decq642] fold-down full sequence",
-          "subject": "1800000013640000a0724e18090000000000000000fe5f00",
+          "subject": "1800000013640000A0724E18090000000000000000FE5F00",
           "string": "1.0000000000000E+6124"
        },
        {
           "description": "[decq644] fold-down full sequence",
-          "subject": "180000001364000010a5d4e8000000000000000000fe5f00",
+          "subject": "180000001364000010A5D4E8000000000000000000FE5F00",
           "string": "1.000000000000E+6123"
        },
        {
           "description": "[decq646] fold-down full sequence",
-          "subject": "1800000013640000e8764817000000000000000000fe5f00",
+          "subject": "1800000013640000E8764817000000000000000000FE5F00",
           "string": "1.00000000000E+6122"
        },
        {
           "description": "[decq648] fold-down full sequence",
-          "subject": "1800000013640000e40b5402000000000000000000fe5f00",
+          "subject": "1800000013640000E40B5402000000000000000000FE5F00",
           "string": "1.0000000000E+6121"
        },
        {
           "description": "[decq650] fold-down full sequence",
-          "subject": "1800000013640000ca9a3b00000000000000000000fe5f00",
+          "subject": "1800000013640000CA9A3B00000000000000000000FE5F00",
           "string": "1.000000000E+6120"
        },
        {
           "description": "[decq652] fold-down full sequence",
-          "subject": "1800000013640000e1f50500000000000000000000fe5f00",
+          "subject": "1800000013640000E1F50500000000000000000000FE5F00",
           "string": "1.00000000E+6119"
        },
        {
           "description": "[decq654] fold-down full sequence",
-          "subject": "180000001364008096980000000000000000000000fe5f00",
+          "subject": "180000001364008096980000000000000000000000FE5F00",
           "string": "1.0000000E+6118"
        },
        {
           "description": "[decq656] fold-down full sequence",
-          "subject": "1800000013640040420f0000000000000000000000fe5f00",
+          "subject": "1800000013640040420F0000000000000000000000FE5F00",
           "string": "1.000000E+6117"
        },
        {
           "description": "[decq658] fold-down full sequence",
-          "subject": "18000000136400a086010000000000000000000000fe5f00",
+          "subject": "18000000136400A086010000000000000000000000FE5F00",
           "string": "1.00000E+6116"
        },
        {
           "description": "[decq660] fold-down full sequence",
-          "subject": "180000001364001027000000000000000000000000fe5f00",
+          "subject": "180000001364001027000000000000000000000000FE5F00",
           "string": "1.0000E+6115"
        },
        {
           "description": "[decq662] fold-down full sequence",
-          "subject": "18000000136400e803000000000000000000000000fe5f00",
+          "subject": "18000000136400E803000000000000000000000000FE5F00",
           "string": "1.000E+6114"
        },
        {
           "description": "[decq664] fold-down full sequence",
-          "subject": "180000001364006400000000000000000000000000fe5f00",
+          "subject": "180000001364006400000000000000000000000000FE5F00",
           "string": "1.00E+6113"
        },
        {
           "description": "[decq666] fold-down full sequence",
-          "subject": "180000001364000a00000000000000000000000000fe5f00",
+          "subject": "180000001364000A00000000000000000000000000FE5F00",
           "string": "1.0E+6112"
        },
        {
           "description": "[decq080] Nmin and below (Subnormal)",
-          "subject": "180000001364000a00000000000000000000000000000000",
+          "subject": "180000001364000A00000000000000000000000000000000",
           "string": "1.0E-6175"
        },
        {
@@ -550,167 +550,167 @@
        },
        {
           "description": "[decq670] fold-down full sequence",
-          "subject": "180000001364000100000000000000000000000000fc5f00",
+          "subject": "180000001364000100000000000000000000000000FC5F00",
           "string": "1E+6110"
        },
        {
           "description": "[decq668] fold-down full sequence",
-          "subject": "180000001364000100000000000000000000000000fe5f00",
+          "subject": "180000001364000100000000000000000000000000FE5F00",
           "string": "1E+6111"
        },
        {
           "description": "[decq665] fold-down full sequence (Clamped)",
-          "subject": "180000001364000a00000000000000000000000000fe5f00",
+          "subject": "180000001364000A00000000000000000000000000FE5F00",
           "string": "1.0E+6112"
        },
        {
           "description": "[decq663] fold-down full sequence (Clamped)",
-          "subject": "180000001364006400000000000000000000000000fe5f00",
+          "subject": "180000001364006400000000000000000000000000FE5F00",
           "string": "1.00E+6113"
        },
        {
           "description": "[decq661] fold-down full sequence (Clamped)",
-          "subject": "18000000136400e803000000000000000000000000fe5f00",
+          "subject": "18000000136400E803000000000000000000000000FE5F00",
           "string": "1.000E+6114"
        },
        {
           "description": "[decq659] fold-down full sequence (Clamped)",
-          "subject": "180000001364001027000000000000000000000000fe5f00",
+          "subject": "180000001364001027000000000000000000000000FE5F00",
           "string": "1.0000E+6115"
        },
        {
           "description": "[decq657] fold-down full sequence (Clamped)",
-          "subject": "18000000136400a086010000000000000000000000fe5f00",
+          "subject": "18000000136400A086010000000000000000000000FE5F00",
           "string": "1.00000E+6116"
        },
        {
           "description": "[decq655] fold-down full sequence (Clamped)",
-          "subject": "1800000013640040420f0000000000000000000000fe5f00",
+          "subject": "1800000013640040420F0000000000000000000000FE5F00",
           "string": "1.000000E+6117"
        },
        {
           "description": "[decq653] fold-down full sequence (Clamped)",
-          "subject": "180000001364008096980000000000000000000000fe5f00",
+          "subject": "180000001364008096980000000000000000000000FE5F00",
           "string": "1.0000000E+6118"
        },
        {
           "description": "[decq651] fold-down full sequence (Clamped)",
-          "subject": "1800000013640000e1f50500000000000000000000fe5f00",
+          "subject": "1800000013640000E1F50500000000000000000000FE5F00",
           "string": "1.00000000E+6119"
        },
        {
           "description": "[decq649] fold-down full sequence (Clamped)",
-          "subject": "1800000013640000ca9a3b00000000000000000000fe5f00",
+          "subject": "1800000013640000CA9A3B00000000000000000000FE5F00",
           "string": "1.000000000E+6120"
        },
        {
           "description": "[decq647] fold-down full sequence (Clamped)",
-          "subject": "1800000013640000e40b5402000000000000000000fe5f00",
+          "subject": "1800000013640000E40B5402000000000000000000FE5F00",
           "string": "1.0000000000E+6121"
        },
        {
           "description": "[decq645] fold-down full sequence (Clamped)",
-          "subject": "1800000013640000e8764817000000000000000000fe5f00",
+          "subject": "1800000013640000E8764817000000000000000000FE5F00",
           "string": "1.00000000000E+6122"
        },
        {
           "description": "[decq643] fold-down full sequence (Clamped)",
-          "subject": "180000001364000010a5d4e8000000000000000000fe5f00",
+          "subject": "180000001364000010A5D4E8000000000000000000FE5F00",
           "string": "1.000000000000E+6123"
        },
        {
           "description": "[decq641] fold-down full sequence (Clamped)",
-          "subject": "1800000013640000a0724e18090000000000000000fe5f00",
+          "subject": "1800000013640000A0724E18090000000000000000FE5F00",
           "string": "1.0000000000000E+6124"
        },
        {
           "description": "[decq639] fold-down full sequence (Clamped)",
-          "subject": "1800000013640000407a10f35a0000000000000000fe5f00",
+          "subject": "1800000013640000407A10F35A0000000000000000FE5F00",
           "string": "1.00000000000000E+6125"
        },
        {
           "description": "[decq637] fold-down full sequence (Clamped)",
-          "subject": "180000001364000080c6a47e8d0300000000000000fe5f00",
+          "subject": "180000001364000080C6A47E8D0300000000000000FE5F00",
           "string": "1.000000000000000E+6126"
        },
        {
           "description": "[decq635] fold-down full sequence (Clamped)",
-          "subject": "180000001364000000c16ff2862300000000000000fe5f00",
+          "subject": "180000001364000000C16FF2862300000000000000FE5F00",
           "string": "1.0000000000000000E+6127"
        },
        {
           "description": "[decq633] fold-down full sequence (Clamped)",
-          "subject": "1800000013640000008a5d78456301000000000000fe5f00",
+          "subject": "1800000013640000008A5D78456301000000000000FE5F00",
           "string": "1.00000000000000000E+6128"
        },
        {
           "description": "[decq631] fold-down full sequence (Clamped)",
-          "subject": "18000000136400000064a7b3b6e00d000000000000fe5f00",
+          "subject": "18000000136400000064A7B3B6E00D000000000000FE5F00",
           "string": "1.000000000000000000E+6129"
        },
        {
           "description": "[decq629] fold-down full sequence (Clamped)",
-          "subject": "180000001364000000e8890423c78a000000000000fe5f00",
+          "subject": "180000001364000000E8890423C78A000000000000FE5F00",
           "string": "1.0000000000000000000E+6130"
        },
        {
           "description": "[decq627] fold-down full sequence (Clamped)",
-          "subject": "18000000136400000010632d5ec76b050000000000fe5f00",
+          "subject": "18000000136400000010632D5EC76B050000000000FE5F00",
           "string": "1.00000000000000000000E+6131"
        },
        {
           "description": "[decq625] fold-down full sequence (Clamped)",
-          "subject": "180000001364000000a0dec5adc935360000000000fe5f00",
+          "subject": "180000001364000000A0DEC5ADC935360000000000FE5F00",
           "string": "1.000000000000000000000E+6132"
        },
        {
           "description": "[decq623] fold-down full sequence (Clamped)",
-          "subject": "18000000136400000040b2bac9e0191e0200000000fe5f00",
+          "subject": "18000000136400000040B2BAC9E0191E0200000000FE5F00",
           "string": "1.0000000000000000000000E+6133"
        },
        {
           "description": "[decq621] fold-down full sequence (Clamped)",
-          "subject": "18000000136400000080f64ae1c7022d1500000000fe5f00",
+          "subject": "18000000136400000080F64AE1C7022D1500000000FE5F00",
           "string": "1.00000000000000000000000E+6134"
        },
        {
           "description": "[decq619] fold-down full sequence (Clamped)",
-          "subject": "18000000136400000000a1edccce1bc2d300000000fe5f00",
+          "subject": "18000000136400000000A1EDCCCE1BC2D300000000FE5F00",
           "string": "1.000000000000000000000000E+6135"
        },
        {
           "description": "[decq617] fold-down full sequence (Clamped)",
-          "subject": "180000001364000000004a48011416954508000000fe5f00",
+          "subject": "180000001364000000004A48011416954508000000FE5F00",
           "string": "1.0000000000000000000000000E+6136"
        },
        {
           "description": "[decq615] fold-down full sequence (Clamped)",
-          "subject": "18000000136400000000e4d20cc8dcd2b752000000fe5f00",
+          "subject": "18000000136400000000E4D20CC8DCD2B752000000FE5F00",
           "string": "1.00000000000000000000000000E+6137"
        },
        {
           "description": "[decq613] fold-down full sequence (Clamped)",
-          "subject": "18000000136400000000e83c80d09f3c2e3b030000fe5f00",
+          "subject": "18000000136400000000E83C80D09F3C2E3B030000FE5F00",
           "string": "1.000000000000000000000000000E+6138"
        },
        {
           "description": "[decq611] fold-down full sequence (Clamped)",
-          "subject": "18000000136400000000106102253e5ece4f200000fe5f00",
+          "subject": "18000000136400000000106102253E5ECE4F200000FE5F00",
           "string": "1.0000000000000000000000000000E+6139"
        },
        {
           "description": "[decq609] fold-down full sequence (Clamped)",
-          "subject": "18000000136400000000a0ca17726dae0f1e430100fe5f00",
+          "subject": "18000000136400000000A0CA17726DAE0F1E430100FE5F00",
           "string": "1.00000000000000000000000000000E+6140"
        },
        {
           "description": "[decq607] fold-down full sequence (Clamped)",
-          "subject": "1800000013640000000040eaed7446d09c2c9f0c00fe5f00",
+          "subject": "1800000013640000000040EAED7446D09C2C9F0C00FE5F00",
           "string": "1.000000000000000000000000000000E+6141"
        },
        {
           "description": "[decq605] fold-down full sequence (Clamped)",
-          "subject": "1800000013640000000080264b91c02220be377e00fe5f00",
+          "subject": "1800000013640000000080264B91C02220BE377E00FE5F00",
           "string": "1.0000000000000000000000000000000E+6142"
        },
        {
@@ -720,12 +720,12 @@
        },
        {
           "description": "[decq603] fold-down full sequence (Clamped)",
-          "subject": "180000001364000000000081efac855b416d2dee04fe5f00",
+          "subject": "180000001364000000000081EFAC855B416D2DEE04FE5F00",
           "string": "1.00000000000000000000000000000000E+6143"
        },
        {
           "description": "[decq037] fold-downs (more below) (Clamped)",
-          "subject": "18000000136400000000000a5bc138938d44c64d31fe5f00",
+          "subject": "18000000136400000000000A5BC138938D44C64D31FE5F00",
           "string": "1.000000000000000000000000000000000E+6144"
        },
        {
@@ -745,27 +745,27 @@
        },
        {
           "description": "[decq076] Nmin and below",
-          "subject": "18000000136400010000000a5bc138938d44c64d31000000",
+          "subject": "18000000136400010000000A5BC138938D44C64D31000000",
           "string": "1.000000000000000000000000000000001E-6143"
        },
        {
           "description": "[decq036] fold-downs (more below)",
-          "subject": "18000000136400000000807f1bcf85b27059c8a43cfe5f00",
+          "subject": "18000000136400000000807F1BCF85B27059C8A43CFE5F00",
           "string": "1.230000000000000000000000000000000E+6144"
        },
        {
           "description": "[decq062] fold-downs (more below)",
-          "subject": "180000001364007b000000000000000000000000003c3000",
+          "subject": "180000001364007B000000000000000000000000003C3000",
           "string": "1.23"
        },
        {
           "description": "[decq035] fold-downs (more below) (Clamped)",
-          "subject": "18000000136400000000807f1bcf85b27059c8a43cfe5f00",
+          "subject": "18000000136400000000807F1BCF85B27059C8A43CFE5F00",
           "string": "1.230000000000000000000000000000000E+6144"
        },
        {
           "description": "[decq034] Nmax and similar",
-          "subject": "18000000136400f2af967ed05c82de3297ff6fde3cfe5f00",
+          "subject": "18000000136400F2AF967ED05C82DE3297FF6FDE3CFE5F00",
           "string": "1.234567890123456789012345678901234E+6144"
        },
        {
@@ -775,12 +775,12 @@
        },
        {
           "description": "[decq449] exponent lengths",
-          "subject": "1800000013640007000000000000000000000000001e5f00",
+          "subject": "1800000013640007000000000000000000000000001E5F00",
           "string": "7E+5999"
        },
        {
           "description": "[decq447] exponent lengths",
-          "subject": "1800000013640007000000000000000000000000000e3800",
+          "subject": "1800000013640007000000000000000000000000000E3800",
           "string": "7E+999"
        },
        {
@@ -795,17 +795,17 @@
        },
        {
           "description": "[decq842] VG testcase",
-          "subject": "180000001364000000fed83f4e7c9fe4e269e38a5bcd1700",
+          "subject": "180000001364000000FED83F4E7C9FE4E269E38A5BCD1700",
           "string": "7.049000000000010795488000000000000E-3097"
        },
        {
           "description": "[decq841] VG testcase",
-          "subject": "180000001364000000203b9db5056f000000000000002400",
+          "subject": "180000001364000000203B9DB5056F000000000000002400",
           "string": "8.000000000000000000E-1550"
        },
        {
           "description": "[decq840] VG testcase",
-          "subject": "180000001364003c17258419d710c42f0000000000002400",
+          "subject": "180000001364003C17258419D710C42F0000000000002400",
           "string": "8.81125000000001349436E-1548"
        },
        {
@@ -815,17 +815,17 @@
        },
        {
           "description": "[decq032] Nmax and similar",
-          "subject": "18000000136400ffffffff638e8d37c087adbe09edff5f00",
+          "subject": "18000000136400FFFFFFFF638E8D37C087ADBE09EDFF5F00",
           "string": "9.999999999999999999999999999999999E+6144"
        },
        {
           "description": "[decq702] Selected DPD codes",
-          "subject": "180000001364000a00000000000000000000000000403000",
+          "subject": "180000001364000A00000000000000000000000000403000",
           "string": "10"
        },
        {
           "description": "[decq057] fold-downs (more below)",
-          "subject": "180000001364000c00000000000000000000000000403000",
+          "subject": "180000001364000C00000000000000000000000000403000",
           "string": "12"
        },
        {
@@ -840,12 +840,12 @@
        },
        {
           "description": "[decq705] Selected DPD codes",
-          "subject": "180000001364001d00000000000000000000000000403000",
+          "subject": "180000001364001D00000000000000000000000000403000",
           "string": "29"
        },
        {
           "description": "[decq706] Selected DPD codes",
-          "subject": "180000001364001e00000000000000000000000000403000",
+          "subject": "180000001364001E00000000000000000000000000403000",
           "string": "30"
        },
        {
@@ -870,12 +870,12 @@
        },
        {
           "description": "[decq711] Selected DPD codes",
-          "subject": "180000001364003b00000000000000000000000000403000",
+          "subject": "180000001364003B00000000000000000000000000403000",
           "string": "59"
        },
        {
           "description": "[decq712] Selected DPD codes",
-          "subject": "180000001364003c00000000000000000000000000403000",
+          "subject": "180000001364003C00000000000000000000000000403000",
           "string": "60"
        },
        {
@@ -905,42 +905,42 @@
        },
        {
           "description": "[decq718] Selected DPD codes",
-          "subject": "180000001364004a00000000000000000000000000403000",
+          "subject": "180000001364004A00000000000000000000000000403000",
           "string": "74"
        },
        {
           "description": "[decq719] Selected DPD codes",
-          "subject": "180000001364004b00000000000000000000000000403000",
+          "subject": "180000001364004B00000000000000000000000000403000",
           "string": "75"
        },
        {
           "description": "[decq720] Selected DPD codes",
-          "subject": "180000001364004c00000000000000000000000000403000",
+          "subject": "180000001364004C00000000000000000000000000403000",
           "string": "76"
        },
        {
           "description": "[decq721] Selected DPD codes",
-          "subject": "180000001364004d00000000000000000000000000403000",
+          "subject": "180000001364004D00000000000000000000000000403000",
           "string": "77"
        },
        {
           "description": "[decq722] Selected DPD codes",
-          "subject": "180000001364004e00000000000000000000000000403000",
+          "subject": "180000001364004E00000000000000000000000000403000",
           "string": "78"
        },
        {
           "description": "[decq723] Selected DPD codes",
-          "subject": "180000001364004f00000000000000000000000000403000",
+          "subject": "180000001364004F00000000000000000000000000403000",
           "string": "79"
        },
        {
           "description": "[decq056] fold-downs (more below)",
-          "subject": "180000001364007b00000000000000000000000000403000",
+          "subject": "180000001364007B00000000000000000000000000403000",
           "string": "123"
        },
        {
           "description": "[decq064] fold-downs (more below)",
-          "subject": "1800000013640039300000000000000000000000003c3000",
+          "subject": "1800000013640039300000000000000000000000003C3000",
           "string": "123.45"
        },
        {
@@ -960,7 +960,7 @@
        },
        {
           "description": "[decq741] DPD: one of each of the huffman groups",
-          "subject": "180000001364000a03000000000000000000000000403000",
+          "subject": "180000001364000A03000000000000000000000000403000",
           "string": "778"
        },
        {
@@ -970,12 +970,12 @@
        },
        {
           "description": "[decq746] DPD: one of each of the huffman groups",
-          "subject": "180000001364001f03000000000000000000000000403000",
+          "subject": "180000001364001F03000000000000000000000000403000",
           "string": "799"
        },
        {
           "description": "[decq743] DPD: one of each of the huffman groups",
-          "subject": "180000001364006d03000000000000000000000000403000",
+          "subject": "180000001364006D03000000000000000000000000403000",
           "string": "877"
        },
        {
@@ -1000,47 +1000,47 @@
        },
        {
           "description": "[decq745] DPD: one of each of the huffman groups",
-          "subject": "18000000136400d303000000000000000000000000403000",
+          "subject": "18000000136400D303000000000000000000000000403000",
           "string": "979"
        },
        {
           "description": "[decq770] DPD all-highs cases (includes the 24 redundant codes)",
-          "subject": "18000000136400dc03000000000000000000000000403000",
+          "subject": "18000000136400DC03000000000000000000000000403000",
           "string": "988"
        },
        {
           "description": "[decq774] DPD all-highs cases (includes the 24 redundant codes)",
-          "subject": "18000000136400dd03000000000000000000000000403000",
+          "subject": "18000000136400DD03000000000000000000000000403000",
           "string": "989"
        },
        {
           "description": "[decq730] Selected DPD codes",
-          "subject": "18000000136400e203000000000000000000000000403000",
+          "subject": "18000000136400E203000000000000000000000000403000",
           "string": "994"
        },
        {
           "description": "[decq731] Selected DPD codes",
-          "subject": "18000000136400e303000000000000000000000000403000",
+          "subject": "18000000136400E303000000000000000000000000403000",
           "string": "995"
        },
        {
           "description": "[decq744] DPD: one of each of the huffman groups",
-          "subject": "18000000136400e503000000000000000000000000403000",
+          "subject": "18000000136400E503000000000000000000000000403000",
           "string": "997"
        },
        {
           "description": "[decq780] DPD all-highs cases (includes the 24 redundant codes)",
-          "subject": "18000000136400e603000000000000000000000000403000",
+          "subject": "18000000136400E603000000000000000000000000403000",
           "string": "998"
        },
        {
           "description": "[decq787] DPD all-highs cases (includes the 24 redundant codes)",
-          "subject": "18000000136400e703000000000000000000000000403000",
+          "subject": "18000000136400E703000000000000000000000000403000",
           "string": "999"
        },
        {
           "description": "[decq053] fold-downs (more below)",
-          "subject": "18000000136400d204000000000000000000000000403000",
+          "subject": "18000000136400D204000000000000000000000000403000",
           "string": "1234"
        },
        {
@@ -1055,17 +1055,17 @@
        },
        {
           "description": "[decq793] Miscellaneous (testers' queries, etc.)",
-          "subject": "1800000013640090940d0000000000000000000000403000",
+          "subject": "1800000013640090940D0000000000000000000000403000",
           "string": "890000"
        },
        {
           "description": "[decq824] values around [u]int32 edges (zeros done earlier)",
-          "subject": "18000000136400feffff7f00000000000000000000403000",
+          "subject": "18000000136400FEFFFF7F00000000000000000000403000",
           "string": "2147483646"
        },
        {
           "description": "[decq825] values around [u]int32 edges (zeros done earlier)",
-          "subject": "18000000136400ffffff7f00000000000000000000403000",
+          "subject": "18000000136400FFFFFF7F00000000000000000000403000",
           "string": "2147483647"
        },
        {
@@ -1080,12 +1080,12 @@
        },
        {
           "description": "[decq828] values around [u]int32 edges (zeros done earlier)",
-          "subject": "18000000136400feffffff00000000000000000000403000",
+          "subject": "18000000136400FEFFFFFF00000000000000000000403000",
           "string": "4294967294"
        },
        {
           "description": "[decq829] values around [u]int32 edges (zeros done earlier)",
-          "subject": "18000000136400ffffffff00000000000000000000403000",
+          "subject": "18000000136400FFFFFFFF00000000000000000000403000",
           "string": "4294967295"
        },
        {
@@ -1100,22 +1100,22 @@
        },
        {
           "description": "[decq100] underflows cannot be tested for simple copies, check edge cases (Subnormal)",
-          "subject": "18000000136400ffffffff095bc138938d44c64d31000000",
+          "subject": "18000000136400FFFFFFFF095BC138938D44C64D31000000",
           "string": "9.99999999999999999999999999999999E-6144"
        },
        {
           "description": "[decq022] Normality",
-          "subject": "18000000136400c7711cc7b548f377dc80a131c836403000",
+          "subject": "18000000136400C7711CC7B548F377DC80A131C836403000",
           "string": "1111111111111111111111111111111111"
        },
        {
           "description": "[decq020] Normality",
-          "subject": "18000000136400f2af967ed05c82de3297ff6fde3c403000",
+          "subject": "18000000136400F2AF967ED05C82DE3297FF6FDE3C403000",
           "string": "1234567890123456789012345678901234"
        },
        {
           "description": "[decq550] Specials",
-          "subject": "18000000136400ffffffff638e8d37c087adbe09ed413000",
+          "subject": "18000000136400FFFFFFFF638E8D37C087ADBE09ED413000",
           "string": "9999999999999999999999999999999999"
        }
     ]

@@ -5,31 +5,31 @@
     "valid": [
        {
           "description": " [basx023] conform to rules and exponent will be in permitted range).",
-          "subject": "1800000013640001000000000000000000000000003eb000",
+          "subject": "1800000013640001000000000000000000000000003EB000",
           "string": "-0.1"
        },
 
        {
           "description": "[basx045] strings without E cannot generate E in result",
-          "subject": "1800000013640003000000000000000000000000003a3000",
+          "subject": "1800000013640003000000000000000000000000003A3000",
           "string": "+0.003",
           "match_string": "0.003"
        },
        {
           "description": "[basx610] Zeros",
-          "subject": "1800000013640000000000000000000000000000003e3000",
+          "subject": "1800000013640000000000000000000000000000003E3000",
           "string": ".0",
           "match_string": "0.0"
        },
        {
           "description": "[basx612] Zeros",
-          "subject": "1800000013640000000000000000000000000000003eb000",
+          "subject": "1800000013640000000000000000000000000000003EB000",
           "string": "-.0",
           "match_string": "-0.0"
        },
        {
           "description": "[basx043] strings without E cannot generate E in result",
-          "subject": "18000000136400fc040000000000000000000000003c3000",
+          "subject": "18000000136400FC040000000000000000000000003C3000",
           "string": "+12.76",
           "match_string": "12.76"
        },
@@ -63,21 +63,95 @@
        },
        {
           "description": "[basx047] strings without E cannot generate E in result",
-          "subject": "1800000013640005000000000000000000000000003e3000",
+          "subject": "1800000013640005000000000000000000000000003E3000",
           "string": ".5",
           "match_string": "0.5"
        },
        {
           "description": "[dqbsr431] check rounding modes heeded (Rounded)",
-          "subject": "1800000013640099761cc7b548f377dc80a131c836fe2f00",
+          "subject": "1800000013640099761CC7B548F377DC80A131C836FE2F00",
           "string": "1.1111111111111111111111111111123450",
           "match_string": "1.111111111111111111111111111112345"
        },
        {
           "description": "OK2",
-          "subject": "18000000136400000000000a5bc138938d44c64d31fc2f00",
+          "subject": "18000000136400000000000A5BC138938D44C64D31FC2F00",
           "string": ".100000000000000000000000000000000000000000000000000000000000",
           "match_string": "0.1000000000000000000000000000000000"
+       }
+    ],
+    "parseErrors": [
+       {
+          "description": " [basx564] Near-specials (Conversion_syntax)",
+          "subject": "Infi"
+       },
+       {
+          "description": " [basx565] Near-specials (Conversion_syntax)",
+          "subject": "Infin"
+       },
+       {
+          "description": " [basx566] Near-specials (Conversion_syntax)",
+          "subject": "Infini"
+       },
+       {
+          "description": " [basx567] Near-specials (Conversion_syntax)",
+          "subject": "Infinit"
+       },
+       {
+          "description": " [basx568] Near-specials (Conversion_syntax)",
+          "subject": "-Infinit"
+       },
+       {
+          "description": " [basx590] some baddies with dots and Es and dots and specials (Conversion_syntax)",
+          "subject": ".Infinity"
+       },
+       {
+          "description": " [basx562] Near-specials (Conversion_syntax)",
+          "subject": "NaNq"
+       },
+       {
+          "description": " [basx563] Near-specials (Conversion_syntax)",
+          "subject": "NaNs"
+       },
+       {
+          "description": " [dqbas939] overflow results at different rounding modes (Overflow & Inexact & Rounded)",
+          "subject": "-7e10000"
+       },
+       {
+          "description": " [dqbsr534] negatives (Rounded & Inexact)",
+          "subject": "-1.11111111111111111111111111111234650"
+       },
+       {
+          "description": " [dqbsr535] negatives (Rounded & Inexact)",
+          "subject": "-1.11111111111111111111111111111234551"
+       },
+       {
+          "description": " [dqbsr533] negatives (Rounded & Inexact)",
+          "subject": "-1.11111111111111111111111111111234550"
+       },
+       {
+          "description": " [dqbsr532] negatives (Rounded & Inexact)",
+          "subject": "-1.11111111111111111111111111111234549"
+       },
+       {
+          "description": " [dqbsr432] check rounding modes heeded (Rounded & Inexact)",
+          "subject": "1.11111111111111111111111111111234549"
+       },
+       {
+          "description": " [dqbsr433] check rounding modes heeded (Rounded & Inexact)",
+          "subject": "1.11111111111111111111111111111234550"
+       },
+       {
+          "description": " [dqbsr435] check rounding modes heeded (Rounded & Inexact)",
+          "subject": "1.11111111111111111111111111111234551"
+       },
+       {
+          "description": " [dqbsr434] check rounding modes heeded (Rounded & Inexact)",
+          "subject": "1.11111111111111111111111111111234650"
+       },
+       {
+          "description": " [dqbas938] overflow results at different rounding modes (Overflow & Inexact & Rounded)",
+          "subject": "7e10000"
        }
     ]
 }
