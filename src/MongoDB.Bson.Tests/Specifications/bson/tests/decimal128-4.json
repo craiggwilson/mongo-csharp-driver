@@ -1,0 +1,83 @@
+{
+    "description": "Decimal128",
+    "bson_type": "0x13",
+    "test_key": "d",
+    "valid": [
+       {
+          "description": " [basx023] conform to rules and exponent will be in permitted range).",
+          "subject": "1800000013640001000000000000000000000000003eb000",
+          "string": "-0.1"
+       },
+
+       {
+          "description": "[basx045] strings without E cannot generate E in result",
+          "subject": "1800000013640003000000000000000000000000003a3000",
+          "string": "+0.003",
+          "match_string": "0.003"
+       },
+       {
+          "description": "[basx610] Zeros",
+          "subject": "1800000013640000000000000000000000000000003e3000",
+          "string": ".0",
+          "match_string": "0.0"
+       },
+       {
+          "description": "[basx612] Zeros",
+          "subject": "1800000013640000000000000000000000000000003eb000",
+          "string": "-.0",
+          "match_string": "-0.0"
+       },
+       {
+          "description": "[basx043] strings without E cannot generate E in result",
+          "subject": "18000000136400fc040000000000000000000000003c3000",
+          "string": "+12.76",
+          "match_string": "12.76"
+       },
+       {
+          "description": "[basx055] strings without E cannot generate E in result",
+          "subject": "180000001364000500000000000000000000000000303000",
+          "string": "0.00000005",
+          "match_string": "5E-8"
+       },
+       {
+          "description": "[basx054] strings without E cannot generate E in result",
+          "subject": "180000001364000500000000000000000000000000323000",
+          "string": "0.0000005",
+          "match_string": "5E-7"
+       },
+       {
+          "description": "[basx052] strings without E cannot generate E in result",
+          "subject": "180000001364000500000000000000000000000000343000",
+          "string": "0.000005"
+       },
+       {
+          "description": "[basx051] strings without E cannot generate E in result",
+          "subject": "180000001364000500000000000000000000000000363000",
+          "string": "00.00005",
+          "match_string": "0.00005"
+       },
+       {
+          "description": "[basx050] strings without E cannot generate E in result",
+          "subject": "180000001364000500000000000000000000000000383000",
+          "string": "0.0005"
+       },
+       {
+          "description": "[basx047] strings without E cannot generate E in result",
+          "subject": "1800000013640005000000000000000000000000003e3000",
+          "string": ".5",
+          "match_string": "0.5"
+       },
+       {
+          "description": "[dqbsr431] check rounding modes heeded (Rounded)",
+          "subject": "1800000013640099761cc7b548f377dc80a131c836fe2f00",
+          "string": "1.1111111111111111111111111111123450",
+          "match_string": "1.111111111111111111111111111112345"
+       },
+       {
+          "description": "OK2",
+          "subject": "18000000136400000000000a5bc138938d44c64d31fc2f00",
+          "string": ".100000000000000000000000000000000000000000000000000000000000",
+          "match_string": "0.1000000000000000000000000000000000"
+       }
+    ]
+}
