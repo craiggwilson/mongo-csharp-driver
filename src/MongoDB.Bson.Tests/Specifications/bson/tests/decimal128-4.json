@@ -154,11 +154,11 @@
           "subject": "7e10000"
        },
        {
-          "description": "Inexct rounding#1",
+          "description": "Inexact rounding#1",
           "string": "100000000000000000000000000000000000000000000000000000000001"
        },
        {
-          "description": "Inexct rounding#2",
+          "description": "Inexact rounding#2",
           "string": "1E-6177"
        }
     ]
