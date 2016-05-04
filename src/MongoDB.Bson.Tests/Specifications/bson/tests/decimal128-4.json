@@ -152,6 +152,14 @@
        {
           "description": " [dqbas938] overflow results at different rounding modes (Overflow & Inexact & Rounded)",
           "subject": "7e10000"
+       },
+       {
+          "description": "Inexct rounding#1",
+          "string": "100000000000000000000000000000000000000000000000000000000001",
+       },
+       {
+          "description": "Inexct rounding#2",
+          "string": "1E-6177",
        }
     ]
 }
