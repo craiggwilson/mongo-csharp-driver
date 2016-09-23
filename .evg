@@ -1,22 +1,89 @@
-tasks:
-  - name: compile
-    commands:
-      - command: git.get_project
-        params: 
-          directory: src
-      - command: shell.exec
-        params: 
-          script: |
-            echo "hello world!"
-            echo "${test_flags}"
+#############################################
+# Evergreen configuration for the .NET driver
+#############################################
+
+command_type: system
+
+functions:
+  "fetch source":
+    - command: git.get_project
+      params:
+        directory: mongo-csharp-driver
+    - command: git.apply_patch
+      params:
+        directory: "mongo-csharp-driver"
+
+  "download dotnet":
+    - command: shell.exec
+      params:
+        working_dir: mongo-csharp-driver/build
+        script: |
+          set -o verbose
+          set -o errexit
+          rm -rf dotnet || true
+          mkdir dotnet
+          cd dotnet
+          curl -s ${dotnet_url} --output dotnet.tgz
+          ${decompress} dotnet.tgz
+          chmod +x ./dotnet-*/bin/*
+          mv ./dotnet-*/bin/* .
+
+  "download mongod":
+    - command: shell.exec
+      params:
+        working_dir: mongo-csharp-driver/build
+        script: |
+          set -o verbose
+          set -o errexit
+          rm -rf mongodb || true
+          mkdir mongodb
+          cd mongodb
+          curl -s ${mongo_url} --output mongodb.tgz
+          ${decompress} mongodb.tgz
+          chmod +x ./mongodb-*/bin/*
+          mv ./mongodb-*/bin/* .
+
+  "start mongod":
+    - command: shell.exec
+      params:
+        working_dir: mongo-csharp-driver/build
+        background: true
+        script: |
+          set -o verbose
+          rm -rf ../dbFiles && mkdir -p ../dbFiles;
+          echo "Starting mongod...";
+          ./mongodb/mongod${extension} ${mongod_args} --dbpath ../dbFiles --setParameter=enableTestCommands=1
+          echo "Waiting for mongod to start up..."
+          ./mongodb/mongo${extension} --nodb --eval 'assert.soon(function(x){try{var d = new Mongo("localhost:27017"); return true}catch(e){return false}}, "timed out connecting")' ${mongo_args}
+          echo "Done!"
 
 
 buildvariants:
-- name: linux-64
-  display_name: Linux-64
+- name: debian81
+  display_name: Debian 8.1 (nightly)
   run_on:
-  - ubuntu1404-test
+  - debian81-test
   expansions:
-    test_flags: "blah blah"
+    mongo_url: http://downloads.mongodb.org/linux/mongodb-linux-x86_64-debian81-latest.tgz
+    dotnet_url: https://go.microsoft.com/fwlink/?LinkID=827530
   tasks:
-  - name: compile
+  - test-bson
+
+
+pre:
+  - func: "fetch source"
+  - func: "download dotnet"
+  - func: "download mongod"
+  - func: "start mongod"
+
+  
+tasks:
+  - name: test-bson
+    commands:
+      - command: shell.exec
+        params: 
+          working_dir: mongo-csharp-driver 
+          script: |
+            echo "hello world!"
+            ./build/dotnet/dotnet version
+            
