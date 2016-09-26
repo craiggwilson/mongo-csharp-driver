@@ -4,41 +4,102 @@
 
 command_type: system
 
+axes:
+  - id: mongodb_version
+    display_name: MongoDB Version
+    values:
+      - id: "3.3.14"
+        display_name: "3.3"
+      - id: "3.2.9"
+        display_name: "3.2"
+      - id: "3.0.12"
+        display_name: "3.0"
+      - id: "2.6.12"
+        display_name: "2.6"
+  - id: os
+    display_name: OS
+    values:
+      - id: debian81
+        display_name: Debian 8.1 (nightly)
+        run_on: debian81-test
+        variables:
+          mongo_download_url: "https://downloads.mongodb.org/linux/mongodb-linux-x86_64-debian81-${mongodb_version}.tgz"
+          dotnet_download_url: https://go.microsoft.com/fwlink/?LinkID=827530
+      - id: osx1010
+        display_name: OSX 10.10
+        run_on: osx-1010
+        variables:
+          mongo_download_url: "https://downloads.mongodb.org/osx/mongodb-osx-x86_64-${mongodb_version}.tgz"
+          dotnet_download_url: https://go.microsoft.com/fwlink/?LinkID=827533
+      - id: rhel70
+        display_name: RHEL 7.0
+        run_on: rhel70
+        variables:
+          mongo_download_url: "https://downloads.mongodb.org/linux/mongodb-linux-x86_64-rhel70-${mongodb_version}.tgz"
+          dotnet_download_url: https://go.microsoft.com/fwlink/?LinkID=827534
+      - id: ubuntu1404
+        display_name: Ubuntu 14.04
+        run_on: ubuntu1404-test
+        variables:
+          mongo_download_url: "https://downloads.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1404-${mongodb_version}.tgz"
+          dotnet_download_url: https://go.microsoft.com/fwlink/?LinkID=827536
+      - id: ubuntu1604
+        display_name: Ubuntu 16.04
+        run_on: ubuntu1604-test
+        variables:
+          mongo_download_url: "https://downloads.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1604-${mongodb_version}.tgz"
+          dotnet_download_url: https://go.microsoft.com/fwlink/?LinkID=827535
+      - id: windows
+        display_name: Windows
+        run_on: windows-64-vs2015-test
+        variables:
+          mongo_download_url: "https://downloads.mongodb.org/win32/mongodb-win32-x86_64-2008plus-${mongodb_version}.zip"
+          dotnet_download_url: https://go.microsoft.com/fwlink/?LinkID=827537
+  - id: cluster_type
+    display_name: Cluster Type
+    values:
+      - id: standalone
+        display_name: Standalone
+        variables:
+          mongo_connection_string: "mongodb://localhost:27017"
+
+buildvariants:
+  - matrix_name: "tests"
+    matrix_spec: {os: "*", cluster_type: "*", mongodb_version: "*"}
+    display_name: "${os} ${cluster_type} ${mongodb_version}"
+    tasks: ".test"
+
 functions:
   "fetch source":
     - command: git.get_project
       params:
-        directory: mongo-csharp-driver
-    - command: git.apply_patch
-      params:
-        directory: "mongo-csharp-driver"
+        directory: driver
 
   "download dotnet":
     - command: shell.exec
       params:
-        working_dir: mongo-csharp-driver/build
+        working_dir: driver/build
         script: |
           set -o verbose
           set -o errexit
           rm -rf dotnet || true
           mkdir dotnet
           cd dotnet
-          curl -s ${dotnet_url} --output dotnet.tgz
+          curl -sSL ${dotnet_download_url} --output dotnet.tgz
           ${decompress} dotnet.tgz
-          chmod +x ./dotnet-*/bin/*
-          mv ./dotnet-*/bin/* .
+          chmod +x dotnet
 
   "download mongod":
     - command: shell.exec
       params:
-        working_dir: mongo-csharp-driver/build
+        working_dir: driver/build
         script: |
           set -o verbose
           set -o errexit
           rm -rf mongodb || true
           mkdir mongodb
           cd mongodb
-          curl -s ${mongo_url} --output mongodb.tgz
+          curl -s ${mongo_download_url} --output mongodb.tgz
           ${decompress} mongodb.tgz
           chmod +x ./mongodb-*/bin/*
           mv ./mongodb-*/bin/* .
@@ -46,28 +107,26 @@ functions:
   "start mongod":
     - command: shell.exec
       params:
-        working_dir: mongo-csharp-driver/build
+        working_dir: driver/build
         background: true
         script: |
           set -o verbose
-          rm -rf ../dbFiles && mkdir -p ../dbFiles;
+          rm -rf db_files && mkdir -p db_files;
           echo "Starting mongod...";
-          ./mongodb/mongod${extension} ${mongod_args} --dbpath ../dbFiles --setParameter=enableTestCommands=1
+          ./mongodb/mongod${extension} ${mongod_args} --dbpath db_files --setParameter=enableTestCommands=1
           echo "Waiting for mongod to start up..."
           ./mongodb/mongo${extension} --nodb --eval 'assert.soon(function(x){try{var d = new Mongo("localhost:27017"); return true}catch(e){return false}}, "timed out connecting")' ${mongo_args}
           echo "Done!"
 
-
-buildvariants:
-- name: debian81
-  display_name: Debian 8.1 (nightly)
-  run_on:
-  - debian81-test
-  expansions:
-    mongo_url: http://downloads.mongodb.org/linux/mongodb-linux-x86_64-debian81-latest.tgz
-    dotnet_url: https://go.microsoft.com/fwlink/?LinkID=827530
-  tasks:
-  - test-bson
+  "dotnet test":
+    - command: shell.exec
+      params:
+        working_dir: driver
+        script: |
+          set -o verbose
+          cd tests/${test_project}
+          export MONGO_URI=${mongo_connection_string}
+          ../../build/dotnet/dotnet${extension} test
 
 
 pre:
@@ -76,14 +135,16 @@ pre:
   - func: "download mongod"
   - func: "start mongod"
 
-  
 tasks:
-  - name: test-bson
+  - name: dotnet-test-bson
+    tags: ["dotnet", "test"]
     commands:
-      - command: shell.exec
-        params: 
-          working_dir: mongo-csharp-driver 
-          script: |
-            echo "hello world!"
-            ./build/dotnet/dotnet version
-            
+      - func: "dotnet test"
+        vars:
+          test_project: MongoDB.Bson.Tests.Dotnet
+  - name: dotnet-test-core
+    tags: ["dotnet", "test", "requires_db"]
+    commands:
+      - func: "dotnet test"
+        vars:
+          test_project: MongoDB.Driver.Core.Tests.Dotnet
