@@ -8,8 +8,8 @@ axes:
   - id: mongodb_version
     display_name: MongoDB Version
     values:
-      - id: "3.3.14"
-        display_name: "3.3"
+      - id: "3.4.0-rc0"
+        display_name: "3.4"
       - id: "3.2.9"
         display_name: "3.2"
       - id: "3.0.12"
@@ -113,7 +113,7 @@ functions:
           set -o verbose
           rm -rf db_files && mkdir -p db_files;
           echo "Starting mongod...";
-          ./mongodb/mongod${extension} ${mongod_args} --dbpath db_files --setParameter=enableTestCommands=1
+          ./mongodb/mongod${extension} ${mongod_args} --dbpath db_files --setParameter=enableTestCommands=1 --logPath mongod.log --fork
           echo "Waiting for mongod to start up..."
           ./mongodb/mongo${extension} --nodb --eval 'assert.soon(function(x){try{var d = new Mongo("localhost:27017"); return true}catch(e){return false}}, "timed out connecting")' ${mongo_args}
           echo "Done!"
@@ -126,14 +126,26 @@ functions:
           set -o verbose
           cd tests/${test_project}
           export MONGO_URI=${mongo_connection_string}
+          ../../build/dotnet/dotnet${extension} restore
+          ../../build/dotnet/dotnet${extension} test
+
+  "dotnet test with db":
+    - func: "download mongod"
+    - func: "start mongod"
+    - command: shell.exec
+      params:
+        working_dir: driver
+        script: |
+          set -o verbose
+          cd tests/${test_project}
+          export MONGO_URI=${mongo_connection_string}
+          ../../build/dotnet/dotnet${extension} restore
           ../../build/dotnet/dotnet${extension} test
 
 
 pre:
   - func: "fetch source"
   - func: "download dotnet"
-  - func: "download mongod"
-  - func: "start mongod"
 
 tasks:
   - name: dotnet-test-bson
@@ -145,6 +157,6 @@ tasks:
   - name: dotnet-test-core
     tags: ["dotnet", "test", "requires_db"]
     commands:
-      - func: "dotnet test"
+      - func: "dotnet test with db"
         vars:
           test_project: MongoDB.Driver.Core.Tests.Dotnet
