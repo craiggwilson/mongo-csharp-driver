@@ -1,4 +1,4 @@
-﻿/* Copyright 2013-2015 MongoDB Inc.
+﻿/* Copyright 2013-2017 MongoDB Inc.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -96,7 +96,7 @@ namespace MongoDB.Driver.Core.Operations
             using (var channelSource = binding.GetReadChannelSource(cancellationToken))
             {
                 var operation = CreateOperation();
-                var result = operation.Execute(channelSource, binding.ReadPreference, cancellationToken);
+                var result = operation.Execute(channelSource, binding.ReadPreference, binding.Session, cancellationToken);
                 return CreateCursor(channelSource, operation.Command, result);
             }
         }
@@ -110,7 +110,7 @@ namespace MongoDB.Driver.Core.Operations
             using (var channelSource = await binding.GetReadChannelSourceAsync(cancellationToken).ConfigureAwait(false))
             {
                 var operation = CreateOperation();
-                var result = await operation.ExecuteAsync(channelSource, binding.ReadPreference, cancellationToken).ConfigureAwait(false);
+                var result = await operation.ExecuteAsync(channelSource, binding.ReadPreference, binding.Session, cancellationToken).ConfigureAwait(false);
                 return CreateCursor(channelSource, operation.Command, result);
             }
         }

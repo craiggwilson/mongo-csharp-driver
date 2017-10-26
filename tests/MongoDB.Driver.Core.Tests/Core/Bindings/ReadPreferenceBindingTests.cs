@@ -39,7 +39,7 @@ namespace MongoDB.Driver.Core.Bindings
         [Fact]
         public void Constructor_should_throw_if_cluster_is_null()
         {
-            Action act = () => new ReadPreferenceBinding(null, ReadPreference.Primary);
+            Action act = () => new ReadPreferenceBinding(null, ReadPreference.Primary, NoCoreSession.Instance);
 
             act.ShouldThrow<ArgumentNullException>();
         }
@@ -47,7 +47,7 @@ namespace MongoDB.Driver.Core.Bindings
         [Fact]
         public void Constructor_should_throw_if_readPreference_is_null()
         {
-            Action act = () => new ReadPreferenceBinding(_mockCluster.Object, null);
+            Action act = () => new ReadPreferenceBinding(_mockCluster.Object, null, NoCoreSession.Instance);
 
             act.ShouldThrow<ArgumentNullException>();
         }
@@ -58,7 +58,7 @@ namespace MongoDB.Driver.Core.Bindings
             [Values(false, true)]
             bool async)
         {
-            var subject = new ReadPreferenceBinding(_mockCluster.Object, ReadPreference.Primary);
+            var subject = new ReadPreferenceBinding(_mockCluster.Object, ReadPreference.Primary, NoCoreSession.Instance);
             subject.Dispose();
 
             Action act;
@@ -80,7 +80,7 @@ namespace MongoDB.Driver.Core.Bindings
             [Values(false, true)]
             bool async)
         {
-            var subject = new ReadPreferenceBinding(_mockCluster.Object, ReadPreference.Primary);
+            var subject = new ReadPreferenceBinding(_mockCluster.Object, ReadPreference.Primary, NoCoreSession.Instance);
             var selectedServer = new Mock<IServer>().Object;
 
             if (async)
@@ -104,7 +104,7 @@ namespace MongoDB.Driver.Core.Bindings
         [Fact]
         public void Dispose_should_not_call_dispose_on_the_cluster()
         {
-            var subject = new ReadPreferenceBinding(_mockCluster.Object, ReadPreference.Primary);
+            var subject = new ReadPreferenceBinding(_mockCluster.Object, ReadPreference.Primary, NoCoreSession.Instance);
 
             subject.Dispose();
 

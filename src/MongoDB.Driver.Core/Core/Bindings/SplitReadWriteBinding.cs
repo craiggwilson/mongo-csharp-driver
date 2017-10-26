@@ -1,4 +1,4 @@
-/* Copyright 2013-2015 MongoDB Inc.
+/* Copyright 2013-2017 MongoDB Inc.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -41,15 +41,17 @@ namespace MongoDB.Driver.Core.Bindings
         {
             _readBinding = Ensure.IsNotNull(readBinding, nameof(readBinding));
             _writeBinding = Ensure.IsNotNull(writeBinding, nameof(writeBinding));
+            Ensure.That(object.ReferenceEquals(_readBinding.Session, _writeBinding.Session), "The read and the write binding must have the same session.");
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SplitReadWriteBinding"/> class.
+        /// Initializes a new instance of the <see cref="SplitReadWriteBinding" /> class.
         /// </summary>
         /// <param name="cluster">The cluster.</param>
         /// <param name="readPreference">The read preference.</param>
-        public SplitReadWriteBinding(ICluster cluster, ReadPreference readPreference)
-            : this(new ReadPreferenceBinding(cluster, readPreference), new WritableServerBinding(cluster))
+        /// <param name="session">The session.</param>
+        public SplitReadWriteBinding(ICluster cluster, ReadPreference readPreference, ICoreSession session)
+            : this(new ReadPreferenceBinding(cluster, readPreference, session), new WritableServerBinding(cluster, session))
         {
         }
 
@@ -58,6 +60,12 @@ namespace MongoDB.Driver.Core.Bindings
         public ReadPreference ReadPreference
         {
             get { return _readBinding.ReadPreference; }
+        }
+
+        /// <inheritdoc/>
+        public ICoreSession Session
+        {
+            get { return _readBinding.Session; } // both bindings have the same session
         }
 
         // methods

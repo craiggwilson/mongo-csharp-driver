@@ -36,7 +36,7 @@ namespace MongoDB.Driver.Core.Bindings
         [Fact]
         public void Constructor_should_throw_if_channelSource_is_null()
         {
-            Action act = () => new ChannelSourceReadWriteBinding(null, ReadPreference.Primary);
+            Action act = () => new ChannelSourceReadWriteBinding(null, ReadPreference.Primary, NoCoreSession.Instance);
 
             act.ShouldThrow<ArgumentNullException>();
         }
@@ -44,7 +44,7 @@ namespace MongoDB.Driver.Core.Bindings
         [Fact]
         public void Constructor_should_throw_if_readPreference_is_null()
         {
-            Action act = () => new ChannelSourceReadWriteBinding(_mockChannelSource.Object, null);
+            Action act = () => new ChannelSourceReadWriteBinding(_mockChannelSource.Object, null, NoCoreSession.Instance);
 
             act.ShouldThrow<ArgumentNullException>();
         }
@@ -52,7 +52,7 @@ namespace MongoDB.Driver.Core.Bindings
         [Fact]
         public void Constructor_should_not_fork_channelSource()
         {
-            new ChannelSourceReadWriteBinding(_mockChannelSource.Object, ReadPreference.Primary);
+            new ChannelSourceReadWriteBinding(_mockChannelSource.Object, ReadPreference.Primary, NoCoreSession.Instance);
 
             _mockChannelSource.Verify(s => s.Fork(), Times.Never);
         }
@@ -63,7 +63,7 @@ namespace MongoDB.Driver.Core.Bindings
             [Values(false, true)]
             bool async)
         {
-            var subject = new ChannelSourceReadWriteBinding(_mockChannelSource.Object, ReadPreference.Primary);
+            var subject = new ChannelSourceReadWriteBinding(_mockChannelSource.Object, ReadPreference.Primary, NoCoreSession.Instance);
             subject.Dispose();
 
             Action act;
@@ -85,7 +85,7 @@ namespace MongoDB.Driver.Core.Bindings
             [Values(false, true)]
             bool async)
         {
-            var subject = new ChannelSourceReadWriteBinding(_mockChannelSource.Object, ReadPreference.Primary);
+            var subject = new ChannelSourceReadWriteBinding(_mockChannelSource.Object, ReadPreference.Primary, NoCoreSession.Instance);
 
             if (async)
             {
@@ -105,7 +105,7 @@ namespace MongoDB.Driver.Core.Bindings
             [Values(false, true)]
             bool async)
         {
-            var subject = new ChannelSourceReadWriteBinding(_mockChannelSource.Object, ReadPreference.Primary);
+            var subject = new ChannelSourceReadWriteBinding(_mockChannelSource.Object, ReadPreference.Primary, NoCoreSession.Instance);
             subject.Dispose();
 
             Action act;
@@ -127,7 +127,7 @@ namespace MongoDB.Driver.Core.Bindings
             [Values(false, true)]
             bool async)
         {
-            var subject = new ChannelSourceReadWriteBinding(_mockChannelSource.Object, ReadPreference.Primary);
+            var subject = new ChannelSourceReadWriteBinding(_mockChannelSource.Object, ReadPreference.Primary, NoCoreSession.Instance);
 
             if (async)
             {
@@ -144,7 +144,7 @@ namespace MongoDB.Driver.Core.Bindings
         [Fact]
         public void Dispose_should_call_dispose_on_connection_source()
         {
-            var subject = new ChannelSourceReadWriteBinding(_mockChannelSource.Object, ReadPreference.Primary);
+            var subject = new ChannelSourceReadWriteBinding(_mockChannelSource.Object, ReadPreference.Primary, NoCoreSession.Instance);
 
             subject.Dispose();
 

@@ -42,6 +42,7 @@ namespace MongoDB.Driver
         {
             _operationExecutor = new MockOperationExecutor();
             _subject = CreateSubject(_operationExecutor);
+            _operationExecutor.Client = _subject.Client;
         }
 
         [Fact]
@@ -761,10 +762,12 @@ namespace MongoDB.Driver
         // private methods
         private MongoDatabaseImpl CreateSubject(IOperationExecutor operationExecutor)
         {
+            var mockClient = new Mock<IMongoClient>();
+            mockClient.SetupGet(c => c.ClusterClock).Returns(new ClusterClock());
             var settings = new MongoDatabaseSettings();
             settings.ApplyDefaultValues(new MongoClientSettings());
             return new MongoDatabaseImpl(
-                new Mock<IMongoClient>().Object,
+                mockClient.Object,
                 new DatabaseNamespace("foo"),
                 settings,
                 new Mock<ICluster>().Object,

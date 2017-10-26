@@ -39,7 +39,7 @@ namespace MongoDB.Driver.Core.Bindings
         [Fact]
         public void Constructor_should_throw_if_cluster_is_null()
         {
-            Action act = () => new WritableServerBinding(null);
+            Action act = () => new WritableServerBinding(null, NoCoreSession.Instance);
 
             act.ShouldThrow<ArgumentNullException>();
         }
@@ -47,7 +47,7 @@ namespace MongoDB.Driver.Core.Bindings
         [Fact]
         public void ReadPreference_should_be_primary()
         {
-            var subject = new WritableServerBinding(_mockCluster.Object);
+            var subject = new WritableServerBinding(_mockCluster.Object, NoCoreSession.Instance);
 
             subject.ReadPreference.Should().Be(ReadPreference.Primary);
         }
@@ -58,7 +58,7 @@ namespace MongoDB.Driver.Core.Bindings
             [Values(false, true)]
             bool async)
         {
-            var subject = new WritableServerBinding(_mockCluster.Object);
+            var subject = new WritableServerBinding(_mockCluster.Object, NoCoreSession.Instance);
             subject.Dispose();
 
             Action act;
@@ -80,7 +80,7 @@ namespace MongoDB.Driver.Core.Bindings
             [Values(false, true)]
             bool async)
         {
-            var subject = new WritableServerBinding(_mockCluster.Object);
+            var subject = new WritableServerBinding(_mockCluster.Object, NoCoreSession.Instance);
             var selectedServer = new Mock<IServer>().Object;
 
             if (async)
@@ -107,7 +107,7 @@ namespace MongoDB.Driver.Core.Bindings
             [Values(false, true)]
             bool async)
         {
-            var subject = new WritableServerBinding(_mockCluster.Object);
+            var subject = new WritableServerBinding(_mockCluster.Object, NoCoreSession.Instance);
             subject.Dispose();
 
             Action act;
@@ -129,7 +129,7 @@ namespace MongoDB.Driver.Core.Bindings
             [Values(false, true)]
             bool async)
         {
-            var subject = new WritableServerBinding(_mockCluster.Object);
+            var subject = new WritableServerBinding(_mockCluster.Object, NoCoreSession.Instance);
             var selectedServer = new Mock<IServer>().Object;
 
             if (async)
@@ -153,7 +153,7 @@ namespace MongoDB.Driver.Core.Bindings
         [Fact]
         public void Dispose_should_call_dispose_on_read_binding_and_write_binding()
         {
-            var subject = new WritableServerBinding(_mockCluster.Object);
+            var subject = new WritableServerBinding(_mockCluster.Object, NoCoreSession.Instance);
 
             subject.Dispose();
 

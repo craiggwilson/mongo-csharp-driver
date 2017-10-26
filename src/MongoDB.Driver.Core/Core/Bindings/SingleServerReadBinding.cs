@@ -1,4 +1,4 @@
-/* Copyright 2013-2015 MongoDB Inc.
+/* Copyright 2013-2017 MongoDB Inc.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -30,6 +30,7 @@ namespace MongoDB.Driver.Core.Bindings
         private bool _disposed;
         private readonly ReadPreference _readPreference;
         private readonly IServer _server;
+        private readonly ICoreSession _session;
 
         // constructors
         /// <summary>
@@ -37,10 +38,12 @@ namespace MongoDB.Driver.Core.Bindings
         /// </summary>
         /// <param name="server">The server.</param>
         /// <param name="readPreference">The read preference.</param>
-        public SingleServerReadBinding(IServer server, ReadPreference readPreference)
+        /// <param name="session">The session.</param>
+        public SingleServerReadBinding(IServer server, ReadPreference readPreference, ICoreSession session)
         {
             _server = Ensure.IsNotNull(server, nameof(server));
             _readPreference = Ensure.IsNotNull(readPreference, nameof(readPreference));
+            _session = Ensure.IsNotNull(session, nameof(session));
         }
 
         // properties
@@ -48,6 +51,12 @@ namespace MongoDB.Driver.Core.Bindings
         public ReadPreference ReadPreference
         {
             get { return _readPreference; }
+        }
+
+        /// <inheritdoc/>
+        public ICoreSession Session
+        {
+            get { return _session; }
         }
 
         // methods

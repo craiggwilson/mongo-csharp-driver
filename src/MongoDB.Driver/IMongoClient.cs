@@ -1,4 +1,4 @@
-/* Copyright 2013-2016 MongoDB Inc.
+/* Copyright 2013-2017 MongoDB Inc.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -38,6 +38,14 @@ namespace MongoDB.Driver
         ICluster Cluster { get; }
 
         /// <summary>
+        /// Gets the cluster clock.
+        /// </summary>
+        /// <value>
+        /// The cluster clock.
+        /// </value>
+        IClusterClock ClusterClock { get; }
+
+        /// <summary>
         /// Gets the settings.
         /// </summary>
         MongoClientSettings Settings { get; }
@@ -52,10 +60,29 @@ namespace MongoDB.Driver
         /// <summary>
         /// Drops the database with the specified name.
         /// </summary>
+        /// <param name="session">The session.</param>
+        /// <param name="name">The name of the database to drop.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        void DropDatabase(IClientSessionHandle session, string name, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Drops the database with the specified name.
+        /// </summary>
         /// <param name="name">The name of the database to drop.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A task.</returns>
         Task DropDatabaseAsync(string name, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Drops the database with the specified name.
+        /// </summary>
+        /// <param name="session">The session.</param>
+        /// <param name="name">The name of the database to drop.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>
+        /// A task.
+        /// </returns>
+        Task DropDatabaseAsync(IClientSessionHandle session, string name, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Gets a database.
@@ -75,9 +102,36 @@ namespace MongoDB.Driver
         /// <summary>
         /// Lists the databases on the server.
         /// </summary>
+        /// <param name="session">The session.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>
+        /// A cursor.
+        /// </returns>
+        IAsyncCursor<BsonDocument> ListDatabases(IClientSessionHandle session, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Lists the databases on the server.
+        /// </summary>
         /// <param name="cancellationToken">The cancellation token.</param>
         /// <returns>A Task whose result is a cursor.</returns>
         Task<IAsyncCursor<BsonDocument>> ListDatabasesAsync(CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Lists the databases on the server.
+        /// </summary>
+        /// <param name="session">The session.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>
+        /// A Task whose result is a cursor.
+        /// </returns>
+        Task<IAsyncCursor<BsonDocument>> ListDatabasesAsync(IClientSessionHandle session, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Starts a client sesssion.
+        /// </summary>
+        /// <param name="options">The session options.</param>
+        /// <returns>A client session.</returns>
+        IClientSessionHandle StartSession(ClientSessionOptions options = null);
 
         /// <summary>
         /// Returns a new IMongoClient instance with a different read concern setting.

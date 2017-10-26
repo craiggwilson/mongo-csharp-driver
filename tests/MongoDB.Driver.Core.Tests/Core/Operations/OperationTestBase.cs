@@ -127,7 +127,7 @@ namespace MongoDB.Driver.Core.Operations
         protected TResult ExecuteOperation<TResult>(IReadOperation<TResult> operation, ReadPreference readPreference, bool async)
         {
             var cluster = CoreTestConfiguration.Cluster;
-            using (var binding = new ReadPreferenceBinding(cluster, readPreference))
+            using (var binding = new ReadPreferenceBinding(cluster, readPreference, NoCoreSession.Instance))
             using (var bindingHandle = new ReadBindingHandle(binding))
             {
                 return ExecuteOperation(operation, bindingHandle, async);

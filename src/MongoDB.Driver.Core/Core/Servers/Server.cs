@@ -1,4 +1,4 @@
-/* Copyright 2013-2016 MongoDB Inc.
+/* Copyright 2013-2017 MongoDB Inc.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -309,26 +309,33 @@ namespace MongoDB.Driver.Core.Servers
                 DatabaseNamespace databaseNamespace,
                 BsonDocument command,
                 IElementNameValidator commandValidator,
+                Func<CommandResponseHandling> responseHandling,
                 bool slaveOk,
                 IBsonSerializer<TResult> resultSerializer,
                 MessageEncoderSettings messageEncoderSettings,
                 CancellationToken cancellationToken)
             {
-                return Command(databaseNamespace,
+                return Command(
+                    NoCoreSession.Instance,
+                    null, // readPreference
+                    databaseNamespace,
                     command,
                     commandValidator,
-                    () => CommandResponseHandling.Return,
+                    null, // additionalOptions
+                    responseHandling,
                     slaveOk,
                     resultSerializer,
                     messageEncoderSettings,
                     cancellationToken);
             }
 
-            // methods
             public TResult Command<TResult>(
+                ICoreSession session,
+                ReadPreference readPreference,
                 DatabaseNamespace databaseNamespace,
                 BsonDocument command,
                 IElementNameValidator commandValidator,
+                BsonDocument additionalOptions,
                 Func<CommandResponseHandling> responseHandling,
                 bool slaveOk,
                 IBsonSerializer<TResult> resultSerializer,
@@ -337,9 +344,12 @@ namespace MongoDB.Driver.Core.Servers
             {
                 slaveOk = GetEffectiveSlaveOk(slaveOk);
                 var protocol = new CommandWireProtocol<TResult>(
+                    session,
+                    readPreference,
                     databaseNamespace,
                     command,
                     commandValidator,
+                    additionalOptions,
                     responseHandling,
                     slaveOk,
                     resultSerializer,
@@ -352,15 +362,20 @@ namespace MongoDB.Driver.Core.Servers
                 DatabaseNamespace databaseNamespace,
                 BsonDocument command,
                 IElementNameValidator commandValidator,
+                Func<CommandResponseHandling> responseHandling,
                 bool slaveOk,
                 IBsonSerializer<TResult> resultSerializer,
                 MessageEncoderSettings messageEncoderSettings,
                 CancellationToken cancellationToken)
             {
-                return CommandAsync(databaseNamespace,
+                return CommandAsync(
+                    NoCoreSession.Instance,
+                    null, // readPreference
+                    databaseNamespace,
                     command,
                     commandValidator,
-                    () => CommandResponseHandling.Return,
+                    null, // additionalOptions
+                    responseHandling,
                     slaveOk,
                     resultSerializer,
                     messageEncoderSettings,
@@ -368,9 +383,12 @@ namespace MongoDB.Driver.Core.Servers
             }
 
             public Task<TResult> CommandAsync<TResult>(
+                ICoreSession session,
+                ReadPreference readPreference,
                 DatabaseNamespace databaseNamespace,
                 BsonDocument command,
                 IElementNameValidator commandValidator,
+                BsonDocument additionalOptions,
                 Func<CommandResponseHandling> responseHandling,
                 bool slaveOk,
                 IBsonSerializer<TResult> resultSerializer,
@@ -379,9 +397,12 @@ namespace MongoDB.Driver.Core.Servers
             {
                 slaveOk = GetEffectiveSlaveOk(slaveOk);
                 var protocol = new CommandWireProtocol<TResult>(
+                    session,
+                    readPreference,
                     databaseNamespace,
                     command,
                     commandValidator,
+                    additionalOptions,
                     responseHandling,
                     slaveOk,
                     resultSerializer,

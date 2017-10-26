@@ -194,7 +194,7 @@ namespace MongoDB.Driver.Core.Operations
                 if (Feature.WriteCommands.IsSupported(channel.ConnectionDescription.ServerVersion) && _writeConcern.IsAcknowledged)
                 {
                     var emulator = CreateEmulator();
-                    var result = emulator.Execute(channel, cancellationToken);
+                    var result = emulator.Execute(channel, binding.Session, cancellationToken);
                     return new[] { result };
                 }
                 else
@@ -224,7 +224,7 @@ namespace MongoDB.Driver.Core.Operations
                 if (Feature.WriteCommands.IsSupported(channel.ConnectionDescription.ServerVersion) && _writeConcern.IsAcknowledged)
                 {
                     var emulator = CreateEmulator();
-                    var result = await emulator.ExecuteAsync(channel, cancellationToken).ConfigureAwait(false);
+                    var result = await emulator.ExecuteAsync(channel, binding.Session, cancellationToken).ConfigureAwait(false);
                     return new[] { result };
                 }
                 else

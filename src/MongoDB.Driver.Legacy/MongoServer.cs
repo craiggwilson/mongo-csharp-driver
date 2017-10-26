@@ -1,4 +1,4 @@
-/* Copyright 2010-2016 MongoDB Inc.
+/* Copyright 2010-2017 MongoDB Inc.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -820,11 +820,11 @@ namespace MongoDB.Driver
 
             if (readPreference.ReadPreferenceMode == ReadPreferenceMode.Primary)
             {
-                return new ReadWriteBindingHandle(new WritableServerBinding(_cluster));
+                return new ReadWriteBindingHandle(new WritableServerBinding(_cluster, NoCoreSession.Instance));
             }
             else
             {
-                return new ReadBindingHandle(new ReadPreferenceBinding(_cluster, readPreference));
+                return new ReadBindingHandle(new ReadPreferenceBinding(_cluster, readPreference, NoCoreSession.Instance));
             }
 
         }
@@ -845,7 +845,7 @@ namespace MongoDB.Driver
                 return ToWriteBinding(request.Binding).Fork();
             }
 
-            return new ReadWriteBindingHandle(new WritableServerBinding(_cluster));
+            return new ReadWriteBindingHandle(new WritableServerBinding(_cluster, NoCoreSession.Instance));
         }
 
         // private methods
@@ -914,11 +914,11 @@ namespace MongoDB.Driver
             {
                 if (readPreference.ReadPreferenceMode == ReadPreferenceMode.Primary)
                 {
-                    channelBinding = new ReadWriteBindingHandle(new ChannelReadWriteBinding(server, channel.Fork()));
+                    channelBinding = new ReadWriteBindingHandle(new ChannelReadWriteBinding(server, channel.Fork(), NoCoreSession.Instance));
                 }
                 else
                 {
-                    channelBinding = new ReadBindingHandle(new ChannelReadBinding(server, channel.Fork(), readPreference));
+                    channelBinding = new ReadBindingHandle(new ChannelReadBinding(server, channel.Fork(), readPreference, NoCoreSession.Instance));
                 }
                 connectionId = channel.ConnectionDescription.ConnectionId;
             }

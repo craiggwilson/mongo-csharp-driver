@@ -1,4 +1,4 @@
-/* Copyright 2010-2015 MongoDB Inc.
+/* Copyright 2010-2017 MongoDB Inc.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -19,11 +19,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using MongoDB.Driver.Core.Bindings;
 using MongoDB.Driver.Core.Operations;
+using Moq;
 
 namespace MongoDB.Driver.Tests
 {
     internal class MockOperationExecutor : IOperationExecutor
     {
+        private IMongoClient _client;
         private readonly Queue<object> _calls;
         private readonly Queue<object> _results;
 
@@ -31,6 +33,12 @@ namespace MongoDB.Driver.Tests
         {
             _calls = new Queue<object>();
             _results = new Queue<object>();
+        }
+
+        public IMongoClient Client
+        {
+            get { return _client; }
+            set { _client = value; }
         }
 
         public int QueuedCallCount
@@ -160,6 +168,20 @@ namespace MongoDB.Driver.Tests
             }
 
             return writeCall;
+        }
+
+        public IClientSessionHandle StartImplicitSession(CancellationToken cancellationToken)
+        {
+            var options = new ClientSessionOptions();
+            var serverSession = new ServerSession();
+            var session = new ClientSession(_client, options, serverSession, isImplicitSession: true);
+            var handle = new ClientSessionHandle(session);
+            return handle;
+        }
+
+        public Task<IClientSessionHandle> StartImplicitSessionAsync(CancellationToken cancellationToken)
+        {
+            return Task.FromResult(StartImplicitSession(cancellationToken));
         }
 
         public class ReadCall<TResult>

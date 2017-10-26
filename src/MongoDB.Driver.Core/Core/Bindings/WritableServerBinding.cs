@@ -1,4 +1,4 @@
-/* Copyright 2013-2015 MongoDB Inc.
+/* Copyright 2013-2017 MongoDB Inc.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -31,15 +31,18 @@ namespace MongoDB.Driver.Core.Bindings
         // fields
         private readonly ICluster _cluster;
         private bool _disposed;
+        private readonly ICoreSession _session;
 
         // constructors
         /// <summary>
-        /// Initializes a new instance of the <see cref="WritableServerBinding"/> class.
+        /// Initializes a new instance of the <see cref="WritableServerBinding" /> class.
         /// </summary>
         /// <param name="cluster">The cluster.</param>
-        public WritableServerBinding(ICluster cluster)
+        /// <param name="session">The session.</param>
+        public WritableServerBinding(ICluster cluster, ICoreSession session)
         {
             _cluster = Ensure.IsNotNull(cluster, nameof(cluster));
+            _session = Ensure.IsNotNull(session, nameof(session));
         }
 
         // properties
@@ -47,6 +50,12 @@ namespace MongoDB.Driver.Core.Bindings
         public ReadPreference ReadPreference
         {
             get { return ReadPreference.Primary; }
+        }
+
+        /// <inheritdoc/>
+        public ICoreSession Session
+        {
+            get { return _session; }
         }
 
         // methods
