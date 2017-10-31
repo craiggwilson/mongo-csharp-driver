@@ -24,7 +24,7 @@ namespace MongoDB.Driver
     /// A base class for classes that wrap a client session.
     /// </summary>
     /// <seealso cref="MongoDB.Driver.IClientSession" />
-    public abstract class WrappingClientSession : IClientSession
+    internal abstract class WrappingClientSession : IClientSession
     {
         // private fields
         private bool _disposed;
@@ -129,13 +129,6 @@ namespace MongoDB.Driver
         {
             Dispose(true);
             GC.SuppressFinalize(this);
-        }
-
-        /// <inheritdoc />
-        public ICoreSession ToCoreSession()
-        {
-            ThrowIfDisposed();
-            return _wrapped.ToCoreSession();
         }
 
         // protected methods

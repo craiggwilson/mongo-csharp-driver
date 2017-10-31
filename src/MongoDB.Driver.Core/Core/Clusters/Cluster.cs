@@ -52,6 +52,7 @@ namespace MongoDB.Driver.Core.Clusters
         #endregion
 
         // fields
+        private readonly IClusterClock _clusterClock = new ClusterClock();
         private readonly ClusterId _clusterId;
         private ClusterDescription _description;
         private TaskCompletionSource<bool> _descriptionChangedTaskCompletionSource;
@@ -92,6 +93,8 @@ namespace MongoDB.Driver.Core.Clusters
         public event EventHandler<ClusterDescriptionChangedEventArgs> DescriptionChanged;
 
         // properties
+        public IClusterClock ClusterClock => _clusterClock;
+
         public ClusterId ClusterId
         {
             get { return _clusterId; }
@@ -116,7 +119,7 @@ namespace MongoDB.Driver.Core.Clusters
         // methods
         protected IClusterableServer CreateServer(EndPoint endPoint)
         {
-            return _serverFactory.CreateServer(_clusterId, endPoint);
+            return _serverFactory.CreateServer(_clusterId, _clusterClock, endPoint);
         }
 
         public void Dispose()

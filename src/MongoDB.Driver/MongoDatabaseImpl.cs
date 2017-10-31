@@ -73,6 +73,7 @@ namespace MongoDB.Driver
 
         public override void CreateCollection(IClientSessionHandle session, string name, CreateCollectionOptions options, CancellationToken cancellationToken)
         {
+            Ensure.IsNotNull(session, nameof(session));
             Ensure.IsNotNullOrEmpty(name, nameof(name));
 
             if (options == null)
@@ -101,6 +102,7 @@ namespace MongoDB.Driver
 
         public override Task CreateCollectionAsync(IClientSessionHandle session, string name, CreateCollectionOptions options, CancellationToken cancellationToken)
         {
+            Ensure.IsNotNull(session, nameof(session));
             Ensure.IsNotNullOrEmpty(name, nameof(name));
 
             if (options == null)
@@ -127,6 +129,7 @@ namespace MongoDB.Driver
 
         public override void CreateView<TDocument, TResult>(IClientSessionHandle session, string viewName, string viewOn, PipelineDefinition<TDocument, TResult> pipeline, CreateViewOptions<TDocument> options = null, CancellationToken cancellationToken = default(CancellationToken))
         {
+            Ensure.IsNotNull(session, nameof(session));
             Ensure.IsNotNull(viewName, nameof(viewName));
             Ensure.IsNotNull(viewOn, nameof(viewOn));
             Ensure.IsNotNull(pipeline, nameof(pipeline));
@@ -142,6 +145,7 @@ namespace MongoDB.Driver
 
         public override Task CreateViewAsync<TDocument, TResult>(IClientSessionHandle session, string viewName, string viewOn, PipelineDefinition<TDocument, TResult> pipeline, CreateViewOptions<TDocument> options = null, CancellationToken cancellationToken = default(CancellationToken))
         {
+            Ensure.IsNotNull(session, nameof(session));
             Ensure.IsNotNull(viewName, nameof(viewName));
             Ensure.IsNotNull(viewOn, nameof(viewOn));
             Ensure.IsNotNull(pipeline, nameof(pipeline));
@@ -157,6 +161,7 @@ namespace MongoDB.Driver
 
         public override void DropCollection(IClientSessionHandle session, string name, CancellationToken cancellationToken)
         {
+            Ensure.IsNotNull(session, nameof(session));
             Ensure.IsNotNullOrEmpty(name, nameof(name));
             var operation = CreateDropCollectionOperation(name);
             ExecuteWriteOperation(session, operation, cancellationToken);
@@ -164,11 +169,12 @@ namespace MongoDB.Driver
 
         public override Task DropCollectionAsync(string name, CancellationToken cancellationToken)
         {
-            return UsingImplicitSession(session => DropCollectionAsync(session, name, cancellationToken), cancellationToken);
+            return UsingImplicitSessionAsync(session => DropCollectionAsync(session, name, cancellationToken), cancellationToken);
         }
 
         public override Task DropCollectionAsync(IClientSessionHandle session, string name, CancellationToken cancellationToken)
         {
+            Ensure.IsNotNull(session, nameof(session));
             Ensure.IsNotNullOrEmpty(name, nameof(name));
             var operation = CreateDropCollectionOperation(name);
             return ExecuteWriteOperationAsync(session, operation, cancellationToken);
@@ -194,6 +200,7 @@ namespace MongoDB.Driver
 
         public override IAsyncCursor<BsonDocument> ListCollections(IClientSessionHandle session, ListCollectionsOptions options, CancellationToken cancellationToken)
         {
+            Ensure.IsNotNull(session, nameof(session));
             options = options ?? new ListCollectionsOptions();
             var operation = CreateListCollectionsOperation(options);
             return ExecuteReadOperation(session, operation, ReadPreference.Primary, cancellationToken);
@@ -206,6 +213,7 @@ namespace MongoDB.Driver
 
         public override Task<IAsyncCursor<BsonDocument>> ListCollectionsAsync(IClientSessionHandle session, ListCollectionsOptions options, CancellationToken cancellationToken)
         {
+            Ensure.IsNotNull(session, nameof(session));
             options = options ?? new ListCollectionsOptions();
             var operation = CreateListCollectionsOperation(options);
             return ExecuteReadOperationAsync(session, operation, ReadPreference.Primary, cancellationToken);
@@ -218,6 +226,7 @@ namespace MongoDB.Driver
 
         public override void RenameCollection(IClientSessionHandle session, string oldName, string newName, RenameCollectionOptions options, CancellationToken cancellationToken)
         {
+            Ensure.IsNotNull(session, nameof(session));
             Ensure.IsNotNullOrEmpty(oldName, nameof(oldName));
             Ensure.IsNotNullOrEmpty(newName, nameof(newName));
             options = options ?? new RenameCollectionOptions();
@@ -233,6 +242,7 @@ namespace MongoDB.Driver
 
         public override Task RenameCollectionAsync(IClientSessionHandle session, string oldName, string newName, RenameCollectionOptions options, CancellationToken cancellationToken)
         {
+            Ensure.IsNotNull(session, nameof(session));
             Ensure.IsNotNullOrEmpty(oldName, nameof(oldName));
             Ensure.IsNotNullOrEmpty(newName, nameof(newName));
             options = options ?? new RenameCollectionOptions();
@@ -248,6 +258,7 @@ namespace MongoDB.Driver
 
         public override TResult RunCommand<TResult>(IClientSessionHandle session, Command<TResult> command, ReadPreference readPreference = null, CancellationToken cancellationToken = default(CancellationToken))
         {
+            Ensure.IsNotNull(session, nameof(session));
             Ensure.IsNotNull(command, nameof(command));
             readPreference = readPreference ?? ReadPreference.Primary;
 
@@ -262,6 +273,7 @@ namespace MongoDB.Driver
 
         public override Task<TResult> RunCommandAsync<TResult>(IClientSessionHandle session, Command<TResult> command, ReadPreference readPreference = null, CancellationToken cancellationToken = default(CancellationToken))
         {
+            Ensure.IsNotNull(session, nameof(session));
             Ensure.IsNotNull(command, nameof(command));
             readPreference = readPreference ?? ReadPreference.Primary;
 

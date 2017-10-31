@@ -85,12 +85,6 @@ namespace MongoDB.Driver
         /// </summary>
         /// <param name="newOperationTime">The new operation time.</param>
         void AdvanceOperationTime(BsonTimestamp newOperationTime);
-
-        /// <summary>
-        /// Converts this ClientSession to a CoreSession.
-        /// </summary>
-        /// <returns>A core session.</returns>
-        ICoreSession ToCoreSession();
     }
 
     /// <summary>

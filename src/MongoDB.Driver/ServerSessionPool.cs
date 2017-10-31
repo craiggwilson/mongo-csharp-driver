@@ -27,8 +27,19 @@ namespace MongoDB.Driver
     public class ServerSessionPool : IServerSessionPool
     {
         // private fields
+        private readonly IMongoClient _client;
         private readonly object _lock = new object();
         private readonly List<IServerSession> _pool = new List<IServerSession>();
+
+        // constructors
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ServerSessionPool" /> class.
+        /// </summary>
+        /// <param name="client">The client.</param>
+        public ServerSessionPool(IMongoClient client)
+        {
+            _client = Ensure.IsNotNull(client, nameof(client));
+        }
 
         /// <inheritdoc />
         public IServerSession AcquireSession()
@@ -81,14 +92,16 @@ namespace MongoDB.Driver
         // private methods
         private bool IsAboutToExpire(IServerSession serverSession)
         {
-            if (!serverSession.LastUsedAt.HasValue)
+            var logicalSessionTimeout = _client.Cluster.Description.LogicalSessionTimeout;
+            if (!serverSession.LastUsedAt.HasValue || !logicalSessionTimeout.HasValue)
             {
                 return true;
             }
             else
             {
-                var timeToExpire = DateTime.UtcNow - serverSession.LastUsedAt.Value;
-                return timeToExpire < TimeSpan.FromMinutes(1);
+                var expiresAt = serverSession.LastUsedAt.Value + logicalSessionTimeout.Value;
+                var timeRemaining = expiresAt - DateTime.UtcNow;
+                return timeRemaining < TimeSpan.FromMinutes(1);
             }
         }
 

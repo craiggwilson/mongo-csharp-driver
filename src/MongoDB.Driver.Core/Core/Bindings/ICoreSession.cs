@@ -31,12 +31,12 @@ namespace MongoDB.Driver.Core.Bindings
     {
         // properties
         /// <summary>
-        /// Gets the cluster clock.
+        /// Gets the cluster time.
         /// </summary>
         /// <value>
-        /// The cluster clock.
+        /// The cluster time.
         /// </value>
-        IClusterClock ClusterClock { get; }
+        BsonDocument ClusterTime { get; }
 
         /// <summary>
         /// Gets the session Id.
@@ -55,14 +55,26 @@ namespace MongoDB.Driver.Core.Bindings
         bool IsImplicitSession { get; }
 
         /// <summary>
-        /// Gets the operation clock.
+        /// Gets the operation time.
         /// </summary>
         /// <value>
-        /// The operation clock.
+        /// The operation time.
         /// </value>
-        IOperationClock OperationClock { get; }
+        BsonTimestamp OperationTime { get; }
 
         // methods
+        /// <summary>
+        /// Advances the cluster time.
+        /// </summary>
+        /// <param name="newClusterTime">The new cluster time.</param>
+        void AdvanceClusterTime(BsonDocument newClusterTime);
+
+        /// <summary>
+        /// Advances the operation time.
+        /// </summary>
+        /// <param name="newOperationTime">The new operation time.</param>
+        void AdvanceOperationTime(BsonTimestamp newOperationTime);
+
         /// <summary>
         /// Called by the driver when the session is used (i.e. sent to the server).
         /// </summary>

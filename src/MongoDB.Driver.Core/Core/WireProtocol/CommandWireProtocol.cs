@@ -113,10 +113,10 @@ namespace MongoDB.Driver.Core.WireProtocol
         }
 
         // methods
-        private QueryMessage CreateMessage(ConnectionDescription connectionDescription)
+        private QueryMessage CreateMessage(ConnectionDescription connectionDescription, out bool messageContainsSessionId)
         {
             // TODO: decide whether to use OP_QUERY or OP_MSG
-            var wrappedCommand = WrapCommandForQueryMessage(connectionDescription);
+            var wrappedCommand = WrapCommandForQueryMessage(connectionDescription, out messageContainsSessionId);
 
             return new QueryMessage(
                 RequestMessage.GetNextRequestId(),
@@ -136,8 +136,13 @@ namespace MongoDB.Driver.Core.WireProtocol
 
         public TCommandResult Execute(IConnection connection, CancellationToken cancellationToken)
         {
-            var message = CreateMessage(connection.Description);
+            bool messageContainsSessionId;
+            var message = CreateMessage(connection.Description, out messageContainsSessionId);
             connection.SendMessage(message, _messageEncoderSettings, cancellationToken);
+            if (messageContainsSessionId)
+            {
+                _session.WasUsed();
+            }
 
             switch (_responseHandling())
             {
@@ -153,8 +158,14 @@ namespace MongoDB.Driver.Core.WireProtocol
 
         public async Task<TCommandResult> ExecuteAsync(IConnection connection, CancellationToken cancellationToken)
         {
-            var message = CreateMessage(connection.Description);
+            bool messageContainsSessionId;
+            var message = CreateMessage(connection.Description, out messageContainsSessionId);
             await connection.SendMessageAsync(message, _messageEncoderSettings, cancellationToken).ConfigureAwait(false);
+            if (messageContainsSessionId)
+            {
+                _session.WasUsed();
+            }
+
             switch (_responseHandling())
             {
                 case CommandResponseHandling.Ignore:
@@ -200,15 +211,15 @@ namespace MongoDB.Driver.Core.WireProtocol
                 };
 
                 BsonValue clusterTime;
-                if (_session?.ClusterClock != null && rawDocument.TryGetValue("$clusterTime", out clusterTime))
+                if (rawDocument.TryGetValue("$clusterTime", out clusterTime))
                 {
                     var materializedClusterTime = ((RawBsonDocument)clusterTime).Materialize(binaryReaderSettings);
-                    _session.ClusterClock.AdvanceClusterTime(materializedClusterTime);
+                    _session.AdvanceClusterTime(materializedClusterTime);
                 }
                 BsonValue operationTime;
-                if (_session?.OperationClock != null && rawDocument.TryGetValue("operationTime", out operationTime))
+                if (rawDocument.TryGetValue("operationTime", out operationTime))
                 {
-                    _session.OperationClock.AdvanceOperationTime(operationTime.AsBsonTimestamp);
+                    _session.AdvanceOperationTime(operationTime.AsBsonTimestamp);
                 }
 
                 if (!rawDocument.GetValue("ok", false).ToBoolean())
@@ -261,8 +272,9 @@ namespace MongoDB.Driver.Core.WireProtocol
             }
         }
 
-        private BsonDocument WrapCommandForQueryMessage(ConnectionDescription connectionDescription)
+        private BsonDocument WrapCommandForQueryMessage(ConnectionDescription connectionDescription, out bool messageContainsSessionId)
         {
+            messageContainsSessionId = false;
             var extraElements = new List<BsonElement>();
             if (_session.Id != null)
             {
@@ -271,6 +283,7 @@ namespace MongoDB.Driver.Core.WireProtocol
                 {
                     var lsid = new BsonElement("lsid", _session.Id);
                     extraElements.Add(lsid);
+                    messageContainsSessionId = true;
                 }
                 else
                 {
@@ -280,9 +293,9 @@ namespace MongoDB.Driver.Core.WireProtocol
                     }
                 }
             }
-            if (_session.ClusterClock?.ClusterTime != null)
+            if (_session.ClusterTime != null)
             {
-                var clusterTime = new BsonElement("$clusterTime", _session.ClusterClock.ClusterTime);
+                var clusterTime = new BsonElement("$clusterTime", _session.ClusterTime);
                 extraElements.Add(clusterTime);
             }
             var appendExtraElementsSerializer = new ElementAppendingSerializer<BsonDocument>(BsonDocumentSerializer.Instance, extraElements);

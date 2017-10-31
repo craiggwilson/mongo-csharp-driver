@@ -763,7 +763,6 @@ namespace MongoDB.Driver
         private MongoDatabaseImpl CreateSubject(IOperationExecutor operationExecutor)
         {
             var mockClient = new Mock<IMongoClient>();
-            mockClient.SetupGet(c => c.ClusterClock).Returns(new ClusterClock());
             var settings = new MongoDatabaseSettings();
             settings.ApplyDefaultValues(new MongoClientSettings());
             return new MongoDatabaseImpl(

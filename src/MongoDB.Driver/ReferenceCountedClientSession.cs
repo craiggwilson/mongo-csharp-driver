@@ -21,7 +21,7 @@ namespace MongoDB.Driver
     /// A reference counted client session wrapper.
     /// </summary>
     /// <seealso cref="MongoDB.Driver.WrappingClientSession" />
-    public sealed class ReferenceCountedClientSession : WrappingClientSession
+    internal sealed class ReferenceCountedClientSession : WrappingClientSession
     {
         // private fields
         private readonly object _lock = new object();

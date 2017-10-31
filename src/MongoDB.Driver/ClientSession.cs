@@ -96,14 +96,6 @@ namespace MongoDB.Driver
             }
         }
 
-        /// <inheritdoc />
-        public ICoreSession ToCoreSession()
-        {
-            ThrowIfDisposed();
-            var combinedClusterClock = new CombinedClusterClock(_client.ClusterClock, _clusterClock);
-            return new CoreSession(_serverSession.Id, combinedClusterClock, _operationClock, _serverSession.WasUsed, _isImplicitSession);
-        }
-
         /// <summary>
         /// Throws if disposed.
         /// </summary>

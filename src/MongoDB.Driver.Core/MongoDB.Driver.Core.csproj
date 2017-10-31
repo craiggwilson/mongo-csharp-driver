@@ -83,7 +83,6 @@
     <Compile Include="Core\Bindings\ChannelReadBinding.cs" />
     <Compile Include="Core\Bindings\ChannelReadWriteBinding.cs" />
     <Compile Include="Core\Bindings\ChannelSourceReadWriteBinding.cs" />
-    <Compile Include="Core\Bindings\CoreSession.cs" />
     <Compile Include="Core\Bindings\ICoreSession.cs" />
     <Compile Include="Core\Bindings\NoCoreSession.cs" />
     <Compile Include="Core\Connections\ClientDocumentHelper.cs" />
@@ -105,6 +104,7 @@
     <Compile Include="Core\Operations\OperationClock.cs" />
     <Compile Include="Core\Operations\ReIndexOperation.cs" />
     <Compile Include="Core\Operations\WriteConcernErrorHelper.cs" />
+    <Compile Include="Core\Servers\ClusterClockAdvancingCoreSession.cs" />
     <Compile Include="Core\Servers\IServerMonitor.cs" />
     <Compile Include="Core\Servers\IServerMonitorFactory.cs" />
     <Compile Include="Core\Servers\ServerMonitorFactory.cs" />

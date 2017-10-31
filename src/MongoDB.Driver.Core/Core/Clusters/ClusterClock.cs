@@ -45,7 +45,7 @@ namespace MongoDB.Driver.Core.Clusters
             else
             {
                 var xTimestamp = x["clusterTime"].AsBsonTimestamp;
-                var yTimestamp = x["clusterTime"].AsBsonTimestamp;
+                var yTimestamp = y["clusterTime"].AsBsonTimestamp;
                 return xTimestamp > yTimestamp ? x : y;
             }
         }

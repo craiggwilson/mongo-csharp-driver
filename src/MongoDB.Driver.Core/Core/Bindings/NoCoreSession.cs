@@ -14,8 +14,6 @@
 */
 
 using MongoDB.Bson;
-using MongoDB.Driver.Core.Clusters;
-using MongoDB.Driver.Core.Operations;
 
 namespace MongoDB.Driver.Core.Bindings
 {
@@ -39,13 +37,9 @@ namespace MongoDB.Driver.Core.Bindings
         public static ICoreSession Instance => __instance;
         #endregion
 
-        // private fields
-        private readonly IClusterClock _clusterClock = new NoClusterClock();
-        private readonly IOperationClock _operationClock = new NoOperationClock();
-
         // public properties
         /// <inheritdoc />
-        public IClusterClock ClusterClock => _clusterClock;
+        public BsonDocument ClusterTime => null;
 
         /// <inheritdoc />
         public BsonDocument Id => null;
@@ -54,7 +48,17 @@ namespace MongoDB.Driver.Core.Bindings
         public bool IsImplicitSession => true;
 
         /// <inheritdoc />
-        public IOperationClock OperationClock => _operationClock;
+        public BsonTimestamp OperationTime => null;
+
+        /// <inheritdoc />
+        public void AdvanceClusterTime(BsonDocument newClusterTime)
+        {
+        }
+
+        /// <inheritdoc />
+        public void AdvanceOperationTime(BsonTimestamp newOperationTime)
+        {
+        }
 
         /// <inheritdoc />
         public void WasUsed()

@@ -41,13 +41,8 @@ namespace MongoDB.Driver
 
         // constructors
         internal ServerSession()
-            : this(GenerateSessionId())
         {
-        }
-
-        internal ServerSession(BsonDocument id)
-        {
-            _id = Ensure.IsNotNull(id, nameof(id));
+            _id = GenerateSessionId();
         }
 
         // public properties

@@ -45,7 +45,6 @@ namespace MongoDB.Driver
         public MongoCollectionImplTests()
         {
             var mockClient = new Mock<IMongoClient>();
-            mockClient.SetupGet(c => c.ClusterClock).Returns(new ClusterClock());
 
             _operationExecutor = new MockOperationExecutor();
             _operationExecutor.Client = mockClient.Object;

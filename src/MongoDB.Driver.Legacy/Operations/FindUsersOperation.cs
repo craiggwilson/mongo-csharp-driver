@@ -48,7 +48,7 @@ namespace MongoDB.Driver.Operations
         {
             using (var channelSource = binding.GetReadChannelSource(cancellationToken))
             using (var channel = channelSource.GetChannel(cancellationToken))
-            using (var channelBinding = new ChannelReadBinding(channelSource.Server, channel, binding.ReadPreference, NoCoreSession.Instance))
+            using (var channelBinding = new ChannelReadBinding(channelSource.Server, channel, binding.ReadPreference, binding.Session))
             {
                 IReadOperation<IEnumerable<BsonDocument>> operation;
 

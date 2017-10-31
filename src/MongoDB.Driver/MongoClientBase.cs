@@ -30,16 +30,6 @@ namespace MongoDB.Driver
         public abstract ICluster Cluster { get; }
 
         /// <inheritdoc />
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Design", "CA1065:DoNotRaiseExceptionsInUnexpectedLocations")]
-        public virtual IClusterClock ClusterClock
-        {
-            get
-            {
-                throw new NotImplementedException();
-            }
-        }
-
-        /// <inheritdoc />
         public abstract MongoClientSettings Settings { get; }
 
         /// <inheritdoc />
@@ -88,7 +78,13 @@ namespace MongoDB.Driver
         }
 
         /// <inheritdoc />
-        public virtual IClientSessionHandle StartSession(ClientSessionOptions options = null)
+        public virtual IClientSessionHandle StartSession(ClientSessionOptions options = null, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            throw new NotImplementedException();
+        }
+
+        /// <inheritdoc />
+        public virtual Task<IClientSessionHandle> StartSessionAsync(ClientSessionOptions options = null, CancellationToken cancellationToken = default(CancellationToken))
         {
             throw new NotImplementedException();
         }

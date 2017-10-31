@@ -70,7 +70,6 @@ namespace MongoDB.Bson.IO
                 {
                     Wrapped.PopSettings();
                 }
-                _elements.Clear();
             }
             base.WriteEndDocument();
         }

@@ -35,7 +35,6 @@ namespace MongoDB.Driver
     {
         // private fields
         private readonly ICluster _cluster;
-        private readonly IClusterClock _clusterClock;
         private readonly IOperationExecutor _operationExecutor;
         private readonly IServerSessionPool _serverSessionPool;
         private readonly MongoClientSettings _settings;
@@ -57,9 +56,8 @@ namespace MongoDB.Driver
         {
             _settings = Ensure.IsNotNull(settings, nameof(settings)).FrozenCopy();
             _cluster = ClusterRegistry.Instance.GetOrCreateCluster(_settings.ToClusterKey());
-            _clusterClock = new ClusterClock();
             _operationExecutor = new OperationExecutor(this);
-            _serverSessionPool = new ServerSessionPool();
+            _serverSessionPool = new ServerSessionPool(this);
         }
 
         /// <summary>
@@ -96,12 +94,6 @@ namespace MongoDB.Driver
         }
 
         /// <inheritdoc/>
-        public override IClusterClock ClusterClock
-        {
-            get { return _clusterClock; }
-        }
-
-        /// <inheritdoc/>
         public sealed override MongoClientSettings Settings
         {
             get { return _settings; }
@@ -124,6 +116,7 @@ namespace MongoDB.Driver
         /// <inheritdoc/>
         public sealed override void DropDatabase(IClientSessionHandle session, string name, CancellationToken cancellationToken = default(CancellationToken))
         {
+            Ensure.IsNotNull(session, nameof(session));
             var messageEncoderSettings = GetMessageEncoderSettings();
             var operation = new DropDatabaseOperation(new DatabaseNamespace(name), messageEncoderSettings)
             {
@@ -141,6 +134,7 @@ namespace MongoDB.Driver
         /// <inheritdoc/>
         public sealed override Task DropDatabaseAsync(IClientSessionHandle session, string name, CancellationToken cancellationToken = default(CancellationToken))
         {
+            Ensure.IsNotNull(session, nameof(session));
             var messageEncoderSettings = GetMessageEncoderSettings();
             var operation = new DropDatabaseOperation(new DatabaseNamespace(name), messageEncoderSettings)
             {
@@ -170,6 +164,7 @@ namespace MongoDB.Driver
         /// <inheritdoc/>
         public sealed override IAsyncCursor<BsonDocument> ListDatabases(IClientSessionHandle session, CancellationToken cancellationToken = default(CancellationToken))
         {
+            Ensure.IsNotNull(session, nameof(session));
             var messageEncoderSettings = GetMessageEncoderSettings();
             var operation = new ListDatabasesOperation(messageEncoderSettings);
             return ExecuteReadOperation(session, operation);
@@ -184,6 +179,7 @@ namespace MongoDB.Driver
         /// <inheritdoc/>
         public sealed override Task<IAsyncCursor<BsonDocument>> ListDatabasesAsync(IClientSessionHandle session, CancellationToken cancellationToken = default(CancellationToken))
         {
+            Ensure.IsNotNull(session, nameof(session));
             var messageEncoderSettings = GetMessageEncoderSettings();
             var operation = new ListDatabasesOperation(messageEncoderSettings);
             return ExecuteReadOperationAsync(session, operation);
@@ -193,7 +189,7 @@ namespace MongoDB.Driver
         /// Starts an implicit session.
         /// </summary>
         /// <returns>A session.</returns>
-        public IClientSessionHandle StartImplicitSession(CancellationToken cancellationToken)
+        internal IClientSessionHandle StartImplicitSession(CancellationToken cancellationToken)
         {
             var areSessionsSupported = AreSessionsSupported(cancellationToken);
             return StartImplicitSession(areSessionsSupported);
@@ -203,20 +199,24 @@ namespace MongoDB.Driver
         /// Starts an implicit session.
         /// </summary>
         /// <returns>A Task whose result is a session.</returns>
-        public async Task<IClientSessionHandle> StartImplicitSessionAsync(CancellationToken cancellationToken)
+        internal async Task<IClientSessionHandle> StartImplicitSessionAsync(CancellationToken cancellationToken)
         {
             var areSessionsSupported = await AreSessionsSupportedAsync(cancellationToken).ConfigureAwait(false);
             return StartImplicitSession(areSessionsSupported);
         }
 
         /// <inheritdoc/>
-        public sealed override IClientSessionHandle StartSession(ClientSessionOptions options = null)
+        public sealed override IClientSessionHandle StartSession(ClientSessionOptions options = null, CancellationToken cancellationToken = default(CancellationToken))
         {
-            options = options ?? new ClientSessionOptions();
-            var serverSession = AcquireServerSession();
-            var session = new ClientSession(this, options, serverSession, isImplicitSession: false);
-            var handle = new ClientSessionHandle(session);
-            return handle;
+            var areSessionsSupported = AreSessionsSupported(cancellationToken);
+            return StartSession(options, areSessionsSupported);
+        }
+
+        /// <inheritdoc/>
+        public sealed override async Task<IClientSessionHandle> StartSessionAsync(ClientSessionOptions options = null, CancellationToken cancellationToken = default(CancellationToken))
+        {
+            var areSessionsSupported = await AreSessionsSupportedAsync(cancellationToken).ConfigureAwait(false);
+            return StartSession(options, areSessionsSupported);
         }
 
         /// <inheritdoc/>
@@ -350,6 +350,19 @@ namespace MongoDB.Driver
             }
 
             var session = new ClientSession(this, options, serverSession, isImplicitSession: true);
+            var handle = new ClientSessionHandle(session);
+            return handle;
+        }
+
+        private IClientSessionHandle StartSession(ClientSessionOptions options, bool areSessionsSupported)
+        {
+            if (!areSessionsSupported)
+            {
+                throw new NotSupportedException("Sessions are not supported by this version of the server.");
+            }
+            options = options ?? new ClientSessionOptions();
+            var serverSession = AcquireServerSession();
+            var session = new ClientSession(this, options, serverSession, isImplicitSession: false);
             var handle = new ClientSessionHandle(session);
             return handle;
         }

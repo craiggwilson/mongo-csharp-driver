@@ -55,6 +55,7 @@ namespace MongoDB.Driver.Core.Servers
         #endregion
 
         // fields
+        private readonly IClusterClock _clusterClock;
         private readonly ClusterConnectionMode _clusterConnectionMode;
         private IConnectionPool _connectionPool;
         private readonly EndPoint _endPoint;
@@ -73,9 +74,10 @@ namespace MongoDB.Driver.Core.Servers
         public event EventHandler<ServerDescriptionChangedEventArgs> DescriptionChanged;
 
         // constructors
-        public Server(ClusterId clusterId, ClusterConnectionMode clusterConnectionMode, ServerSettings settings, EndPoint endPoint, IConnectionPoolFactory connectionPoolFactory, IServerMonitorFactory serverMonitorFactory, IEventSubscriber eventSubscriber)
+        public Server(ClusterId clusterId, IClusterClock clusterClock, ClusterConnectionMode clusterConnectionMode, ServerSettings settings, EndPoint endPoint, IConnectionPoolFactory connectionPoolFactory, IServerMonitorFactory serverMonitorFactory, IEventSubscriber eventSubscriber)
         {
             Ensure.IsNotNull(clusterId, nameof(clusterId));
+            _clusterClock = Ensure.IsNotNull(clusterClock, nameof(clusterClock));
             _clusterConnectionMode = clusterConnectionMode;
             _settings = Ensure.IsNotNull(settings, nameof(settings));
             _endPoint = Ensure.IsNotNull(endPoint, nameof(endPoint));
@@ -103,6 +105,8 @@ namespace MongoDB.Driver.Core.Servers
         public bool IsInitialized => _state.Value != State.Initial;
 
         public ServerId ServerId => _serverId;
+
+        internal IClusterClock ClusterClock => _clusterClock;
 
         // methods
         public void Dispose()
@@ -344,7 +348,7 @@ namespace MongoDB.Driver.Core.Servers
             {
                 slaveOk = GetEffectiveSlaveOk(slaveOk);
                 var protocol = new CommandWireProtocol<TResult>(
-                    session,
+                    CreateClusterClockAdvancingCoreSession(session),
                     readPreference,
                     databaseNamespace,
                     command,
@@ -397,7 +401,7 @@ namespace MongoDB.Driver.Core.Servers
             {
                 slaveOk = GetEffectiveSlaveOk(slaveOk);
                 var protocol = new CommandWireProtocol<TResult>(
-                    session,
+                    CreateClusterClockAdvancingCoreSession(session),
                     readPreference,
                     databaseNamespace,
                     command,
@@ -692,6 +696,11 @@ namespace MongoDB.Driver.Core.Servers
                     isUpsert);
 
                 return ExecuteProtocolAsync(protocol, cancellationToken);
+            }
+
+            private ICoreSession CreateClusterClockAdvancingCoreSession(ICoreSession session)
+            {
+                return new ClusterClockAdvancingCoreSession(session, _server.ClusterClock);
             }
 
             private void ExecuteProtocol(IWireProtocol protocol, CancellationToken cancellationToken)

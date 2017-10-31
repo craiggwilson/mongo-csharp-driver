@@ -38,14 +38,6 @@ namespace MongoDB.Driver
         ICluster Cluster { get; }
 
         /// <summary>
-        /// Gets the cluster clock.
-        /// </summary>
-        /// <value>
-        /// The cluster clock.
-        /// </value>
-        IClusterClock ClusterClock { get; }
-
-        /// <summary>
         /// Gets the settings.
         /// </summary>
         MongoClientSettings Settings { get; }
@@ -130,8 +122,21 @@ namespace MongoDB.Driver
         /// Starts a client sesssion.
         /// </summary>
         /// <param name="options">The session options.</param>
-        /// <returns>A client session.</returns>
-        IClientSessionHandle StartSession(ClientSessionOptions options = null);
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>
+        /// A client session.
+        /// </returns>
+        IClientSessionHandle StartSession(ClientSessionOptions options = null, CancellationToken cancellationToken = default(CancellationToken));
+
+        /// <summary>
+        /// Starts a client sesssion.
+        /// </summary>
+        /// <param name="options">The session options.</param>
+        /// <param name="cancellationToken">The cancellation token.</param>
+        /// <returns>
+        /// A Task whose result is a client session.
+        /// </returns>
+        Task<IClientSessionHandle> StartSessionAsync(ClientSessionOptions options = null, CancellationToken cancellationToken = default(CancellationToken));
 
         /// <summary>
         /// Returns a new IMongoClient instance with a different read concern setting.
