@@ -99,6 +99,9 @@ namespace MongoDB.Driver
             get { return _settings; }
         }
 
+        // internal properties
+        internal IOperationExecutor OperationExecutor => _operationExecutor;
+
         // private static methods
         private static MongoClientSettings ParseConnectionString(string connectionString)
         {
