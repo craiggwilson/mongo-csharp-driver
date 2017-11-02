@@ -115,7 +115,6 @@ namespace MongoDB.Driver.Core.WireProtocol
         // methods
         private QueryMessage CreateMessage(ConnectionDescription connectionDescription, out bool messageContainsSessionId)
         {
-            // TODO: decide whether to use OP_QUERY or OP_MSG
             var wrappedCommand = WrapCommandForQueryMessage(connectionDescription, out messageContainsSessionId);
 
             return new QueryMessage(
@@ -287,7 +286,7 @@ namespace MongoDB.Driver.Core.WireProtocol
                 }
                 else
                 {
-                    if (!_session.IsImplicitSession)
+                    if (!_session.IsImplicit)
                     {
                         throw new MongoClientException("Sessions are not supported.");
                     }

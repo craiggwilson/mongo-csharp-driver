@@ -24,7 +24,7 @@ namespace MongoDB.Driver
     /// A server session pool.
     /// </summary>
     /// <seealso cref="MongoDB.Driver.IServerSessionPool" />
-    public class ServerSessionPool : IServerSessionPool
+    internal class ServerSessionPool : IServerSessionPool
     {
         // private fields
         private readonly IMongoClient _client;

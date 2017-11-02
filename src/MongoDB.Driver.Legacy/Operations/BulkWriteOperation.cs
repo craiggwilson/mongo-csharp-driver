@@ -132,7 +132,7 @@ namespace MongoDB.Driver
             return _collection.UsingImplicitSession(session => ExecuteHelper(session, writeConcern));
         }
 
-        private BulkWriteResult<TDocument> ExecuteHelper(IClientSession session, WriteConcern writeConcern)
+        private BulkWriteResult<TDocument> ExecuteHelper(IClientSessionHandle session, WriteConcern writeConcern)
         {
             if (_hasBeenExecuted)
             {

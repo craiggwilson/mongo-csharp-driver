@@ -294,7 +294,7 @@ namespace MongoDB.Driver
             var operation = new PingOperation(messageEncoderSettings);
 
             var server = GetServer();
-            using (var binding = new SingleServerReadBinding(server, ReadPreference.PrimaryPreferred, NoCoreSession.Instance))
+            using (var binding = new SingleServerReadBinding(server, ReadPreference.PrimaryPreferred, NoCoreSession.NewHandle()))
             {
                 operation.Execute(binding, CancellationToken.None);
             }

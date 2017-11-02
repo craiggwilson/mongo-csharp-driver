@@ -30,7 +30,7 @@ namespace MongoDB.Driver.Core.Bindings
         private readonly IChannelSourceHandle _channelSource;
         private bool _disposed;
         private readonly ReadPreference _readPreference;
-        private readonly ICoreSession _session;
+        private readonly ICoreSessionHandle _session;
 
         // constructors
         /// <summary>
@@ -39,7 +39,7 @@ namespace MongoDB.Driver.Core.Bindings
         /// <param name="channelSource">The channel source.</param>
         /// <param name="readPreference">The read preference.</param>
         /// <param name="session">The session.</param>
-        public ChannelSourceReadWriteBinding(IChannelSourceHandle channelSource, ReadPreference readPreference, ICoreSession session)
+        public ChannelSourceReadWriteBinding(IChannelSourceHandle channelSource, ReadPreference readPreference, ICoreSessionHandle session)
         {
             _channelSource = Ensure.IsNotNull(channelSource, nameof(channelSource));
             _readPreference = Ensure.IsNotNull(readPreference, nameof(readPreference));
@@ -54,7 +54,7 @@ namespace MongoDB.Driver.Core.Bindings
         }
 
         /// <inheritdoc/>
-        public ICoreSession Session
+        public ICoreSessionHandle Session
         {
             get { return _session; }
         }
@@ -94,8 +94,8 @@ namespace MongoDB.Driver.Core.Bindings
             if (!_disposed)
             {
                 _channelSource.Dispose();
+                _session.Dispose();
                 _disposed = true;
-                GC.SuppressFinalize(this);
             }
         }
 

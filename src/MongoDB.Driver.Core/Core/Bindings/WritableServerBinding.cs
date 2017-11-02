@@ -31,7 +31,7 @@ namespace MongoDB.Driver.Core.Bindings
         // fields
         private readonly ICluster _cluster;
         private bool _disposed;
-        private readonly ICoreSession _session;
+        private readonly ICoreSessionHandle _session;
 
         // constructors
         /// <summary>
@@ -39,7 +39,7 @@ namespace MongoDB.Driver.Core.Bindings
         /// </summary>
         /// <param name="cluster">The cluster.</param>
         /// <param name="session">The session.</param>
-        public WritableServerBinding(ICluster cluster, ICoreSession session)
+        public WritableServerBinding(ICluster cluster, ICoreSessionHandle session)
         {
             _cluster = Ensure.IsNotNull(cluster, nameof(cluster));
             _session = Ensure.IsNotNull(session, nameof(session));
@@ -53,7 +53,7 @@ namespace MongoDB.Driver.Core.Bindings
         }
 
         /// <inheritdoc/>
-        public ICoreSession Session
+        public ICoreSessionHandle Session
         {
             get { return _session; }
         }
@@ -93,7 +93,7 @@ namespace MongoDB.Driver.Core.Bindings
 
         private IChannelSourceHandle GetChannelSourceHelper(IServer server)
         {
-            return new ChannelSourceHandle(new ServerChannelSource(server));
+            return new ChannelSourceHandle(new ServerChannelSource(server, _session.Fork()));
         }
 
         /// <inheritdoc/>
@@ -101,8 +101,8 @@ namespace MongoDB.Driver.Core.Bindings
         {
             if (!_disposed)
             {
+                _session.Dispose();
                 _disposed = true;
-                GC.SuppressFinalize(this);
             }
         }
 

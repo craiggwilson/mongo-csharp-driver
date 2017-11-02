@@ -50,8 +50,8 @@ namespace MongoDB.Driver.Core.Bindings
         /// <param name="cluster">The cluster.</param>
         /// <param name="readPreference">The read preference.</param>
         /// <param name="session">The session.</param>
-        public SplitReadWriteBinding(ICluster cluster, ReadPreference readPreference, ICoreSession session)
-            : this(new ReadPreferenceBinding(cluster, readPreference, session), new WritableServerBinding(cluster, session))
+        public SplitReadWriteBinding(ICluster cluster, ReadPreference readPreference, ICoreSessionHandle session)
+            : this(new ReadPreferenceBinding(cluster, readPreference, session), new WritableServerBinding(cluster, session.Fork()))
         {
         }
 
@@ -63,7 +63,7 @@ namespace MongoDB.Driver.Core.Bindings
         }
 
         /// <inheritdoc/>
-        public ICoreSession Session
+        public ICoreSessionHandle Session
         {
             get { return _readBinding.Session; } // both bindings have the same session
         }

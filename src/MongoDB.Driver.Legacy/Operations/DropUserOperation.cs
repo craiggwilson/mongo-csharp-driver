@@ -46,7 +46,7 @@ namespace MongoDB.Driver.Operations
         {
             using (var channelSource = binding.GetWriteChannelSource(cancellationToken))
             using (var channel = channelSource.GetChannel(cancellationToken))
-            using (var channelBinding = new ChannelReadWriteBinding(channelSource.Server, channel, binding.Session))
+            using (var channelBinding = new ChannelReadWriteBinding(channelSource.Server, channel, binding.Session.Fork()))
             {
                 IWriteOperation<bool> operation;
                 if (Feature.UserManagementCommands.IsSupported(channel.ConnectionDescription.ServerVersion))

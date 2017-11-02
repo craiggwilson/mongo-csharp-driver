@@ -35,6 +35,16 @@ namespace MongoDB.Driver.Core.Bindings
         /// The instance.
         /// </value>
         public static ICoreSession Instance => __instance;
+
+        // public static methods
+        /// <summary>
+        /// Returns a new handle to a NoCoreSession object.
+        /// </summary>
+        /// <returns></returns>
+        public static ICoreSessionHandle NewHandle()
+        {
+            return new CoreSessionHandle(__instance);
+        }
         #endregion
 
         // public properties
@@ -45,7 +55,7 @@ namespace MongoDB.Driver.Core.Bindings
         public BsonDocument Id => null;
 
         /// <inheritdoc />
-        public bool IsImplicitSession => true;
+        public bool IsImplicit => true;
 
         /// <inheritdoc />
         public BsonTimestamp OperationTime => null;
@@ -57,6 +67,11 @@ namespace MongoDB.Driver.Core.Bindings
 
         /// <inheritdoc />
         public void AdvanceOperationTime(BsonTimestamp newOperationTime)
+        {
+        }
+
+        /// <inheritdoc />
+        public void Dispose()
         {
         }
 

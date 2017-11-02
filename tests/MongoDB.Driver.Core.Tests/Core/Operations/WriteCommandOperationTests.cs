@@ -131,7 +131,7 @@ namespace MongoDB.Driver.Core.Operations
 
                 mockChannel.Verify(
                     c => c.CommandAsync(
-                        It.IsAny<ICoreSession>(),
+                        It.IsAny<ICoreSessionHandle>(),
                         It.IsAny<ReadPreference>(),
                         subject.DatabaseNamespace,
                         command,
@@ -150,7 +150,7 @@ namespace MongoDB.Driver.Core.Operations
 
                 mockChannel.Verify(
                     c => c.Command(
-                        It.IsAny<ICoreSession>(),
+                        It.IsAny<ICoreSessionHandle>(),
                         It.IsAny<ReadPreference>(),
                         subject.DatabaseNamespace,
                         command,
@@ -225,7 +225,7 @@ namespace MongoDB.Driver.Core.Operations
         private Mock<IWriteBinding> CreateMockWriteBinding(IChannelSourceHandle channelSource)
         {
             var mockBinding = new Mock<IWriteBinding>();
-            var mockSession = new Mock<ICoreSession>();
+            var mockSession = new Mock<ICoreSessionHandle>();
             mockBinding.SetupGet(b => b.Session).Returns(mockSession.Object);
             mockBinding.Setup(b => b.GetWriteChannelSource(It.IsAny<CancellationToken>())).Returns(channelSource);
             mockBinding.Setup(b => b.GetWriteChannelSourceAsync(It.IsAny<CancellationToken>())).Returns(Task.FromResult(channelSource));

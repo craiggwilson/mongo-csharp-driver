@@ -13,42 +13,93 @@
 * limitations under the License.
 */
 
+using System;
 using MongoDB.Bson;
 using MongoDB.Driver.Core.Bindings;
 using MongoDB.Driver.Core.Clusters;
 
 namespace MongoDB.Driver
 {
-    internal class ClientSessionWrappingCoreSession : ICoreSession
+    internal sealed class ClientSessionWrappingCoreSession : ICoreSession
     {
+        // private fields
         private readonly IClientSession _clientSession;
+        private bool _disposed;
 
+        // constructors
         public ClientSessionWrappingCoreSession(IClientSession clientSession)
         {
             _clientSession = clientSession;
         }
 
-        public BsonDocument ClusterTime => _clientSession.ClusterTime;
+        // public properties
+        public BsonDocument ClusterTime
+        {
+            get
+            {
+                ThrowIfDisposed();
+                return _clientSession.ClusterTime;
+            }
+        }
 
-        public BsonDocument Id => _clientSession.ServerSession.Id;
+        public BsonDocument Id
+        {
+            get
+            {
+                ThrowIfDisposed();
+                return _clientSession.ServerSession.Id;
+            }
+        }
 
-        public bool IsImplicitSession => _clientSession.IsImplicitSession;
+        public bool IsImplicit
+        {
+            get
+            {
+                ThrowIfDisposed();
+                return _clientSession.IsImplicit;
+            }
+        }
 
-        public BsonTimestamp OperationTime => _clientSession.OperationTime;
+        public BsonTimestamp OperationTime
+        {
+            get
+            {
+                ThrowIfDisposed();
+                return _clientSession.OperationTime;
+            }
+        }
 
         public void AdvanceClusterTime(BsonDocument newClusterTime)
         {
+            ThrowIfDisposed();
             _clientSession.AdvanceClusterTime(newClusterTime);
         }
 
         public void AdvanceOperationTime(BsonTimestamp newOperationTime)
         {
+            ThrowIfDisposed();
             _clientSession.AdvanceOperationTime(newOperationTime);
+        }
+
+        public void Dispose()
+        {
+            _clientSession.Dispose();
+            _disposed = true;
         }
 
         public void WasUsed()
         {
+            ThrowIfDisposed();
             _clientSession.ServerSession.WasUsed();
+        }
+
+        // private methods
+        private void ThrowIfDisposed()
+        {
+            if (_disposed)
+            {
+                throw new ObjectDisposedException(GetType().FullName);
+            }
         }
     }
 }

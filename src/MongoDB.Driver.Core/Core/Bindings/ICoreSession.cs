@@ -14,20 +14,14 @@
 */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using MongoDB.Bson;
-using MongoDB.Driver.Core.Clusters;
-using MongoDB.Driver.Core.Operations;
 
 namespace MongoDB.Driver.Core.Bindings
 {
     /// <summary>
     /// The interface for a session in Core.
     /// </summary>
-    public interface ICoreSession
+    public interface ICoreSession : IDisposable
     {
         // properties
         /// <summary>
@@ -52,7 +46,7 @@ namespace MongoDB.Driver.Core.Bindings
         /// <value>
         ///   <c>true</c> if this instance is implicit session; otherwise, <c>false</c>.
         /// </value>
-        bool IsImplicitSession { get; }
+        bool IsImplicit { get; }
 
         /// <summary>
         /// Gets the operation time.
@@ -79,5 +73,18 @@ namespace MongoDB.Driver.Core.Bindings
         /// Called by the driver when the session is used (i.e. sent to the server).
         /// </summary>
         void WasUsed();
+    }
+
+    /// <summary>
+    /// A handle to a reference counted core session.
+    /// </summary>
+    /// <seealso cref="MongoDB.Driver.Core.Bindings.ICoreSession" />
+    public interface ICoreSessionHandle : ICoreSession
+    {
+        /// <summary>
+        /// Increments the reference count of the underlying session and returns a new handle to it.
+        /// </summary>
+        /// <returns>A new handle.</returns>
+        ICoreSessionHandle Fork();
     }
 }

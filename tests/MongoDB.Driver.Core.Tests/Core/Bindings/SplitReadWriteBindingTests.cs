@@ -33,6 +33,10 @@ namespace MongoDB.Driver.Core.Bindings
         {
             _mockReadBinding = new Mock<IReadBinding>();
             _mockWriteBinding = new Mock<IWriteBinding>();
+            var mockSession = new Mock<ICoreSessionHandle>();
+            mockSession.Setup(s => s.Fork()).Returns(mockSession.Object);
+            _mockReadBinding.SetupGet(b => b.Session).Returns(mockSession.Object);
+            _mockWriteBinding.SetupGet(b => b.Session).Returns(mockSession.Object);
         }
 
         [Fact]

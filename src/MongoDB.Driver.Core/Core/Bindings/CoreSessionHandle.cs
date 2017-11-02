@@ -15,32 +15,32 @@
 
 using MongoDB.Driver.Core.Misc;
 
-namespace MongoDB.Driver
+namespace MongoDB.Driver.Core.Bindings
 {
     /// <summary>
-    /// A client session handle
+    /// A handle to a reference counted core session.
     /// </summary>
-    /// <seealso cref="MongoDB.Driver.IClientSessionHandle" />
-    internal sealed class ClientSessionHandle : WrappingClientSession, IClientSessionHandle
+    /// <seealso cref="MongoDB.Driver.Core.Bindings.ICoreSessionHandle" />
+    public sealed class CoreSessionHandle : WrappingCoreSession, ICoreSessionHandle
     {
         // private fields
-        private readonly ReferenceCountedClientSession _wrapped;
+        private readonly ReferenceCountedCoreSession _wrapped;
 
         // constructors
         /// <summary>
-        /// Initializes a new instance of the <see cref="ClientSessionHandle"/> class.
+        /// Initializes a new instance of the <see cref="CoreSessionHandle"/> class.
         /// </summary>
-        /// <param name="wrapped">The wrapped session.</param>
-        public ClientSessionHandle(IClientSession wrapped)
-            : this(new ReferenceCountedClientSession(Ensure.IsNotNull(wrapped, nameof(wrapped))))
+        /// <param name="session">The session.</param>
+        public CoreSessionHandle(ICoreSession session)
+            : this(new ReferenceCountedCoreSession(Ensure.IsNotNull(session, nameof(session))))
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ClientSessionHandle"/> class.
+        /// Initializes a new instance of the <see cref="CoreSessionHandle"/> class.
         /// </summary>
-        /// <param name="wrapped">The wrapped session.</param>
-        public ClientSessionHandle(ReferenceCountedClientSession wrapped)
+        /// <param name="wrapped">The wrapped.</param>
+        public CoreSessionHandle(ReferenceCountedCoreSession wrapped)
             : base(Ensure.IsNotNull(wrapped, nameof(wrapped)))
         {
             _wrapped = wrapped;
@@ -48,11 +48,11 @@ namespace MongoDB.Driver
 
         // public methods
         /// <inheritdoc />
-        public IClientSessionHandle Fork()
+        public ICoreSessionHandle Fork()
         {
             ThrowIfDisposed();
             _wrapped.IncrementReferenceCount();
-            return new ClientSessionHandle(_wrapped);
+            return new CoreSessionHandle(_wrapped);
         }
 
         // protected methods
@@ -64,7 +64,7 @@ namespace MongoDB.Driver
                 if (!IsDisposed())
                 {
                     _wrapped.DecrementReferenceCount();
-                }               
+                }
             }
             base.Dispose(disposing);
         }

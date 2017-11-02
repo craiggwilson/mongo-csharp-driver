@@ -32,7 +32,7 @@ namespace MongoDB.Driver.Core.Bindings
         /// <value>
         /// The session.
         /// </value>
-        ICoreSession Session { get; }
+        ICoreSessionHandle Session { get; }
     }
 
     /// <summary>

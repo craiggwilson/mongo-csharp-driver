@@ -53,7 +53,7 @@ namespace MongoDB.Driver
         /// <param name="settings">The settings to use to access this database.</param>
         [Obsolete("User server.GetDatabase() instead.")]
         public MongoDatabase(MongoServer server, string name, MongoDatabaseSettings settings)
-            : this(server, name, settings, null)
+            : this(server, name, settings, new DefaultLegacyOperationExecutor())
         {
         }
 
@@ -172,7 +172,7 @@ namespace MongoDB.Driver
         }
 
 #pragma warning disable 618
-        private void AddUser(IClientSession session, MongoUser user)
+        private void AddUser(IClientSessionHandle session, MongoUser user)
         {
             var operation = new AddUserOperation(
                 _namespace,
@@ -194,7 +194,7 @@ namespace MongoDB.Driver
             return UsingImplicitSession(session => CollectionExists(session, collectionName));
         }
 
-        private bool CollectionExists(IClientSession session, string collectionName)
+        private bool CollectionExists(IClientSessionHandle session, string collectionName)
         {
             return GetCollectionNames(session).Contains(collectionName);
         }
@@ -222,7 +222,7 @@ namespace MongoDB.Driver
             return UsingImplicitSession(session => CreateCollection(session, collectionName, options));
         }
 
-        private CommandResult CreateCollection(IClientSession session, string collectionName, IMongoCollectionOptions options)
+        private CommandResult CreateCollection(IClientSessionHandle session, string collectionName, IMongoCollectionOptions options)
         {
             if (collectionName == null)
             {
@@ -333,7 +333,7 @@ namespace MongoDB.Driver
             return UsingImplicitSession(session => CreateView(session, viewName, viewOn, pipeline, options));
         }
 
-        private CommandResult CreateView(IClientSession session, string viewName, string viewOn, IEnumerable<BsonDocument> pipeline, IMongoCreateViewOptions options)
+        private CommandResult CreateView(IClientSessionHandle session, string viewName, string viewOn, IEnumerable<BsonDocument> pipeline, IMongoCreateViewOptions options)
         {
             if (viewName == null)
             {
@@ -389,7 +389,7 @@ namespace MongoDB.Driver
             return UsingImplicitSession(session => DropCollection(session, collectionName));
         }
 
-        private CommandResult DropCollection(IClientSession session, string collectionName)
+        private CommandResult DropCollection(IClientSessionHandle session, string collectionName)
         {
             var collectionNamespace = new CollectionNamespace(_namespace, collectionName);
             var messageEncoderSettings = GetMessageEncoderSettings();
@@ -442,7 +442,7 @@ namespace MongoDB.Driver
             return UsingImplicitSession(session => Eval(session, args));
         }
 
-        private BsonValue Eval(IClientSession session, EvalArgs args)
+        private BsonValue Eval(IClientSessionHandle session, EvalArgs args)
         {
             if (args == null) { throw new ArgumentNullException("args"); }
             if (args.Code == null) { throw new ArgumentException("Code is null.", "args"); }
@@ -507,7 +507,7 @@ namespace MongoDB.Driver
         }
 
 #pragma warning disable 618
-        private MongoUser[] FindAllUsers(IClientSession session)
+        private MongoUser[] FindAllUsers(IClientSessionHandle session)
         {
             var operation = new FindUsersOperation(_namespace, null, GetMessageEncoderSettings());
             var userDocuments = ExecuteReadOperation(session, operation, ReadPreference.Primary);
@@ -527,7 +527,7 @@ namespace MongoDB.Driver
         }
 
 #pragma warning disable 618
-        private MongoUser FindUser(IClientSession session, string username)
+        private MongoUser FindUser(IClientSessionHandle session, string username)
         {
             var operation = new FindUsersOperation(_namespace, username, GetMessageEncoderSettings());
             var userDocuments = ExecuteReadOperation(session, operation, ReadPreference.Primary);
@@ -668,7 +668,7 @@ namespace MongoDB.Driver
             return UsingImplicitSession(session => GetCollectionNames(session));
         }
 
-        private IEnumerable<string> GetCollectionNames(IClientSession session)
+        private IEnumerable<string> GetCollectionNames(IClientSessionHandle session)
         {
             var operation = new ListCollectionsOperation(_namespace, GetMessageEncoderSettings());
             var cursor = ExecuteReadOperation(session, operation, ReadPreference.Primary);
@@ -685,7 +685,7 @@ namespace MongoDB.Driver
             return UsingImplicitSession(session => GetCurrentOp(session));
         }
 
-        private BsonDocument GetCurrentOp(IClientSession session)
+        private BsonDocument GetCurrentOp(IClientSessionHandle session)
         {
             var operation = new CurrentOpOperation(_namespace, GetMessageEncoderSettings());
             return ExecuteReadOperation(session, operation);
@@ -807,7 +807,7 @@ namespace MongoDB.Driver
             UsingImplicitSession(session => RemoveUser(session, username));
         }
 
-        private void RemoveUser(IClientSession session, string username)
+        private void RemoveUser(IClientSessionHandle session, string username)
         {
             var operation = new DropUserOperation(_namespace, username, GetMessageEncoderSettings());
             ExecuteWriteOperation(session, operation);
@@ -836,7 +836,7 @@ namespace MongoDB.Driver
             return UsingImplicitSession(session => RenameCollection(session, oldCollectionName, newCollectionName, dropTarget));
         }
 
-        private CommandResult RenameCollection(IClientSession session, string oldCollectionName, string newCollectionName, bool dropTarget)
+        private CommandResult RenameCollection(IClientSessionHandle session, string oldCollectionName, string newCollectionName, bool dropTarget)
         {
             if (oldCollectionName == null)
             {
@@ -914,7 +914,7 @@ namespace MongoDB.Driver
         }
 
         private TCommandResult RunCommandAs<TCommandResult>(
-            IClientSession session,
+            IClientSessionHandle session,
             IMongoCommand command,
             ReadPreference readPreference)
             where TCommandResult : CommandResult
@@ -1036,7 +1036,7 @@ namespace MongoDB.Driver
         }
 
         // private methods
-        private TResult ExecuteReadOperation<TResult>(IClientSession session, IReadOperation<TResult> operation, ReadPreference readPreference = null)
+        private TResult ExecuteReadOperation<TResult>(IClientSessionHandle session, IReadOperation<TResult> operation, ReadPreference readPreference = null)
         {
             readPreference = readPreference ?? _settings.ReadPreference ?? ReadPreference.Primary;
             using (var binding = _server.GetReadBinding(readPreference, session))
@@ -1045,7 +1045,7 @@ namespace MongoDB.Driver
             }
         }
 
-        private TResult ExecuteWriteOperation<TResult>(IClientSession session, IWriteOperation<TResult> operation)
+        private TResult ExecuteWriteOperation<TResult>(IClientSessionHandle session, IWriteOperation<TResult> operation)
         {
             using (var binding = _server.GetWriteBinding(session))
             {
@@ -1064,7 +1064,7 @@ namespace MongoDB.Driver
         }
 
         internal TCommandResult RunCommandAs<TCommandResult>(
-            IClientSession session,
+            IClientSessionHandle session,
             IMongoCommand command,
             IBsonSerializer<TCommandResult> resultSerializer,
             ReadPreference readPreference)
@@ -1095,7 +1095,7 @@ namespace MongoDB.Driver
         }
 #pragma warning restore
 
-        private void UsingImplicitSession(Action<IClientSession> action)
+        private void UsingImplicitSession(Action<IClientSessionHandle> action)
         {
             using (var session = _operationExecutor.StartImplicitSession(CancellationToken.None))
             {
@@ -1103,7 +1103,7 @@ namespace MongoDB.Driver
             }
         }
 
-        private T UsingImplicitSession<T>(Func<IClientSession, T> func)
+        private TResult UsingImplicitSession<TResult>(Func<IClientSessionHandle, TResult> func)
         {
             using (var session = _operationExecutor.StartImplicitSession(CancellationToken.None))
             {

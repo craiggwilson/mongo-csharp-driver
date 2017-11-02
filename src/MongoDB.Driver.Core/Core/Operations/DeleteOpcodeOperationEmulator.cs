@@ -65,7 +65,7 @@ namespace MongoDB.Driver.Core.Operations
         }
 
         // public methods
-        public WriteConcernResult Execute(IChannelHandle channel, ICoreSession session, CancellationToken cancellationToken)
+        public WriteConcernResult Execute(IChannelHandle channel, ICoreSessionHandle session, CancellationToken cancellationToken)
         {
             Ensure.IsNotNull(channel, nameof(channel));
 
@@ -85,7 +85,7 @@ namespace MongoDB.Driver.Core.Operations
             return CreateResultOrThrow(channel, result, exception);
         }
 
-        public async Task<WriteConcernResult> ExecuteAsync(IChannelHandle channel, ICoreSession session, CancellationToken cancellationToken)
+        public async Task<WriteConcernResult> ExecuteAsync(IChannelHandle channel, ICoreSessionHandle session, CancellationToken cancellationToken)
         {
             Ensure.IsNotNull(channel, nameof(channel));
 

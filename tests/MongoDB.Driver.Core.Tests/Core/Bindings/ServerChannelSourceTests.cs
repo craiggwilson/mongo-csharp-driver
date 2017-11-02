@@ -42,7 +42,8 @@ namespace MongoDB.Driver.Core.Bindings
         [Fact]
         public void Constructor_should_throw_when_server_is_null()
         {
-            Action act = () => new ServerChannelSource(null);
+            var session = new Mock<ICoreSessionHandle>().Object;
+            Action act = () => new ServerChannelSource(null, session);
 
             act.ShouldThrow<ArgumentNullException>();
         }
@@ -50,7 +51,8 @@ namespace MongoDB.Driver.Core.Bindings
         [Fact]
         public void ServerDescription_should_return_description_of_server()
         {
-            var subject = new ServerChannelSource(_mockServer.Object);
+            var session = new Mock<ICoreSessionHandle>().Object;
+            var subject = new ServerChannelSource(_mockServer.Object, session);
 
             var desc = ServerDescriptionHelper.Disconnected(new ClusterId());
 
@@ -67,7 +69,8 @@ namespace MongoDB.Driver.Core.Bindings
             [Values(false, true)]
             bool async)
         {
-            var subject = new ServerChannelSource(_mockServer.Object);
+            var session = new Mock<ICoreSessionHandle>().Object;
+            var subject = new ServerChannelSource(_mockServer.Object, session);
             subject.Dispose();
 
             Action act;
@@ -89,7 +92,8 @@ namespace MongoDB.Driver.Core.Bindings
             [Values(false, true)]
             bool async)
         {
-            var subject = new ServerChannelSource(_mockServer.Object);
+            var session = new Mock<ICoreSessionHandle>().Object;
+            var subject = new ServerChannelSource(_mockServer.Object, session);
 
             if (async)
             {

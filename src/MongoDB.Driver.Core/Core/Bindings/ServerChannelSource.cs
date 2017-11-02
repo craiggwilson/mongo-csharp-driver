@@ -30,15 +30,18 @@ namespace MongoDB.Driver.Core.Bindings
         // fields
         private bool _disposed;
         private readonly IServer _server;
+        private readonly ICoreSessionHandle _session;
 
         // constructors
         /// <summary>
-        /// Initializes a new instance of the <see cref="ServerChannelSource"/> class.
+        /// Initializes a new instance of the <see cref="ServerChannelSource" /> class.
         /// </summary>
         /// <param name="server">The server.</param>
-        public ServerChannelSource(IServer server)
+        /// <param name="session">The session.</param>
+        public ServerChannelSource(IServer server, ICoreSessionHandle session)
         {
             _server = Ensure.IsNotNull(server, nameof(server));
+            _session = Ensure.IsNotNull(session, nameof(session));
         }
 
         // properties
@@ -52,6 +55,12 @@ namespace MongoDB.Driver.Core.Bindings
         public ServerDescription ServerDescription
         {
             get { return _server.Description; }
+        }
+
+        /// <inheritdoc/>
+        public ICoreSessionHandle Session
+        {
+            get { return _session; }
         }
 
         // methods
@@ -74,8 +83,8 @@ namespace MongoDB.Driver.Core.Bindings
         {
             if (!_disposed)
             {
+                _session.Dispose();
                 _disposed = true;
-                GC.SuppressFinalize(this);
             }
         }
 

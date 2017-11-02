@@ -144,7 +144,7 @@ namespace MongoDB.Driver.Core.Operations
         }
 
         // methods
-        private TCommandResult ExecuteProtocol(IChannelHandle channel, ICoreSession session, ReadPreference readPreference, CancellationToken cancellationToken)
+        private TCommandResult ExecuteProtocol(IChannelHandle channel, ICoreSessionHandle session, ReadPreference readPreference, CancellationToken cancellationToken)
         {
             var slaveOk = readPreference != null && readPreference.ReadPreferenceMode != ReadPreferenceMode.Primary;
             var additionalOptions = GetEffectiveAdditionalOptions();
@@ -175,7 +175,7 @@ namespace MongoDB.Driver.Core.Operations
         /// </returns>
         protected TCommandResult ExecuteProtocol(
             IChannelSource channelSource,
-            ICoreSession session,
+            ICoreSessionHandle session,
             ReadPreference readPreference,
             CancellationToken cancellationToken)
         {
@@ -185,7 +185,7 @@ namespace MongoDB.Driver.Core.Operations
             }
         }
 
-        private Task<TCommandResult> ExecuteProtocolAsync(IChannelHandle channel, ICoreSession session, ReadPreference readPreference, CancellationToken cancellationToken)
+        private Task<TCommandResult> ExecuteProtocolAsync(IChannelHandle channel, ICoreSessionHandle session, ReadPreference readPreference, CancellationToken cancellationToken)
         {
             var slaveOk = readPreference != null && readPreference.ReadPreferenceMode != ReadPreferenceMode.Primary;
             var additionalOptions = GetEffectiveAdditionalOptions();
@@ -216,7 +216,7 @@ namespace MongoDB.Driver.Core.Operations
         /// </returns>
         protected async Task<TCommandResult> ExecuteProtocolAsync(
             IChannelSource channelSource,
-            ICoreSession session,
+            ICoreSessionHandle session,
             ReadPreference readPreference,
             CancellationToken cancellationToken)
         {

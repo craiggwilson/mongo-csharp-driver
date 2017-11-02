@@ -20,6 +20,7 @@ using MongoDB.Driver.Core.Operations;
 
 namespace MongoDB.Driver
 {
+    // used when the application uses the deprecated MongoServer, MongoDatabase and MongoCollection constructors
     internal class DefaultLegacyOperationExecutor : IOperationExecutor
     {
         public TResult ExecuteReadOperation<TResult>(IReadBinding binding, IReadOperation<TResult> operation, CancellationToken cancellationToken)
@@ -44,12 +45,12 @@ namespace MongoDB.Driver
 
         public IClientSessionHandle StartImplicitSession(CancellationToken cancellationToken)
         {
-            return new ClientSessionHandle(new DefaultLegacyClientSession());
+            return new ClientSessionHandle(new NoClientSession());
         }
 
         public Task<IClientSessionHandle> StartImplicitSessionAsync(CancellationToken cancellationToken)
         {
-            return Task.FromResult<IClientSessionHandle>(new ClientSessionHandle(new DefaultLegacyClientSession()));
+            return Task.FromResult<IClientSessionHandle>(new ClientSessionHandle(new NoClientSession()));
         }
     }
 }

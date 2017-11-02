@@ -106,7 +106,7 @@ namespace MongoDB.Driver.Core.Operations
         }
 
         // public methods
-        public BulkWriteOperationResult Execute(IChannelHandle channel, ICoreSession session, CancellationToken cancellationToken)
+        public BulkWriteOperationResult Execute(IChannelHandle channel, ICoreSessionHandle session, CancellationToken cancellationToken)
         {
             using (EventContext.BeginOperation())
             {
@@ -131,7 +131,7 @@ namespace MongoDB.Driver.Core.Operations
             }
         }
 
-        public async Task<BulkWriteOperationResult> ExecuteAsync(IChannelHandle channel, ICoreSession session, CancellationToken cancellationToken)
+        public async Task<BulkWriteOperationResult> ExecuteAsync(IChannelHandle channel, ICoreSessionHandle session, CancellationToken cancellationToken)
         {
             using (EventContext.BeginOperation())
             {
@@ -204,21 +204,21 @@ namespace MongoDB.Driver.Core.Operations
             return requests;
         }
 
-        private BulkWriteBatchResult ExecuteBatch(IChannelHandle channel, ICoreSession session, BatchableSource<WriteRequest> requestSource, int originalIndex, CancellationToken cancellationToken)
+        private BulkWriteBatchResult ExecuteBatch(IChannelHandle channel, ICoreSessionHandle session, BatchableSource<WriteRequest> requestSource, int originalIndex, CancellationToken cancellationToken)
         {
             var writeCommand = CreateBatchCommand(channel, requestSource);
             var writeCommandResult = ExecuteProtocol(channel, session, writeCommand, () => GetResponseHandling(requestSource), cancellationToken);
             return CreateBatchResult(requestSource, originalIndex, writeCommandResult);
         }
 
-        private async Task<BulkWriteBatchResult> ExecuteBatchAsync(IChannelHandle channel, ICoreSession session, BatchableSource<WriteRequest> requestSource, int originalIndex, CancellationToken cancellationToken)
+        private async Task<BulkWriteBatchResult> ExecuteBatchAsync(IChannelHandle channel, ICoreSessionHandle session, BatchableSource<WriteRequest> requestSource, int originalIndex, CancellationToken cancellationToken)
         {
             var writeCommand = CreateBatchCommand(channel, requestSource);
             var writeCommandResult = await ExecuteProtocolAsync(channel, session, writeCommand, () => GetResponseHandling(requestSource), cancellationToken).ConfigureAwait(false);
             return CreateBatchResult(requestSource, originalIndex, writeCommandResult);
         }
 
-        private BulkWriteOperationResult ExecuteBatches(IChannelHandle channel, ICoreSession session, CancellationToken cancellationToken)
+        private BulkWriteOperationResult ExecuteBatches(IChannelHandle channel, ICoreSessionHandle session, CancellationToken cancellationToken)
         {
             var decoratedRequests = DecorateRequests(_requests);
             var helper = new BatchHelper(decoratedRequests, _writeConcern, _isOrdered);
@@ -229,7 +229,7 @@ namespace MongoDB.Driver.Core.Operations
             return helper.CreateFinalResultOrThrow(channel);
         }
 
-        private async Task<BulkWriteOperationResult> ExecuteBatchesAsync(IChannelHandle channel, ICoreSession session, CancellationToken cancellationToken)
+        private async Task<BulkWriteOperationResult> ExecuteBatchesAsync(IChannelHandle channel, ICoreSessionHandle session, CancellationToken cancellationToken)
         {
             var decoratedRequests = DecorateRequests(_requests);
             var helper = new BatchHelper(decoratedRequests, _writeConcern, _isOrdered);
@@ -240,7 +240,7 @@ namespace MongoDB.Driver.Core.Operations
             return helper.CreateFinalResultOrThrow(channel);
         }
 
-        private BsonDocument ExecuteProtocol(IChannelHandle channel, ICoreSession session, BsonDocument command, Func<CommandResponseHandling> responseHandling, CancellationToken cancellationToken)
+        private BsonDocument ExecuteProtocol(IChannelHandle channel, ICoreSessionHandle session, BsonDocument command, Func<CommandResponseHandling> responseHandling, CancellationToken cancellationToken)
         {
             return channel.Command<BsonDocument>(
                 session,
@@ -256,7 +256,7 @@ namespace MongoDB.Driver.Core.Operations
                 cancellationToken) ?? new BsonDocument("ok", 1);
         }
 
-        private async Task<BsonDocument> ExecuteProtocolAsync(IChannelHandle channel, ICoreSession session, BsonDocument command, Func<CommandResponseHandling> responseHandling, CancellationToken cancellationToken)
+        private async Task<BsonDocument> ExecuteProtocolAsync(IChannelHandle channel, ICoreSessionHandle session, BsonDocument command, Func<CommandResponseHandling> responseHandling, CancellationToken cancellationToken)
         {
             return (await channel.CommandAsync<BsonDocument>(
                 session,

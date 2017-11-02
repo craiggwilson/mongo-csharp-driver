@@ -33,7 +33,7 @@ namespace MongoDB.Driver.Core.Bindings
         private bool _disposed;
         private readonly ReadPreference _readPreference;
         private readonly IServer _server;
-        private readonly ICoreSession _session;
+        private readonly ICoreSessionHandle _session;
 
         // constructors
         /// <summary>
@@ -43,7 +43,7 @@ namespace MongoDB.Driver.Core.Bindings
         /// <param name="channel">The channel.</param>
         /// <param name="readPreference">The read preference.</param>
         /// <param name="session">The session.</param>
-        public ChannelReadBinding(IServer server, IChannelHandle channel, ReadPreference readPreference, ICoreSession session)
+        public ChannelReadBinding(IServer server, IChannelHandle channel, ReadPreference readPreference, ICoreSessionHandle session)
         {
             _server = Ensure.IsNotNull(server, nameof(server));
             _channel = Ensure.IsNotNull(channel, nameof(channel));
@@ -59,7 +59,7 @@ namespace MongoDB.Driver.Core.Bindings
         }
 
         /// <inheritdoc/>
-        public ICoreSession Session
+        public ICoreSessionHandle Session
         {
             get { return _session; }
         }
@@ -71,8 +71,8 @@ namespace MongoDB.Driver.Core.Bindings
             if (!_disposed)
             {
                 _channel.Dispose();
+                _session.Dispose();
                 _disposed = true;
-                GC.SuppressFinalize(this);
             }
         }
 
@@ -92,7 +92,7 @@ namespace MongoDB.Driver.Core.Bindings
 
         private IChannelSourceHandle GetReadChannelSourceHelper()
         {
-            return new ChannelSourceHandle(new ChannelChannelSource(_server, _channel.Fork()));
+            return new ChannelSourceHandle(new ChannelChannelSource(_server, _channel.Fork(), _session.Fork()));
         }
 
         private void ThrowIfDisposed()

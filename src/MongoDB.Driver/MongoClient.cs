@@ -352,9 +352,8 @@ namespace MongoDB.Driver
                 serverSession = NoServerSession.Instance;
             }
 
-            var session = new ClientSession(this, options, serverSession, isImplicitSession: true);
-            var handle = new ClientSessionHandle(session);
-            return handle;
+            var session = new ClientSession(this, options, serverSession, isImplicit: true);
+            return new ClientSessionHandle(session);
         }
 
         private IClientSessionHandle StartSession(ClientSessionOptions options, bool areSessionsSupported)
@@ -365,7 +364,7 @@ namespace MongoDB.Driver
             }
             options = options ?? new ClientSessionOptions();
             var serverSession = AcquireServerSession();
-            var session = new ClientSession(this, options, serverSession, isImplicitSession: false);
+            var session = new ClientSession(this, options, serverSession, isImplicit: false);
             var handle = new ClientSessionHandle(session);
             return handle;
         }

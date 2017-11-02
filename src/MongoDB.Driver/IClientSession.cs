@@ -15,7 +15,6 @@
 
 using System;
 using MongoDB.Bson;
-using MongoDB.Driver.Core.Bindings;
 
 namespace MongoDB.Driver
 {
@@ -42,12 +41,12 @@ namespace MongoDB.Driver
         BsonDocument ClusterTime { get; }
 
         /// <summary>
-        /// Gets a value indicating whether this instance is an implicit session.
+        /// Gets a value indicating whether this session is an implicit session.
         /// </summary>
         /// <value>
-        ///   <c>true</c> if this instance is an implicit session; otherwise, <c>false</c>.
+        ///   <c>true</c> if this session is an implicit session; otherwise, <c>false</c>.
         /// </value>
-        bool IsImplicitSession { get; }
+        bool IsImplicit { get; }
 
         /// <summary>
         /// Gets the operation time.

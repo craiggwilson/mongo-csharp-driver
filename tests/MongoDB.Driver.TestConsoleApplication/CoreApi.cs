@@ -87,7 +87,7 @@ namespace MongoDB.Driver.TestConsoleApplication
 
         private async Task ClearData(ICluster cluster)
         {
-            using (var binding = new WritableServerBinding(cluster, NoCoreSession.Instance))
+            using (var binding = new WritableServerBinding(cluster, NoCoreSession.NewHandle()))
             {
                 var commandOp = new DropDatabaseOperation(_collection.DatabaseNamespace, _messageEncoderSettings);
                 await commandOp.ExecuteAsync(binding, CancellationToken.None);
@@ -96,7 +96,7 @@ namespace MongoDB.Driver.TestConsoleApplication
 
         private async Task InsertData(ICluster cluster)
         {
-            using (var binding = new WritableServerBinding(cluster, NoCoreSession.Instance))
+            using (var binding = new WritableServerBinding(cluster, NoCoreSession.NewHandle()))
             {
                 for (int i = 0; i < 100; i++)
                 {
@@ -108,7 +108,7 @@ namespace MongoDB.Driver.TestConsoleApplication
         private async Task DoWork(ICluster cluster)
         {
             var rand = new Random();
-            using (var binding = new WritableServerBinding(cluster, NoCoreSession.Instance))
+            using (var binding = new WritableServerBinding(cluster, NoCoreSession.NewHandle()))
             {
                 while (!_cancellationTokenSource.IsCancellationRequested)
                 {

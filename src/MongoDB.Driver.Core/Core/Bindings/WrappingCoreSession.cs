@@ -17,41 +17,31 @@ using System;
 using MongoDB.Bson;
 using MongoDB.Driver.Core.Misc;
 
-namespace MongoDB.Driver
+namespace MongoDB.Driver.Core.Bindings
 {
     /// <summary>
-    /// A base class for classes that wrap a client session.
+    /// An abstract base class for a core session that wraps another core session.
     /// </summary>
-    /// <seealso cref="MongoDB.Driver.IClientSession" />
-    internal abstract class WrappingClientSession : IClientSession
+    /// <seealso cref="MongoDB.Driver.Core.Bindings.ICoreSession" />
+    public abstract class WrappingCoreSession : ICoreSession
     {
         // private fields
         private bool _disposed;
-        private readonly IClientSession _wrapped;
+        private readonly ICoreSession _wrapped;
 
         // constructors
         /// <summary>
-        /// Initializes a new instance of the <see cref="WrappingClientSession"/> class.
+        /// Initializes a new instance of the <see cref="WrappingCoreSession"/> class.
         /// </summary>
-        /// <param name="wrapped">The wrapped session.</param>
-        public WrappingClientSession(IClientSession wrapped)
+        /// <param name="wrapped">The wrapped.</param>
+        public WrappingCoreSession(ICoreSession wrapped)
         {
             _wrapped = Ensure.IsNotNull(wrapped, nameof(wrapped));
         }
 
         // public properties
         /// <inheritdoc />
-        public IMongoClient Client
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return _wrapped.Client;
-            }
-        }
-
-        /// <inheritdoc />
-        public BsonDocument ClusterTime
+        public virtual BsonDocument ClusterTime
         {
             get
             {
@@ -61,7 +51,17 @@ namespace MongoDB.Driver
         }
 
         /// <inheritdoc />
-        public bool IsImplicit
+        public virtual BsonDocument Id
+        {
+            get
+            {
+                ThrowIfDisposed();
+                return _wrapped.Id;
+            }
+        }
+
+        /// <inheritdoc />
+        public virtual bool IsImplicit
         {
             get
             {
@@ -71,32 +71,12 @@ namespace MongoDB.Driver
         }
 
         /// <inheritdoc />
-        public BsonTimestamp OperationTime
+        public virtual BsonTimestamp OperationTime
         {
             get
             {
                 ThrowIfDisposed();
                 return _wrapped.OperationTime;
-            }
-        }
-
-        /// <inheritdoc />
-        public ClientSessionOptions Options
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return _wrapped.Options;
-            }
-        }
-
-        /// <inheritdoc />
-        public IServerSession ServerSession
-        {
-            get
-            {
-                ThrowIfDisposed();
-                return _wrapped.ServerSession;
             }
         }
 
@@ -106,18 +86,18 @@ namespace MongoDB.Driver
         /// <value>
         /// The wrapped session.
         /// </value>
-        public IClientSession Wrapped => _wrapped;
+        public ICoreSession Wrapped => _wrapped;
 
         // public methods
         /// <inheritdoc />
-        public void AdvanceClusterTime(BsonDocument newClusterTime)
+        public virtual void AdvanceClusterTime(BsonDocument newClusterTime)
         {
             ThrowIfDisposed();
             _wrapped.AdvanceClusterTime(newClusterTime);
         }
 
         /// <inheritdoc />
-        public void AdvanceOperationTime(BsonTimestamp newOperationTime)
+        public virtual void AdvanceOperationTime(BsonTimestamp newOperationTime)
         {
             ThrowIfDisposed();
             _wrapped.AdvanceOperationTime(newOperationTime);
@@ -130,11 +110,15 @@ namespace MongoDB.Driver
             GC.SuppressFinalize(this);
         }
 
+        /// <inheritdoc />
+        public virtual void WasUsed()
+        {
+            ThrowIfDisposed();
+            _wrapped.WasUsed();
+        }
+
         // protected methods
-        /// <summary>
-        /// Releases unmanaged and - optionally - managed resources.
-        /// </summary>
-        /// <param name="disposing"><c>true</c> to release both managed and unmanaged resources; <c>false</c> to release only unmanaged resources.</param>
+        /// <inheritdoc />
         protected virtual void Dispose(bool disposing)
         {
             // the subclass decides what to do with the wrapped session
@@ -153,7 +137,7 @@ namespace MongoDB.Driver
         /// Throws if disposed.
         /// </summary>
         /// <exception cref="ObjectDisposedException"></exception>
-        protected virtual void ThrowIfDisposed()
+        protected void ThrowIfDisposed()
         {
             if (_disposed)
             {

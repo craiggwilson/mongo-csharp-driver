@@ -45,7 +45,7 @@ namespace MongoDB.Driver
             return _collection.UsingImplicitSession(session => GetEnumerator(session));
         }
 
-        private IEnumerator<BsonDocument> GetEnumerator(IClientSession session)
+        private IEnumerator<BsonDocument> GetEnumerator(IClientSessionHandle session)
         {
             var cursor = _collection.ExecuteReadOperation(session, _operation, _readPreference);
             return cursor.ToEnumerable().GetEnumerator();

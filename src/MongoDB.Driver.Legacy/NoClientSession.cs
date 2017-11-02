@@ -17,7 +17,8 @@ using MongoDB.Bson;
 
 namespace MongoDB.Driver
 {
-    internal class DefaultLegacyClientSession : IClientSession
+    // used by the DefaultLegacyOperationExecutor when the application uses the deprecated MongoServer, MongoDatabase and MongoCollection constructors
+    internal class NoClientSession : IClientSession
     {
         private readonly IServerSession _noServerSession = new NoServerSession();
 
@@ -25,7 +26,7 @@ namespace MongoDB.Driver
 
         public BsonDocument ClusterTime => null;
 
-        public bool IsImplicitSession => true;
+        public bool IsImplicit => true;
 
         public BsonTimestamp OperationTime => null;
 

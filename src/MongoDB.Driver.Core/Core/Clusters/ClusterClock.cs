@@ -68,41 +68,6 @@ namespace MongoDB.Driver.Core.Clusters
     }
 
     /// <summary>
-    /// A cluster clock that combines two other cluster clocks.
-    /// </summary>
-    /// <seealso cref="MongoDB.Driver.Core.Clusters.IClusterClock" />
-    public class CombinedClusterClock : IClusterClock
-    {
-        // private fields
-        private readonly IClusterClock _clock1;
-        private readonly IClusterClock _clock2;
-
-        // constructors
-        /// <summary>
-        /// Initializes a new instance of the <see cref="CombinedClusterClock" /> class.
-        /// </summary>
-        /// <param name="clock1">The first clock.</param>
-        /// <param name="clock2">The second clock.</param>
-        public CombinedClusterClock(IClusterClock clock1, IClusterClock clock2)
-        {
-            _clock1 = Ensure.IsNotNull(clock1, nameof(clock2));
-            _clock2 = Ensure.IsNotNull(clock2, nameof(clock2));
-        }
-
-        // public properties
-        /// <inheritdoc />
-        public BsonDocument ClusterTime => ClusterClock.GreaterClusterTime(_clock1.ClusterTime, _clock2.ClusterTime);
-
-        // public methods
-        /// <inheritdoc />
-        public void AdvanceClusterTime(BsonDocument newClusterTime)
-        {
-            _clock1.AdvanceClusterTime(newClusterTime);
-            _clock2.AdvanceClusterTime(newClusterTime);
-        }
-    }
-
-    /// <summary>
     /// An object that represents no cluster clock.
     /// </summary>
     /// <seealso cref="MongoDB.Driver.Core.Clusters.IClusterClock" />

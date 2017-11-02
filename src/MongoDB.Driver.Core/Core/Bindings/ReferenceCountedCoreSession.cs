@@ -13,13 +13,13 @@
 * limitations under the License.
 */
 
-namespace MongoDB.Driver
+namespace MongoDB.Driver.Core.Bindings
 {
     /// <summary>
-    /// A reference counted client session wrapper.
+    /// A reference counted core session.
     /// </summary>
-    /// <seealso cref="MongoDB.Driver.WrappingClientSession" />
-    internal sealed class ReferenceCountedClientSession : WrappingClientSession
+    /// <seealso cref="MongoDB.Driver.Core.Bindings.WrappingCoreSession" />
+    public sealed class ReferenceCountedCoreSession : WrappingCoreSession
     {
         // private fields
         private readonly object _lock = new object();
@@ -27,10 +27,10 @@ namespace MongoDB.Driver
 
         // constructors
         /// <summary>
-        /// Initializes a new instance of the <see cref="ReferenceCountedClientSession"/> class.
+        /// Initializes a new instance of the <see cref="ReferenceCountedCoreSession"/> class.
         /// </summary>
-        /// <param name="wrapped">The wrapped session.</param>
-        public ReferenceCountedClientSession(IClientSession wrapped)
+        /// <param name="wrapped">The wrapped.</param>
+        public ReferenceCountedCoreSession(ICoreSession wrapped)
             : base(wrapped)
         {
             _referenceCount = 1;

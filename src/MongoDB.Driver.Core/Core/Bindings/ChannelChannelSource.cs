@@ -1,4 +1,4 @@
-﻿/* Copyright 2013-2015 MongoDB Inc.
+﻿/* Copyright 2013-2017 MongoDB Inc.
 *
 * Licensed under the Apache License, Version 2.0 (the "License");
 * you may not use this file except in compliance with the License.
@@ -28,12 +28,14 @@ namespace MongoDB.Driver.Core.Bindings
         private readonly IChannelHandle _channel;
         private bool _disposed;
         private readonly IServer _server;
+        private readonly ICoreSessionHandle _session;
 
         // constructors
-        public ChannelChannelSource(IServer server, IChannelHandle channel)
+        public ChannelChannelSource(IServer server, IChannelHandle channel, ICoreSessionHandle session)
         {
             _server = Ensure.IsNotNull(server, nameof(server));
             _channel = Ensure.IsNotNull(channel, nameof(channel));
+            _session = Ensure.IsNotNull(session, nameof(session));
         }
 
         // properties
@@ -47,14 +49,19 @@ namespace MongoDB.Driver.Core.Bindings
             get { return _server.Description; }
         }
 
+        public ICoreSessionHandle Session
+        {
+            get { return _session; }
+        }
+
         // methods
         public void Dispose()
         {
             if (!_disposed)
             {
                 _channel.Dispose();
+                _session.Dispose();
                 _disposed = true;
-                GC.SuppressFinalize(this);
             }
         }
 

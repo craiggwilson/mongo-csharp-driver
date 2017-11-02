@@ -14,15 +14,16 @@
 */
 
 using MongoDB.Driver.Core.Bindings;
-using MongoDB.Driver.Core.Clusters;
 
 namespace MongoDB.Driver
 {
     internal static class IClientSessionExtensions
     {
-        public static ICoreSession ToCoreSession(this IClientSession clientSession)
+        public static ICoreSessionHandle ToCoreSession(this IClientSessionHandle clientSession)
         {
-            return new ClientSessionWrappingCoreSession(clientSession);
+            var coreSession = new ClientSessionWrappingCoreSession(clientSession.Fork());
+            var referenceCounted = new ReferenceCountedCoreSession(coreSession);
+            return new CoreSessionHandle(referenceCounted);
         }
     }
 }

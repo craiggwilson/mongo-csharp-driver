@@ -538,7 +538,7 @@ namespace MongoDB.Driver
             return UsingImplicitSession(session => DropDatabase(session, databaseName));
         }
 
-        private CommandResult DropDatabase(IClientSession session, string databaseName)
+        private CommandResult DropDatabase(IClientSessionHandle session, string databaseName)
         {
             var databaseNamespace = new DatabaseNamespace(databaseName);
             var messageEncoderSettings = GetMessageEncoderSettings();
@@ -643,7 +643,7 @@ namespace MongoDB.Driver
             return UsingImplicitSession(session => GetDatabaseNames(session));
         }
 
-        private IEnumerable<string> GetDatabaseNames(IClientSession session)
+        private IEnumerable<string> GetDatabaseNames(IClientSessionHandle session)
         {
             var messageEncoderSettings = GetMessageEncoderSettings();
             var operation = new ListDatabasesOperation(messageEncoderSettings);
@@ -832,7 +832,7 @@ namespace MongoDB.Driver
         }
 
         // internal methods
-        internal IReadBindingHandle GetReadBinding(ReadPreference readPreference, IClientSession session)
+        internal IReadBindingHandle GetReadBinding(ReadPreference readPreference, IClientSessionHandle session)
         {
             var request = __threadStaticRequest;
             if (request != null)
@@ -859,7 +859,7 @@ namespace MongoDB.Driver
             }
         }
 
-        internal IWriteBindingHandle GetWriteBinding(IClientSession session)
+        internal IWriteBindingHandle GetWriteBinding(IClientSessionHandle session)
         {
             var request = __threadStaticRequest;
             if (request != null)
@@ -871,7 +871,7 @@ namespace MongoDB.Driver
         }
 
         // private methods
-        private TResult ExecuteReadOperation<TResult>(IClientSession session, IReadOperation<TResult> operation, ReadPreference readPreference = null)
+        private TResult ExecuteReadOperation<TResult>(IClientSessionHandle session, IReadOperation<TResult> operation, ReadPreference readPreference = null)
         {
             readPreference = readPreference ?? _settings.ReadPreference ?? ReadPreference.Primary;
             using (var binding = GetReadBinding(readPreference, session))
@@ -880,7 +880,7 @@ namespace MongoDB.Driver
             }
         }
 
-        private TResult ExecuteWriteOperation<TResult>(IClientSession session, IWriteOperation<TResult> operation)
+        private TResult ExecuteWriteOperation<TResult>(IClientSessionHandle session, IWriteOperation<TResult> operation)
         {
             using (var binding = GetWriteBinding(session))
             {
@@ -936,11 +936,11 @@ namespace MongoDB.Driver
             {
                 if (readPreference.ReadPreferenceMode == ReadPreferenceMode.Primary)
                 {
-                    channelBinding = new ReadWriteBindingHandle(new ChannelReadWriteBinding(server, channel.Fork(), NoCoreSession.Instance));
+                    channelBinding = new ReadWriteBindingHandle(new ChannelReadWriteBinding(server, channel.Fork(), NoCoreSession.NewHandle()));
                 }
                 else
                 {
-                    channelBinding = new ReadBindingHandle(new ChannelReadBinding(server, channel.Fork(), readPreference, NoCoreSession.Instance));
+                    channelBinding = new ReadBindingHandle(new ChannelReadBinding(server, channel.Fork(), readPreference, NoCoreSession.NewHandle()));
                 }
                 connectionId = channel.ConnectionDescription.ConnectionId;
             }
@@ -994,7 +994,7 @@ namespace MongoDB.Driver
             return writeBinding;
         }
 
-        private T UsingImplicitSession<T>(Func<IClientSession, T> func)
+        private TResult UsingImplicitSession<TResult>(Func<IClientSessionHandle, TResult> func)
         {
             using (var session = _operationExecutor.StartImplicitSession(CancellationToken.None))
             {

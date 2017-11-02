@@ -86,7 +86,7 @@ namespace MongoDB.Driver.Operations
             throw new NotSupportedException();
         }
 
-        private bool UserExists(IChannelSourceHandle channelSource, ICoreSession session, CancellationToken cancellationToken)
+        private bool UserExists(IChannelSourceHandle channelSource, ICoreSessionHandle session, CancellationToken cancellationToken)
         {
             try
             {

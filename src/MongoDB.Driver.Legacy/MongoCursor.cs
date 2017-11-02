@@ -829,7 +829,7 @@ namespace MongoDB.Driver
             return Collection.UsingImplicitSession(session => GetEnumerator(session));
         }
 
-        private IEnumerator<TDocument> GetEnumerator(IClientSession session)
+        private IEnumerator<TDocument> GetEnumerator(IClientSessionHandle session)
         {
             IsFrozen = true;
 

@@ -1085,7 +1085,7 @@ namespace MongoDB.Driver.Core.Operations
             using (var readWriteBinding = CoreTestConfiguration.GetReadWriteBinding())
             using (var channelSource = readWriteBinding.GetWriteChannelSource(CancellationToken.None))
             using (var channel = channelSource.GetChannel(CancellationToken.None))
-            using (var channelBinding = new ChannelReadWriteBinding(channelSource.Server, channel, readWriteBinding.Session))
+            using (var channelBinding = new ChannelReadWriteBinding(channelSource.Server, channel, readWriteBinding.Session.Fork()))
             {
                 var result = ExecuteOperation(subject, channelBinding, async);
 
@@ -1129,7 +1129,7 @@ namespace MongoDB.Driver.Core.Operations
             using (var readWriteBinding = CoreTestConfiguration.GetReadWriteBinding())
             using (var channelSource = readWriteBinding.GetWriteChannelSource(CancellationToken.None))
             using (var channel = channelSource.GetChannel(CancellationToken.None))
-            using (var channelBinding = new ChannelReadWriteBinding(channelSource.Server, channel, readWriteBinding.Session))
+            using (var channelBinding = new ChannelReadWriteBinding(channelSource.Server, channel, readWriteBinding.Session.Fork()))
             {
                 var result = ExecuteOperation(subject, channelBinding, async);
                 result.ProcessedRequests.Should().HaveCount(5);
@@ -1167,7 +1167,7 @@ namespace MongoDB.Driver.Core.Operations
             using (var readWriteBinding = CoreTestConfiguration.GetReadWriteBinding())
             using (var channelSource = readWriteBinding.GetWriteChannelSource(CancellationToken.None))
             using (var channel = channelSource.GetChannel(CancellationToken.None))
-            using (var channelBinding = new ChannelReadWriteBinding(channelSource.Server, channel, readWriteBinding.Session))
+            using (var channelBinding = new ChannelReadWriteBinding(channelSource.Server, channel, readWriteBinding.Session.Fork()))
             {
                 var result = ExecuteOperation(subject, channelBinding, async);
                 result.ProcessedRequests.Should().HaveCount(5);
@@ -1205,7 +1205,7 @@ namespace MongoDB.Driver.Core.Operations
             using (var readWriteBinding = CoreTestConfiguration.GetReadWriteBinding())
             using (var channelSource = readWriteBinding.GetWriteChannelSource(CancellationToken.None))
             using (var channel = channelSource.GetChannel(CancellationToken.None))
-            using (var channelBinding = new ChannelReadWriteBinding(channelSource.Server, channel, readWriteBinding.Session))
+            using (var channelBinding = new ChannelReadWriteBinding(channelSource.Server, channel, readWriteBinding.Session.Fork()))
             {
                 var result = ExecuteOperation(subject, channelBinding, async);
                 result.ProcessedRequests.Should().HaveCount(4);

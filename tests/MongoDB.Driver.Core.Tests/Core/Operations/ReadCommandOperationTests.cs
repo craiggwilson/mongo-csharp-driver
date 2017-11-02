@@ -298,7 +298,7 @@ namespace MongoDB.Driver.Core.Operations
         private Mock<IReadBinding> CreateMockReadBinding(ReadPreference readPreference, IChannelSourceHandle channelSource)
         {
             var mockBinding = new Mock<IReadBinding>();
-            var mockSession = new Mock<ICoreSession>();
+            var mockSession = new Mock<ICoreSessionHandle>();
             mockBinding.SetupGet(b => b.ReadPreference).Returns(readPreference);
             mockBinding.SetupGet(b => b.Session).Returns(mockSession.Object);
             mockBinding.Setup(b => b.GetReadChannelSource(It.IsAny<CancellationToken>())).Returns(channelSource);

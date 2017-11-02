@@ -19,39 +19,26 @@ using MongoDB.Driver.Core.Clusters;
 
 namespace MongoDB.Driver.Core.Servers
 {
-    internal  sealed class ClusterClockAdvancingCoreSession : ICoreSession
+    internal  sealed class ClusterClockAdvancingCoreSession : WrappingCoreSession
     {
         private readonly IClusterClock _clusterClock;
-        private readonly ICoreSession _wrapped;
 
         public ClusterClockAdvancingCoreSession(ICoreSession wrapped, IClusterClock clusterClock)
+            : base(wrapped)
         {
-            _wrapped = wrapped;
             _clusterClock = clusterClock;
         }
 
-        public BsonDocument ClusterTime => ClusterClock.GreaterClusterTime(_wrapped.ClusterTime, _clusterClock.ClusterTime);
-
-        public BsonDocument Id => _wrapped.Id;
-
-        public bool IsImplicitSession => _wrapped.IsImplicitSession;
-
-        public BsonTimestamp OperationTime => _wrapped.OperationTime;
-
-        public void AdvanceClusterTime(BsonDocument newClusterTime)
+        public override void AdvanceClusterTime(BsonDocument newClusterTime)
         {
-            _wrapped.AdvanceClusterTime(newClusterTime);
+            base.AdvanceClusterTime(newClusterTime);
             _clusterClock.AdvanceClusterTime(newClusterTime);
         }
 
-        public void AdvanceOperationTime(BsonTimestamp newOperationTime)
+        protected override void Dispose(bool disposing)
         {
-            _wrapped.AdvanceOperationTime(newOperationTime);
-        }
-
-        public void WasUsed()
-        {
-            _wrapped.WasUsed();
+            // do NOT call Dispose on wrapped session
+            base.Dispose(disposing);
         }
     }
 }

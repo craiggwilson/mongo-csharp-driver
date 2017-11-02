@@ -15,7 +15,6 @@
 
 using System;
 using MongoDB.Bson;
-using MongoDB.Driver.Core.Bindings;
 using MongoDB.Driver.Core.Clusters;
 using MongoDB.Driver.Core.Misc;
 using MongoDB.Driver.Core.Operations;
@@ -32,7 +31,7 @@ namespace MongoDB.Driver
         private readonly IMongoClient _client;
         private readonly IClusterClock _clusterClock = new ClusterClock();
         private bool _disposed;
-        private bool _isImplicitSession;
+        private bool _isImplicit;
         private readonly IOperationClock _operationClock = new OperationClock();
         private readonly ClientSessionOptions _options;
         private IServerSession _serverSession;
@@ -42,12 +41,12 @@ namespace MongoDB.Driver
             IMongoClient client,
             ClientSessionOptions options,
             IServerSession serverSession,
-            bool isImplicitSession)
+            bool isImplicit)
         {
             _client = Ensure.IsNotNull(client, nameof(client));
             _options = Ensure.IsNotNull(options, nameof(options));
             _serverSession = Ensure.IsNotNull(serverSession, nameof(serverSession));
-            _isImplicitSession = isImplicitSession;
+            _isImplicit = isImplicit;
         }
 
         // public properties
@@ -58,7 +57,7 @@ namespace MongoDB.Driver
         public BsonDocument ClusterTime => _clusterClock.ClusterTime;
 
         /// <inheritdoc />
-        public bool IsImplicitSession => _isImplicitSession;
+        public bool IsImplicit => _isImplicit;
 
         /// <inheritdoc />
         public BsonTimestamp OperationTime => _operationClock.OperationTime;

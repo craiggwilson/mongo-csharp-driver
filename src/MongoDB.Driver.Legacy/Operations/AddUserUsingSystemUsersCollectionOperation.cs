@@ -84,7 +84,7 @@ namespace MongoDB.Driver.Operations
             throw new NotSupportedException();
         }
 
-        private BsonDocument FindUser(IChannelSourceHandle channelSource, ICoreSession session, CollectionNamespace collectionNamespace, CancellationToken cancellationToken)
+        private BsonDocument FindUser(IChannelSourceHandle channelSource, ICoreSessionHandle session, CollectionNamespace collectionNamespace, CancellationToken cancellationToken)
         {
             var operation = new FindOperation<BsonDocument>(collectionNamespace, BsonDocumentSerializer.Instance, _messageEncoderSettings)
             {
@@ -96,14 +96,14 @@ namespace MongoDB.Driver.Operations
             return userDocuments.FirstOrDefault();
         }
 
-        private void InsertUser(IChannelSourceHandle channelSource, ICoreSession session, CollectionNamespace collectionNamespace, BsonDocument user, CancellationToken cancellationToken)
+        private void InsertUser(IChannelSourceHandle channelSource, ICoreSessionHandle session, CollectionNamespace collectionNamespace, BsonDocument user, CancellationToken cancellationToken)
         {
             var inserts = new[] { new InsertRequest(user) };
             var operation = new BulkMixedWriteOperation(collectionNamespace, inserts, _messageEncoderSettings) { WriteConcern = WriteConcern.Acknowledged };
             operation.Execute(channelSource, session, cancellationToken);
         }
 
-        private void UpdateUser(IChannelSourceHandle channelSource, ICoreSession session, CollectionNamespace collectionNamespace, BsonDocument user, CancellationToken cancellationToken)
+        private void UpdateUser(IChannelSourceHandle channelSource, ICoreSessionHandle session, CollectionNamespace collectionNamespace, BsonDocument user, CancellationToken cancellationToken)
         {
             var filter = new BsonDocument("_id", user["_id"]);
             var updates = new[] { new UpdateRequest(UpdateType.Replacement, filter, user) };

@@ -174,7 +174,7 @@ namespace MongoDB.Driver.Tests
         {
             var options = new ClientSessionOptions();
             var serverSession = new ServerSession();
-            var session = new ClientSession(_client, options, serverSession, isImplicitSession: true);
+            var session = new ClientSession(_client, options, serverSession, isImplicit: true);
             var handle = new ClientSessionHandle(session);
             return handle;
         }

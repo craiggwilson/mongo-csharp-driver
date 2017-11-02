@@ -235,12 +235,12 @@ namespace MongoDB.Driver
 
         public static IReadBinding GetReadBinding(ReadPreference readPreference)
         {
-            return new ReadPreferenceBinding(__cluster.Value, readPreference, NoCoreSession.Instance);
+            return new ReadPreferenceBinding(__cluster.Value, readPreference, NoCoreSession.NewHandle());
         }
 
         public static IReadWriteBinding GetReadWriteBinding()
         {
-            return new WritableServerBinding(__cluster.Value, NoCoreSession.Instance);
+            return new WritableServerBinding(__cluster.Value, NoCoreSession.NewHandle());
         }
 
         public static IEnumerable<string> GetModules()

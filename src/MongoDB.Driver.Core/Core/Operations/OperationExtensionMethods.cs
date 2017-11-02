@@ -42,11 +42,11 @@ namespace MongoDB.Driver.Core.Operations
             this IReadOperation<TResult> operation,
             IChannelSourceHandle channelSource,
             ReadPreference readPreference,
-            ICoreSession session,
+            ICoreSessionHandle session,
             CancellationToken cancellationToken)
         {
             Ensure.IsNotNull(operation, nameof(operation));
-            using (var readBinding = new ChannelSourceReadWriteBinding(channelSource.Fork(), readPreference, session))
+            using (var readBinding = new ChannelSourceReadWriteBinding(channelSource.Fork(), readPreference, session.Fork()))
             {
                 return operation.Execute(readBinding, cancellationToken);
             }
@@ -66,11 +66,11 @@ namespace MongoDB.Driver.Core.Operations
         public static TResult Execute<TResult>(
             this IWriteOperation<TResult> operation,
             IChannelSourceHandle channelSource,
-            ICoreSession session,
+            ICoreSessionHandle session,
             CancellationToken cancellationToken)
         {
             Ensure.IsNotNull(operation, nameof(operation));
-            using (var writeBinding = new ChannelSourceReadWriteBinding(channelSource.Fork(), ReadPreference.Primary, session))
+            using (var writeBinding = new ChannelSourceReadWriteBinding(channelSource.Fork(), ReadPreference.Primary, session.Fork()))
             {
                 return operation.Execute(writeBinding, cancellationToken);
             }
@@ -92,11 +92,11 @@ namespace MongoDB.Driver.Core.Operations
             this IReadOperation<TResult> operation,
             IChannelSourceHandle channelSource,
             ReadPreference readPreference,
-            ICoreSession session,
+            ICoreSessionHandle session,
             CancellationToken cancellationToken)
         {
             Ensure.IsNotNull(operation, nameof(operation));
-            using (var readBinding = new ChannelSourceReadWriteBinding(channelSource.Fork(), readPreference, session))
+            using (var readBinding = new ChannelSourceReadWriteBinding(channelSource.Fork(), readPreference, session.Fork()))
             {
                 return await operation.ExecuteAsync(readBinding, cancellationToken).ConfigureAwait(false);
             }
@@ -116,11 +116,11 @@ namespace MongoDB.Driver.Core.Operations
         public static async Task<TResult> ExecuteAsync<TResult>(
             this IWriteOperation<TResult> operation,
             IChannelSourceHandle channelSource,
-            ICoreSession session,
+            ICoreSessionHandle session,
             CancellationToken cancellationToken)
         {
             Ensure.IsNotNull(operation, nameof(operation));
-            using (var writeBinding = new ChannelSourceReadWriteBinding(channelSource.Fork(), ReadPreference.Primary, session))
+            using (var writeBinding = new ChannelSourceReadWriteBinding(channelSource.Fork(), ReadPreference.Primary, session.Fork()))
             {
                 return await operation.ExecuteAsync(writeBinding, cancellationToken).ConfigureAwait(false);
             }

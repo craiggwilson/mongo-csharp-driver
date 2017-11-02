@@ -134,7 +134,7 @@ namespace MongoDB.Driver.Core.Operations
 
         private IAsyncCursor<BsonDocument> CreateCursor(IChannelSourceHandle channelSource, BsonDocument result, BsonDocument command)
         {
-            var getMoreChannelSource = new ServerChannelSource(channelSource.Server);
+            var getMoreChannelSource = new ServerChannelSource(channelSource.Server, channelSource.Session.Fork());
             var cursorDocument = result["cursor"].AsBsonDocument;
             var cursor = new AsyncCursor<BsonDocument>(
                 getMoreChannelSource,
