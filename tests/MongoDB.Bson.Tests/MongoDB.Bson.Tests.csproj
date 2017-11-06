@@ -112,6 +112,7 @@
     <Compile Include="IO\OutputBufferChunkSourceTests.cs" />
     <Compile Include="IO\SingleChunkBufferTests.cs" />
     <Compile Include="IO\TrieNameDecoderTests.cs" />
+    <Compile Include="IO\WrappingBsonWriterTests.cs" />
     <Compile Include="Jira\CSharp728Tests.cs" />
     <Compile Include="Jira\CSharp708Tests.cs" />
     <Compile Include="Jira\CSharp476Tests.cs" />
