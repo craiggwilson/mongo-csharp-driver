@@ -21,6 +21,7 @@ using FluentAssertions;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
+using MongoDB.Bson.Tests.IO;
 using Moq;
 using Xunit;
 
@@ -86,28 +87,27 @@ namespace MongoDB.Bson.Tests.Serialization.Serializers
             result.Should().Be(typeof(BsonDocument));
         }
 
-        [Fact]
-        public void Deserialize_should_throw()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void Deserialize_should_throw(bool useGenericInterface)
         {
             var subject = CreateSubject();
             var reader = new Mock<IBsonReader>().Object;
             var context = BsonDeserializationContext.CreateRoot(reader);
             var args = new BsonDeserializationArgs { NominalType = typeof(BsonDocument) };
 
-            foreach (var useGenericInterface in new[] { false, true })
+            Exception exception;
+            if (useGenericInterface)
             {
-                Exception exception;
-                if (useGenericInterface)
-                {
-                    exception = Record.Exception(() => subject.Deserialize(context, args));
-                }
-                else
-                {
-                    exception = Record.Exception(() => ((IBsonSerializer)subject).Deserialize(context, args));
-                }
-
-                exception.Should().BeOfType<NotSupportedException>();
+                exception = Record.Exception(() => subject.Deserialize(context, args));
             }
+            else
+            {
+                exception = Record.Exception(() => ((IBsonSerializer)subject).Deserialize(context, args));
+            }
+
+            exception.Should().BeOfType<NotSupportedException>();
         }
 
         [Theory]
@@ -150,38 +150,108 @@ namespace MongoDB.Bson.Tests.Serialization.Serializers
             }
         }
 
-        [Fact]
-        public void Serialize_should_use_standard_GuidRepresentation_for_elements()
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void Serialize_should_not_convert_Uuids_in_elements(bool useGenericInterface)
         {
             var guid = Guid.Parse("01020304-0506-0708-090a-0b0c0d0e0f10");
-            var value = new BsonDocument("a", new BsonBinaryData(guid, GuidRepresentation.Standard));
+            var value = new BsonDocument { { "_id", new BsonBinaryData(guid, GuidRepresentation.Standard) }, { "x", 1 } };
             var elements = new BsonDocument("b", new BsonBinaryData(guid, GuidRepresentation.Standard));
             var subject = CreateSubject(elements);
 
-            foreach (var useGenericInterface in new[] { false, true })
+            string result;
+            using (var textWriter = new StringWriter())
+            using (var writer = new JsonWriter(textWriter))
             {
-                string result;
-                using (var textWriter = new StringWriter())
-                using (var writer = new JsonWriter(textWriter))
+                var context = BsonSerializationContext.CreateRoot(writer);
+                var args = new BsonSerializationArgs { NominalType = typeof(BsonDocument) };
+
+                if (useGenericInterface)
                 {
-                    var context = BsonSerializationContext.CreateRoot(writer);
-                    var args = new BsonSerializationArgs { NominalType = typeof(BsonDocument) };
-
-                    if (useGenericInterface)
-                    {
-                        subject.Serialize(context, args, value);
-                    }
-                    else
-                    {
-                        ((IBsonSerializer)subject).Serialize(context, args, value);
-                    }
-
-                    result = textWriter.ToString();
+                    subject.Serialize(context, args, value);
+                }
+                else
+                {
+                    ((IBsonSerializer)subject).Serialize(context, args, value);
                 }
 
-                // note that "a" was converted to a CSUUID but "b" was not
-                result.Should().Be("{ \"a\" : CSUUID(\"01020304-0506-0708-090a-0b0c0d0e0f10\"), \"b\" : UUID(\"01020304-0506-0708-090a-0b0c0d0e0f10\") }");
+                result = textWriter.ToString();
             }
+
+            // note that "_id" was converted to a CSUUID but "b" was not
+            result.Should().Be("{ \"_id\" : CSUUID(\"01020304-0506-0708-090a-0b0c0d0e0f10\"), \"x\" : 1, \"b\" : UUID(\"01020304-0506-0708-090a-0b0c0d0e0f10\") }");
+        }
+
+        [Theory]
+        [InlineData(false)]
+        [InlineData(true)]
+        public void Serialize_should_configure_GuidRepresentation(bool useGenericInterface)
+        {
+            var mockDocumentSerializer = new Mock<IBsonSerializer<BsonDocument>>();
+            var subject = new ElementAppendingSerializer<BsonDocument>(mockDocumentSerializer.Object, new BsonElement[0]);
+            var stream = new MemoryStream();
+            var settings = new BsonBinaryWriterSettings { GuidRepresentation = GuidRepresentation.CSharpLegacy };
+            var writer = new BsonBinaryWriter(stream, settings);
+            var context = BsonSerializationContext.CreateRoot(writer);
+            var args = new BsonSerializationArgs { NominalType = typeof(BsonDocument) };
+            var value = new BsonDocument();
+            GuidRepresentation? capturedGuidRepresentation = null;
+            mockDocumentSerializer
+                .Setup(m => m.Serialize(It.IsAny<BsonSerializationContext>(), args, value))
+                .Callback((BsonSerializationContext c, BsonSerializationArgs a, BsonDocument v) =>
+                {
+                    var elementAppendingWriter = (ElementAppendingBsonWriter)c.Writer;
+                    var configurator = elementAppendingWriter._settingsConfigurator();
+                    var configuredSettings = new BsonBinaryWriterSettings { GuidRepresentation = GuidRepresentation.CSharpLegacy };
+                    configurator(configuredSettings);
+                    capturedGuidRepresentation = configuredSettings.GuidRepresentation;
+                });
+
+            if (useGenericInterface)
+            {
+                subject.Serialize(context, args, value);
+            }
+            else
+            {
+                ((IBsonSerializer)subject).Serialize(context, args, value);
+            }
+
+            capturedGuidRepresentation.Should().Be(GuidRepresentation.Unspecified);
+        }
+
+        [Theory]
+        [InlineData(false, false)]
+        [InlineData(false, true)]
+        [InlineData(true, false)]
+        [InlineData(true, true)]
+        public void Serialize_should_preserve_IsDynamicType_when_creating_new_context(bool isDynamicType, bool useGenericInterface)
+        {
+            var mockDocumentSerializer = new Mock<IBsonSerializer<BsonDocument>>();
+            var subject = new ElementAppendingSerializer<BsonDocument>(mockDocumentSerializer.Object, new BsonElement[0]);
+            var writer = new Mock<IBsonWriter>().Object;
+            var context = BsonSerializationContext.CreateRoot(writer, b => { b.IsDynamicType = t => isDynamicType; });
+            var args = new BsonSerializationArgs { NominalType = typeof(BsonDocument) };
+            var value = new BsonDocument();
+            bool? capturedIsDynamicType = null;
+            mockDocumentSerializer
+                .Setup(m => m.Serialize(It.IsAny<BsonSerializationContext>(), args, value))
+                .Callback((BsonSerializationContext c, BsonSerializationArgs a, BsonDocument v) => capturedIsDynamicType = c.IsDynamicType(typeof(BsonDocument)));
+
+            if (useGenericInterface)
+            {
+                subject.Serialize(context, args, value);
+            }
+            else
+            {
+                ((IBsonSerializer)subject).Serialize(context, args, value);
+            }
+
+            mockDocumentSerializer.Verify(
+                m => m.Serialize(It.Is<BsonSerializationContext>(c => c.IsDynamicType(typeof(BsonDocument)) == isDynamicType), args, value),
+                Times.Once);
+
+            capturedIsDynamicType.Should().Be(isDynamicType);
         }
 
         // private methods
