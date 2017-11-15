@@ -95,6 +95,12 @@ namespace MongoDB.Driver
             }
         }
 
+        /// <inheritdoc />
+        public long AdvanceTransactionId()
+        {
+            return _serverSession.AdvanceTransactionId();
+        }
+
         /// <summary>
         /// Throws if disposed.
         /// </summary>

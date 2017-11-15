@@ -50,6 +50,12 @@ namespace MongoDB.Driver
         }
 
         /// <inheritdoc />
+        public long AdvanceTransactionId()
+        {
+            return -1;
+        }
+
+        /// <inheritdoc />
         public void WasUsed()
         {
         }

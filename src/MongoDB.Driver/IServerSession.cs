@@ -40,6 +40,14 @@ namespace MongoDB.Driver
         /// </value>
         DateTime? LastUsedAt { get; }
 
+        /// <summary>
+        /// Gets the next transaction id.
+        /// </summary>
+        /// <value>
+        /// The transaction id.
+        /// </value>
+        long AdvanceTransactionId();
+
         // methods
         /// <summary>
         /// Called by the driver when the session is used (i.e. sent to the server).

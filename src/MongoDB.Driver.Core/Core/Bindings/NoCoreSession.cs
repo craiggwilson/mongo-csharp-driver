@@ -13,6 +13,7 @@
 * limitations under the License.
 */
 
+using System;
 using MongoDB.Bson;
 
 namespace MongoDB.Driver.Core.Bindings
@@ -73,6 +74,12 @@ namespace MongoDB.Driver.Core.Bindings
         /// <inheritdoc />
         public void Dispose()
         {
+        }
+
+        /// <inheritdoc />
+        public long AdvanceTransactionId()
+        {
+            return -1;
         }
 
         /// <inheritdoc />

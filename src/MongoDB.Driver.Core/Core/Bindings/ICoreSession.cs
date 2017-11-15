@@ -70,6 +70,12 @@ namespace MongoDB.Driver.Core.Bindings
         void AdvanceOperationTime(BsonTimestamp newOperationTime);
 
         /// <summary>
+        /// Advances the transaction id.
+        /// </summary>
+        /// <returns>The transaction id.</returns>
+        long AdvanceTransactionId();
+
+        /// <summary>
         /// Called by the driver when the session is used (i.e. sent to the server).
         /// </summary>
         void WasUsed();

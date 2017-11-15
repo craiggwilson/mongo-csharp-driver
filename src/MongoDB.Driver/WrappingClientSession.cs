@@ -130,6 +130,12 @@ namespace MongoDB.Driver
             GC.SuppressFinalize(this);
         }
 
+        /// <inheritdoc />
+        public long AdvanceTransactionId()
+        {
+            return _wrapped.AdvanceTransactionId();
+        }
+
         // protected methods
         /// <summary>
         /// Releases unmanaged and - optionally - managed resources.

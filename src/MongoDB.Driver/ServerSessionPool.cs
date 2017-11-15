@@ -133,6 +133,12 @@ namespace MongoDB.Driver
             public DateTime? LastUsedAt => _serverSession.LastUsedAt;
 
             /// <inheritdoc />
+            public long AdvanceTransactionId()
+            {
+                return _serverSession.AdvanceTransactionId();
+            }
+
+            /// <inheritdoc />
             public void WasUsed()
             {
                 _serverSession.WasUsed();
