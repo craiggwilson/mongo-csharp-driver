@@ -54,6 +54,7 @@ namespace MongoDB.Driver
         private readonly ReadConcernLevel? _readConcernLevel;
         private readonly ReadPreference _readPreference;
         private readonly string _replicaSetName;
+        private readonly bool? _retryWrites;
         private readonly TimeSpan _localThreshold;
         private readonly IEnumerable<MongoServerAddress> _servers;
         private readonly TimeSpan _serverSelectionTimeout;
@@ -98,6 +99,7 @@ namespace MongoDB.Driver
             _readConcernLevel = builder.ReadConcernLevel;
             _readPreference = builder.ReadPreference;
             _replicaSetName = builder.ReplicaSetName;
+            _retryWrites = builder.RetryWrites;
             _servers = builder.Servers;
             _serverSelectionTimeout = builder.ServerSelectionTimeout;
             _socketTimeout = builder.SocketTimeout;
@@ -320,6 +322,14 @@ namespace MongoDB.Driver
         public string ReplicaSetName
         {
             get { return _replicaSetName; }
+        }
+
+        /// <summary>
+        /// Gets whether writes will be retried.
+        /// </summary>
+        public bool? RetryWrites
+        {
+            get { return _retryWrites; }
         }
 
         /// <summary>
