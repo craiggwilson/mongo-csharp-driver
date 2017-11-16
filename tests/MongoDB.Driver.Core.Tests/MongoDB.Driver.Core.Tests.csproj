@@ -93,6 +93,7 @@
     <Compile Include="Core\Operations\ChangeStreamOperationTests.cs" />
     <Compile Include="Core\Operations\CommandOperationBaseTests.cs" />
     <Compile Include="Core\Operations\CreateViewOperationTests.cs" />
+    <Compile Include="Core\Operations\OperationHelperTests.cs" />
     <Compile Include="Core\Operations\ReIndexOperationTests.cs" />
     <Compile Include="Core\Operations\UpdateRequestTests.cs" />
     <Compile Include="Core\Operations\GeoSearchOperationTests.cs" />
@@ -283,6 +284,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Core\Clusters\MultiServerClusterTests.cs" />
+    <None Include="app.config" />
     <None Include="packages.config" />
     <EmbeddedResource Include="Specifications\connection-string\tests\invalid-uris.json" />
     <EmbeddedResource Include="Specifications\connection-string\tests\invalid-uris.yml" />

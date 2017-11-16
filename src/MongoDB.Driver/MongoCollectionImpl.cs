@@ -777,7 +777,8 @@ namespace MongoDB.Driver
                 MaxTime = options.MaxTime,
                 Projection = renderedProjection.Document,
                 Sort = options.Sort == null ? null : options.Sort.Render(_documentSerializer, _settings.SerializerRegistry),
-                WriteConcern = _settings.WriteConcern
+                WriteConcern = _settings.WriteConcern,
+                RetryOnFailure = _database.Client.Settings.RetryWrites
             };
         }
 
@@ -800,7 +801,8 @@ namespace MongoDB.Driver
                 Projection = renderedProjection.Document,
                 ReturnDocument = options.ReturnDocument.ToCore(),
                 Sort = options.Sort == null ? null : options.Sort.Render(_documentSerializer, _settings.SerializerRegistry),
-                WriteConcern = _settings.WriteConcern
+                WriteConcern = _settings.WriteConcern,
+                RetryOnFailure = _database.Client.Settings.RetryWrites
             };
         }
 
@@ -824,7 +826,8 @@ namespace MongoDB.Driver
                 Projection = renderedProjection.Document,
                 ReturnDocument = options.ReturnDocument.ToCore(),
                 Sort = options.Sort == null ? null : options.Sort.Render(_documentSerializer, _settings.SerializerRegistry),
-                WriteConcern = _settings.WriteConcern
+                WriteConcern = _settings.WriteConcern,
+                RetryOnFailure = _database.Client.Settings.RetryWrites
             };
         }
 

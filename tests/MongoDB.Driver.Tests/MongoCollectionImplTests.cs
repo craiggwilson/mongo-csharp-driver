@@ -52,6 +52,12 @@ namespace MongoDB.Driver
 
         private MongoCollectionImpl<TDocument> CreateSubject<TDocument>(MongoCollectionSettings settings = null)
         {
+            var client = new Mock<IMongoClient>();
+            var clientSettings = new MongoClientSettings();
+            client.SetupGet(x => x.Settings).Returns(clientSettings);
+            var db = new Mock<IMongoDatabase>();
+            db.SetupGet(x => x.Client).Returns(client.Object);
+
             settings = settings ?? new MongoCollectionSettings();
             settings.ReadConcern = _readConcern;
             var dbSettings = new MongoDatabaseSettings();
@@ -59,7 +65,7 @@ namespace MongoDB.Driver
             settings.ApplyDefaultValues(dbSettings);
 
             return new MongoCollectionImpl<TDocument>(
-                new Mock<IMongoDatabase>().Object,
+                db.Object,
                 new CollectionNamespace("foo", "bar"),
                 settings,
                 new Mock<ICluster>().Object,

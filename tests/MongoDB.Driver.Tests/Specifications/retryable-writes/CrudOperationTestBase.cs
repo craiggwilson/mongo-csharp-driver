@@ -14,11 +14,13 @@
 */
 
 using System;
+using System.Threading.Tasks;
 using FluentAssertions;
 using MongoDB.Bson;
 using MongoDB.Driver.Core.Clusters;
+using MongoDB.Driver.Core.Misc;
 
-namespace MongoDB.Driver.Tests.Specifications.crud
+namespace MongoDB.Driver.Tests.Specifications.retryable_writes
 {
     public abstract class CrudOperationTestBase : ICrudOperationTest
     {
@@ -42,7 +44,24 @@ namespace MongoDB.Driver.Tests.Specifications.crud
                 }
             }
 
-            Execute(collection, outcome, async);
+            Exception exception = null;
+            try
+            {
+                Execute(collection, outcome, async);
+            }
+            catch(Exception ex)
+            {
+                exception = ex;
+            }
+
+            if (outcome.GetValue("error", false).AsBoolean && exception == null)
+            {
+                throw new Exception("expected an error, but got none");
+            }
+            else if(!outcome.GetValue("error", false).AsBoolean && exception != null)
+            {
+                throw exception;
+            }
 
             if (outcome.Contains("collection"))
             {
