@@ -42,6 +42,7 @@ namespace MongoDB.Driver.Core.Operations
         private MessageEncoderSettings _messageEncoderSettings;
         private IEnumerable<WriteRequest> _requests;
         private WriteConcern _writeConcern = WriteConcern.Acknowledged;
+        private bool _retryOnFailure;
 
         // constructors
         protected BulkUnmixedWriteOperationBase(
@@ -98,6 +99,12 @@ namespace MongoDB.Driver.Core.Operations
         }
 
         protected abstract string RequestsElementName { get; }
+
+        public bool RetryOnFailure
+        {
+            get { return _retryOnFailure; }
+            set { _retryOnFailure = value; }
+        }
 
         public WriteConcern WriteConcern
         {

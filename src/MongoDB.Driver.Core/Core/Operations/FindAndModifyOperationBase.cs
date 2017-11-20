@@ -105,21 +105,21 @@ namespace MongoDB.Driver.Core.Operations
         }
 
         /// <summary>
-        /// Gets or sets the write concern.
-        /// </summary>
-        public WriteConcern WriteConcern
-        {
-            get { return _writeConcern; }
-            set { _writeConcern = value; }
-        }
-
-        /// <summary>
         /// Gets or sets whether to retry the operation on failure.
         /// </summary>
         public bool RetryOnFailure
         {
             get { return _retryOnFailure; }
             set { _retryOnFailure = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the write concern.
+        /// </summary>
+        public WriteConcern WriteConcern
+        {
+            get { return _writeConcern; }
+            set { _writeConcern = value; }
         }
 
         // public methods
@@ -178,7 +178,11 @@ namespace MongoDB.Driver.Core.Operations
                 {
                     return Execute(binding, transactionId, cancellationToken);
                 }
-                catch
+                catch (Exception retryEx) when (OperationHelper.IsRetryableException(retryEx))
+                {
+                    throw;
+                }
+                catch { }
                 { }
                 throw; // ignore nested exception and throw outer exception
             }
@@ -207,15 +211,15 @@ namespace MongoDB.Driver.Core.Operations
             }
             catch (Exception ex) when (retryable && OperationHelper.IsRetryableException(ex))
             {
-                if (retryable)
+                try
                 {
-                    try
-                    {
-                        return await ExecuteAsync(binding, transactionId, cancellationToken).ConfigureAwait(false);
-                    }
-                    catch
-                    { }
+                    return await ExecuteAsync(binding, transactionId, cancellationToken).ConfigureAwait(false);
                 }
+                catch (Exception retryEx) when (OperationHelper.IsRetryableException(retryEx))
+                {
+                    throw;
+                }
+                catch { }
                 throw; // ignore nested exception and throw outer exception
             }
         }
