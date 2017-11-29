@@ -16,11 +16,11 @@
 using System;
 using MongoDB.Driver.Core.Misc;
 
+#if NETSTANDARD1_5
+using System.Threading;
+#endif
 #if NET45
 using System.Runtime.Remoting.Messaging;
-#endif
-#if !NET45
-using System.Threading;
 #endif
 
 namespace MongoDB.Driver.Core.Events
